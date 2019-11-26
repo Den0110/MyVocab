@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="horizontal_layout_margin">16dp</dimen>
+    <dimen name="vertical_layout_margin">8dp</dimen>
+    <dimen name="translate_text_size">16sp</dimen>
+    <dimen name="divider_size">0.25dp</dimen>
+</resources>

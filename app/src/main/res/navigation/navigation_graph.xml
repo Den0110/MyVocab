@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/vocabFragment">
+
+    <fragment
+        android:id="@+id/learningFragment"
+        android:name="com.myvocab.myvocab.ui.learning.LearningFragment"
+        android:label="@string/label_learning"
+        tools:layout="@layout/fragment_learning"/>
+
+    <fragment
+        android:id="@+id/vocabFragment"
+        android:name="com.myvocab.myvocab.ui.vocab.VocabFragment"
+        android:label="@string/label_vocab"
+        tools:layout="@layout/fragment_vocab"/>
+
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.myvocab.myvocab.ui.settings.SettingsFragment"
+        android:label="@string/label_settings"
+        tools:layout="@layout/fragment_settings"/>
+
+</navigation>

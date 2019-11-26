@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Быстрый Перевод -->
+    <string name="english">АНГЛИЙСКИЙ</string>
+    <string name="russian">РУССКИЙ</string>
+    <string name="could_not_translate">Невозможно перевести</string>
+
+    <!-- Словарь -->
+    <string name="label_vocab">Словарь</string>
+    <string name="in_learning">В изучении</string>
+    <string name="learned">Выучено</string>
+    <string name="message_empty_vocab">Ваш словарь пуст.\nДобавьте новые слова вручную или используя Быстрый Перевод.</string>
+    <string name="message_no_learned_words">Вы не выучили еще ни одного слова.\nУчите их в разделе Изучение.</string>
+
+    <!-- Добавить новое слово -->
+    <string name="label_add_new_word">Добавить новое слово</string>
+    <string name="new_word">Новое слово</string>
+    <string name="translation">Перевод</string>
+    <string name="enter_new_word">Введите новое слово</string>
+    <string name="enter_translation">Введите перевод</string>
+    <string name="add">Добавить</string>
+    <string name="add_test_word_set">Добавить тестовый набор слов</string>
+    <string name="import_csv">Импортировать CSV</string>
+
+    <!-- Изучение -->
+    <string name="label_learning">Изучение</string>
+    <string name="do_you_know">"Вы знаете перевод этого слова?"</string>
+    <string name="was_you_right">Вы правильно предположили?</string>
+    <string name="i_know">Знаю</string>
+    <string name="i_dont_know">Не знаю</string>
+    <string name="i_was_right">Я был прав</string>
+    <string name="i_was_wrong">Я ошибся</string>
+    <string name="memorise_the_translation">Запомните перевод этого слова</string>
+    <string name="next_word">Следущее слово</string>
+    <string name="no_words_to_learn">Нет слов для изучения</string>
+
+    <!-- Настройки -->
+    <string name="label_settings">Настройки</string>
+    <string name="enable_fast_translation">Включить Быстрый Перевод</string>
+    <string name="dialog_permission_draw_overlay">Разрешите MyVocab показывать всплывающий пузырёк Быстрого Перевода</string>
+    <string name="dialog_permission_battery_settings">"Разрешите MyVocab работать в фоновом режиме:\nНа следующем экране выберите \"Все приложения\", найдите MyVocab и выберите \"Нет ограничений\""</string>
+    <string name="dialog_permission_allow">Разрешить</string>
+    <string name="dialog_permission_deny">Запретить</string>
+    <string name="remove_all_words">Удалить все слова</string>
+
+</resources>

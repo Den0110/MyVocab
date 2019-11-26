@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/service_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:text="@string/enable_fast_translation"
+            android:textColor="@color/primaryTextColor"
+            android:textSize="16sp"/>
+
+        <Button
+            android:id="@+id/remove_all_words"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/vertical_layout_margin"
+            android:layout_marginStart="@dimen/horizontal_layout_margin"
+            android:layout_marginEnd="@dimen/horizontal_layout_margin"
+            android:text="@string/remove_all_words"
+            android:visibility="gone"
+            tools:visibility="visible"/>
+
+    </LinearLayout>
+
+</layout>
