@@ -25,5 +25,5 @@ data class Word(
         var lastShowTime: Long = 0
 
 ) : Serializable {
-        constructor() : this(-1, "", "")
+        constructor() : this(null, "", "")
 }

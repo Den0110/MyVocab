@@ -12,9 +12,12 @@ import com.myvocab.myvocab.di.vocab.learned_words.LearnedWordsViewModelsModule
 import com.myvocab.myvocab.ui.vocab.learned_words.LearnedWordsFragment
 import com.myvocab.myvocab.ui.learning.LearningFragment
 import com.myvocab.myvocab.di.learning.LearningViewModelsModule
+import com.myvocab.myvocab.di.search.SearchModule
+import com.myvocab.myvocab.di.search.SearchViewModelsModule
 import com.myvocab.myvocab.ui.settings.SettingsFragment
 import com.myvocab.myvocab.di.settings.SettingsViewModelsModule
 import com.myvocab.myvocab.di.vocab.in_learning_words.InLearningWordsFragment
+import com.myvocab.myvocab.ui.search.SearchFragment
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -38,6 +41,9 @@ abstract class ActivityBuilderModule {
 
     @ContributesAndroidInjector(modules = [AddNewWordViewModelsModule::class])
     abstract fun contributeAddNewWordActivity(): AddNewWordActivity
+
+    @ContributesAndroidInjector(modules = [SearchModule::class, SearchViewModelsModule::class])
+    abstract fun contributeSearchFragment(): SearchFragment
 
     @ContributesAndroidInjector(modules = [SettingsViewModelsModule::class])
     abstract fun contributeSettingsFragment(): SettingsFragment

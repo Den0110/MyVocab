@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(this, R.id.nav_host)
 
         NavigationUI.setupWithNavController(toolbar, navController, AppBarConfiguration.Builder(
-                    setOf(R.id.learningFragment, R.id.vocabFragment, R.id.settingsFragment
+                    setOf(R.id.learningFragment, R.id.vocabFragment, R.id.searchFragment, R.id.settingsFragment
                 )).build())
         NavigationUI.setupWithNavController(bottom_navigation, navController)
 

@@ -3,12 +3,18 @@ package com.myvocab.myvocab.ui.add_new_word
 import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import com.myvocab.myvocab.data.model.Word
+import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.data.source.WordRepository
+import com.myvocab.myvocab.util.Resource
 import com.opencsv.CSVParserBuilder
 import io.reactivex.android.schedulers.AndroidSchedulers
 import com.opencsv.CSVReaderBuilder
+import durdinapps.rxfirebase2.RxFirestore
 import io.reactivex.Single
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import java.io.*
 import java.net.URI
@@ -22,7 +28,7 @@ constructor(private val wordRepository: WordRepository) : ViewModel() {
     companion object {
         private val TAG = "AddNewWordViewModel"
 
-        private val TEST_WORDS: List<Word> = listOf(
+        val TEST_WORDS: List<Word> = listOf(
                 Word(null, "addicted", "зависимый"),
                 Word(null, "appearance", "внешний вид"),
                 Word(null, "especially", "особенно"),
@@ -45,8 +51,8 @@ constructor(private val wordRepository: WordRepository) : ViewModel() {
                 .addWord(Word(word = newWord.value, translation = translation.value))
                 .observeOn(AndroidSchedulers.mainThread())
 
-    fun addTestWords() =
-            wordRepository.addWords(TEST_WORDS)
+    fun addWords(words: List<Word>) =
+            wordRepository.addWords(words)
                     .observeOn(AndroidSchedulers.mainThread())
 
     fun addWordsFromFile(uri: Uri) =
@@ -69,8 +75,8 @@ constructor(private val wordRepository: WordRepository) : ViewModel() {
             while (reader.readNext().also { nextLine = it } != null) { // nextLine[] is an array of values from the line
                 nextLine?.let { wordBunch.add(Word(word = it[0], translation = it[1])) }
             }
-            emitter.onSuccess(wordBunch)
-        } catch (e: IOException) {
+            emitter.onSuccess(wordBunch.apply { reverse() })
+        } catch (e: Exception) {
             emitter.onError(e)
         }
     }

@@ -6,6 +6,18 @@
     <string name="russian">RUSSIAN</string>
     <string name="could_not_translate">Could not translate</string>
 
+    <!-- Learning -->
+    <string name="label_learning">Learning</string>
+    <string name="do_you_know">Do you this word?</string>
+    <string name="was_you_right">Was you right?</string>
+    <string name="i_know">I know</string>
+    <string name="i_dont_know">I don\'t know</string>
+    <string name="i_was_right">I was right</string>
+    <string name="i_was_wrong">I was wrong</string>
+    <string name="memorise_the_translation">Memorise the translation</string>
+    <string name="next_word">Next</string>
+    <string name="no_words_to_learn">No words to learn</string>
+
     <!-- Vocab -->
     <string name="label_vocab">Vocab</string>
     <string name="in_learning">In Learning</string>
@@ -23,17 +35,8 @@
     <string name="add_test_word_set">Add test word set</string>
     <string name="import_csv">Import CSV</string>
 
-    <!-- Learning -->
-    <string name="label_learning">Learning</string>
-    <string name="do_you_know">Do you this word?</string>
-    <string name="was_you_right">Was you right?</string>
-    <string name="i_know">I know</string>
-    <string name="i_dont_know">I don\'t know</string>
-    <string name="i_was_right">I was right</string>
-    <string name="i_was_wrong">I was wrong</string>
-    <string name="memorise_the_translation">Memorise the translation</string>
-    <string name="next_word">Next</string>
-    <string name="no_words_to_learn">No words to learn</string>
+    <!-- Search -->
+    <string name="label_search">Search</string>
 
     <!-- Settings -->
     <string name="label_settings">Settings</string>

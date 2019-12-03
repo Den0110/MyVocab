@@ -5,6 +5,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="snackbarTextViewStyle">@style/AppTheme.SnackBar</item>
+        <item name="snackbarButtonStyle">@style/AppTheme.SnackBar</item>
     </style>
 
     <style name="AppTheme.AppBarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -13,6 +15,10 @@
 
     <style name="AppTheme.Toolbar" parent="AppTheme">
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
+    </style>
+
+    <style name="AppTheme.SnackBar" parent="AppTheme">
+        <item name="android:textColor">#fff</item>
     </style>
 
     <style name="AppTheme.Label" parent="AppTheme">

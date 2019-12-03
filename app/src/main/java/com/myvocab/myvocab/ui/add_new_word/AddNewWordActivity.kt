@@ -5,17 +5,23 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.myvocab.myvocab.BuildConfig
 import com.myvocab.myvocab.R
+import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.databinding.ActivityAddNewWordBinding
+import com.myvocab.myvocab.ui.add_new_word.AddNewWordViewModel.Companion.TEST_WORDS
+import com.myvocab.myvocab.ui.search.WordSetListAdapter
+import com.myvocab.myvocab.util.Resource
 import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_add_new_word.*
@@ -54,10 +60,11 @@ class AddNewWordActivity : DaggerAppCompatActivity() {
         if (BuildConfig.DEBUG) {
             add_test_words.visibility = View.VISIBLE
             add_test_words.setOnClickListener {
-                viewModel.addTestWords().subscribe({
+                viewModel.addWords(TEST_WORDS).subscribe({
                     finish()
-                }, { _ ->
-                    Snackbar.make(it, "Error, word haven't added", Snackbar.LENGTH_SHORT).show()
+                }, { e ->
+                    Log.e(TAG, e.message)
+                    Snackbar.make(it, "Error, words haven't added", Snackbar.LENGTH_SHORT).show()
                 })
             }
         }
@@ -68,12 +75,14 @@ class AddNewWordActivity : DaggerAppCompatActivity() {
                 compositeDisposable.add(
                         viewModel.addWord().subscribe({
                             finish()
-                        }, { _ ->
+                        }, { e ->
+                            Log.e(TAG, e.message)
                             Snackbar.make(it, "Error, word haven't added", Snackbar.LENGTH_SHORT).show()
                         })
                 )
             }
         }
+
     }
 
     override fun onSupportNavigateUp(): Boolean {
@@ -122,7 +131,7 @@ class AddNewWordActivity : DaggerAppCompatActivity() {
                         viewModel.addWordsFromFile(uri).subscribe({
                             finish()
                         }, {
-                            Snackbar.make(container, "Error, word haven't added", Snackbar.LENGTH_SHORT).show()
+                            Snackbar.make(container, "Error, words haven't added", Snackbar.LENGTH_SHORT).show()
                         })
                 )
             }
@@ -152,6 +161,11 @@ class AddNewWordActivity : DaggerAppCompatActivity() {
             new_word_til.isErrorEnabled = false
         }
         return ifAllDataCompleted
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        compositeDisposable.clear()
     }
 
 }

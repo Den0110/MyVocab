@@ -47,10 +47,10 @@ class SettingsFragment : DaggerFragment() {
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(SettingsViewModel::class.java)
 
-        if(BuildConfig.DEBUG){
+//        if(BuildConfig.DEBUG){
             remove_all_words.visibility = View.VISIBLE
             remove_all_words.setOnClickListener { viewModel.removeAllWords() }
-        }
+//        }
 
         service_switch.setOnCheckedChangeListener { _, isChecked ->
             val isRunning = isServiceRunning(context!!, FastTranslationService::class.java)

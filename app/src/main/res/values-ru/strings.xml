@@ -6,6 +6,18 @@
     <string name="russian">РУССКИЙ</string>
     <string name="could_not_translate">Невозможно перевести</string>
 
+    <!-- Изучение -->
+    <string name="label_learning">Изучение</string>
+    <string name="do_you_know">"Вы знаете перевод этого слова?"</string>
+    <string name="was_you_right">Вы правильно предположили?</string>
+    <string name="i_know">Знаю</string>
+    <string name="i_dont_know">Не знаю</string>
+    <string name="i_was_right">Я был прав</string>
+    <string name="i_was_wrong">Я ошибся</string>
+    <string name="memorise_the_translation">Запомните перевод этого слова</string>
+    <string name="next_word">Следущее слово</string>
+    <string name="no_words_to_learn">Нет слов для изучения</string>
+
     <!-- Словарь -->
     <string name="label_vocab">Словарь</string>
     <string name="in_learning">В изучении</string>
@@ -23,17 +35,8 @@
     <string name="add_test_word_set">Добавить тестовый набор слов</string>
     <string name="import_csv">Импортировать CSV</string>
 
-    <!-- Изучение -->
-    <string name="label_learning">Изучение</string>
-    <string name="do_you_know">"Вы знаете перевод этого слова?"</string>
-    <string name="was_you_right">Вы правильно предположили?</string>
-    <string name="i_know">Знаю</string>
-    <string name="i_dont_know">Не знаю</string>
-    <string name="i_was_right">Я был прав</string>
-    <string name="i_was_wrong">Я ошибся</string>
-    <string name="memorise_the_translation">Запомните перевод этого слова</string>
-    <string name="next_word">Следущее слово</string>
-    <string name="no_words_to_learn">Нет слов для изучения</string>
+    <!-- Поиск -->
+    <string name="label_search">Поиск</string>
 
     <!-- Настройки -->
     <string name="label_settings">Настройки</string>

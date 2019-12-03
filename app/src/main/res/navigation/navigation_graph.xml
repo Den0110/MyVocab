@@ -19,6 +19,12 @@
         tools:layout="@layout/fragment_vocab"/>
 
     <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.myvocab.myvocab.ui.search.SearchFragment"
+        android:label="@string/label_search"
+        tools:layout="@layout/fragment_search" />
+
+    <fragment
         android:id="@+id/settingsFragment"
         android:name="com.myvocab.myvocab.ui.settings.SettingsFragment"
         android:label="@string/label_settings"
