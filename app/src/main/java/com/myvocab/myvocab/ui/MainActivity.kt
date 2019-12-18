@@ -2,35 +2,49 @@ package com.myvocab.myvocab.ui
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.navigation.NavController
 import androidx.navigation.Navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.common.fasttranslation.FastTranslationServiceStarter
+import com.myvocab.myvocab.data.source.local.Database
 import com.myvocab.myvocab.util.getFastTranslationState
+import com.myvocab.myvocab.util.setupToolbar
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.toolbar_layout.*
+import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NavigationHost {
+
+    companion object {
+        private val TOP_LEVEL_DESTINATIONS = setOf(
+                R.id.navigation_learning,
+                R.id.navigation_vocab,
+                R.id.navigation_search,
+                R.id.navigation_settings
+        )
+    }
+
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val navController = findNavController(this, R.id.nav_host)
+        navController = findNavController(this, R.id.nav_host)
 
-        NavigationUI.setupWithNavController(toolbar, navController, AppBarConfiguration.Builder(
-                    setOf(R.id.learningFragment, R.id.vocabFragment, R.id.searchFragment, R.id.settingsFragment
-                )).build())
         NavigationUI.setupWithNavController(bottom_navigation, navController)
 
-        if(getFastTranslationState(this)){
+        if (getFastTranslationState(this)) {
             FastTranslationServiceStarter.start(this)
         }
 
     }
 
     override fun onSupportNavigateUp() =
-            findNavController(this, R.id.nav_host).navigateUp()
+            navController.navigateUp()
+
+    override fun registerToolbarWithNavigation(toolbar: Toolbar) =
+            setupToolbar(toolbar, navController, TOP_LEVEL_DESTINATIONS)
 
 }

@@ -2,7 +2,6 @@ package com.myvocab.myvocab.ui.fast_translation
 
 import android.annotation.SuppressLint
 import android.app.Application
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.WindowManager
@@ -21,6 +20,7 @@ import com.myvocab.myvocab.util.getDefaultWindowParams
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
+import timber.log.Timber
 import javax.inject.Inject
 
 class FastTranslationWidget
@@ -32,7 +32,7 @@ constructor(
 ) : LifecycleOwner, ViewModelStoreOwner {
 
     companion object {
-        const val TAG = "FastTranslationWidget"
+        private const val TAG = "FastTranslationWidget"
     }
 
     private val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
@@ -92,7 +92,7 @@ constructor(
             translatedTextView!!.visibility = View.VISIBLE
             translationProgressBar!!.visibility = View.GONE
         }, {
-            Log.e(TAG, it.toString())
+            Timber.e(TAG, it.toString())
             Toast.makeText(context, R.string.could_not_translate, Toast.LENGTH_SHORT).show()
             translationProgressBar!!.visibility = View.GONE
         })

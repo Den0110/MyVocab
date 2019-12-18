@@ -8,7 +8,6 @@ import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.SystemClock
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -26,6 +25,7 @@ import com.myvocab.myvocab.util.*
 import dagger.android.DaggerService
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -76,7 +76,7 @@ class FastTranslationService : DaggerService() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d(TAG, "Service created")
+        Timber.d(TAG, "Service created")
 
         clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         clipboard = Observable.create {
@@ -94,12 +94,12 @@ class FastTranslationService : DaggerService() {
 
         clipboardDisposable = clipboard
                 .throttleFirst(300, TimeUnit.MILLISECONDS)
-                .doOnNext { Log.d(FastTranslationWidgetViewModel.TAG, "Copied: $it") }
+                .doOnNext { Timber.d(TAG, "Copied: $it") }
                 .filter { it.isNotEmpty() && it[0].toInt() in 65..122 }
                 .subscribe ({
                     showBubble(it!!)
                 }, {
-                    Log.e(TAG, it.toString())
+                    Timber.e(TAG, it.toString())
                 })
 
         pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE,
@@ -146,12 +146,12 @@ class FastTranslationService : DaggerService() {
                     .setContentIntent(pendingIntent)
                     .build()
 
-            Log.d(TAG, "Starting foreground service")
+            Timber.d(TAG, "Starting foreground service")
             startForeground(Constants.NotificationId.FOREGROUND_SERVICE, notification)
             startServiceStarter()
 
         } else if (Constants.STOP_FOREGROUND_ACTION == intent.action) {
-            Log.d(TAG, "Stopping foreground service")
+            Timber.d(TAG, "Stopping foreground service")
             stopServiceStarter()
             stopForeground(true)
             stopSelf()
@@ -190,7 +190,7 @@ class FastTranslationService : DaggerService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        Log.d(TAG, "Service destroyed")
+        Timber.d(TAG, "Service destroyed")
         if (bubbleRootView != null) {
             windowManager.removeView(bubbleRootView)
             bubbleRootView = null

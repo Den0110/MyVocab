@@ -16,15 +16,15 @@ import com.myvocab.myvocab.BuildConfig
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.common.fasttranslation.FastTranslationService
 import com.myvocab.myvocab.databinding.FragmentSettingsBinding
+import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.util.PackageUtils
 import com.myvocab.myvocab.util.getFastTranslationState
 import com.myvocab.myvocab.util.isServiceRunning
 import com.myvocab.myvocab.util.setFastTranslationState
-import dagger.android.support.DaggerFragment
 import kotlinx.android.synthetic.main.fragment_settings.*
 import javax.inject.Inject
 
-class SettingsFragment : DaggerFragment() {
+class SettingsFragment : MainNavigationFragment() {
 
     companion object {
         const val REQUEST_CODE_DRAW_OVERLAYS = 1
@@ -47,10 +47,10 @@ class SettingsFragment : DaggerFragment() {
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(SettingsViewModel::class.java)
 
-//        if(BuildConfig.DEBUG){
+        if(BuildConfig.DEBUG){
             remove_all_words.visibility = View.VISIBLE
             remove_all_words.setOnClickListener { viewModel.removeAllWords() }
-//        }
+        }
 
         service_switch.setOnCheckedChangeListener { _, isChecked ->
             val isRunning = isServiceRunning(context!!, FastTranslationService::class.java)

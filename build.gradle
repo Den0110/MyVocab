@@ -11,9 +11,10 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.2'
+        classpath 'com.android.tools.build:gradle:3.5.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.google.gms:google-services:4.3.3'
+        classpath "android.arch.navigation:navigation-safe-args-gradle-plugin:1.0.0"
 
         // Add dependency
         classpath 'io.fabric.tools:gradle:1.31.2'  // Crashlytics plugin
@@ -33,4 +34,9 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
+}
+
+configurations.all() {
+    resolutionStrategy.force "org.antlr:antlr4-runtime:4.7.1"
+    resolutionStrategy.force "org.antlr:antlr4-tool:4.7.1"
 }

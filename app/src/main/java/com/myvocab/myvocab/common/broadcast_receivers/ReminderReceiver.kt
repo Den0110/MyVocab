@@ -3,7 +3,6 @@ package com.myvocab.myvocab.common.broadcast_receivers
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -13,20 +12,21 @@ import com.myvocab.myvocab.R
 import com.myvocab.myvocab.ui.MainActivity
 import com.myvocab.myvocab.util.Constants
 import com.myvocab.myvocab.util.REMINDER_CHANNEL_ID
+import timber.log.Timber
 
 class ReminderReceiver : BroadcastReceiver() {
 
     companion object {
-        const val TAG = "ReminderReceiver"
+        private const val TAG = "ReminderReceiver"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d(TAG, "New remind")
+        Timber.d(TAG, "New remind")
 
         val pendingIntent = NavDeepLinkBuilder(context)
                 .setComponentName(MainActivity::class.java)
                 .setGraph(R.navigation.navigation_graph)
-                .setDestination(R.id.learningFragment)
+                .setDestination(R.id.navigation_learning)
                 .createPendingIntent()
 
         val notification = NotificationCompat.Builder(context, REMINDER_CHANNEL_ID)

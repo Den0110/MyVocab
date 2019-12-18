@@ -9,8 +9,6 @@
     android:fitsSystemWindows="true"
     tools:context=".ui.MainActivity">
 
-    <include layout="@layout/toolbar_layout"/>
-
     <fragment
         android:id="@+id/nav_host"
         android:layout_width="match_parent"
@@ -28,6 +26,7 @@
         app:itemIconTint="@drawable/menu_bottom_navigation_color_state"
         app:itemTextColor="@drawable/menu_bottom_navigation_color_state"
         app:itemBackground="@android:color/white"
+        app:labelVisibilityMode="labeled"
         android:background="@android:color/background_light"/>
 
 </LinearLayout>

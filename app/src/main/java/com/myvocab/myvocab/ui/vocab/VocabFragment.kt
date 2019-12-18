@@ -1,23 +1,20 @@
 package com.myvocab.myvocab.ui.vocab
 
-import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
-import androidx.viewpager.widget.ViewPager
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.databinding.FragmentVocabBinding
-import com.myvocab.myvocab.ui.BaseFragment
-import com.myvocab.myvocab.ui.add_new_word.AddNewWordActivity
+import com.myvocab.myvocab.ui.MainNavigationFragment
+import com.myvocab.myvocab.util.findNavController
 import kotlinx.android.synthetic.main.fragment_vocab.*
 
-class VocabFragment : BaseFragment() {
+class VocabFragment : MainNavigationFragment() {
 
     companion object {
-        const val TAG = "VocabFragment"
+        private const val TAG = "VocabFragment"
     }
 
     private lateinit var binding: FragmentVocabBinding
@@ -29,33 +26,16 @@ class VocabFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        tab_layout.setupWithViewPager(view_pager)
-        view_pager.adapter = VocabPagerAdapter(context!!, childFragmentManager)
-        view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(state: Int) {}
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }
-            override fun onPageSelected(position: Int) {
-                if (position == 0){
-                    add_new_word_btn.show()
-                } else {
-                    add_new_word_btn.hide()
-                }
-            }
-        })
+        super.onViewCreated(view, savedInstanceState)
 
-        add_new_word_btn.setOnClickListener {
-            startActivity(Intent(context, AddNewWordActivity::class.java))
+        my_words_btn.setOnClickListener {
+            findNavController().navigate(R.id.to_my_words)
         }
-    }
 
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG, "onStop")
-    }
+        my_word_sets_btn.setOnClickListener {
+            findNavController().navigate(R.id.to_my_word_sets)
+        }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "onDestroy")
     }
 
 }

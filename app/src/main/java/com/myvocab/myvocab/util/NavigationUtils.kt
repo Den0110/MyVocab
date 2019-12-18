@@ -2,16 +2,22 @@ package com.myvocab.myvocab.util
 
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
+import androidx.navigation.Navigation
 import com.myvocab.myvocab.R
 
-fun setupToolbar(toolbar: Toolbar, navController: NavController){
+fun Fragment.findNavController() = Navigation.findNavController(this.view!!)
+
+fun setupToolbar(toolbar: Toolbar, navController: NavController, topLevelDests: Set<Int>){
     toolbar.title = navController.currentDestination?.label
-    if(!matchDestinations(navController.currentDestination!!, setOf(R.id.vocabFragment, R.id.learningFragment))) {
+    if(!matchDestinations(navController.currentDestination!!, topLevelDests)) {
         toolbar.navigationIcon =
-                ContextCompat.getDrawable(toolbar.context, androidx.appcompat.R.drawable.abc_ic_ab_back_material)
+                ContextCompat.getDrawable(toolbar.context, R.drawable.ic_arrow_back)
         toolbar.setNavigationOnClickListener { navController.navigateUp() }
+    } else {
+        toolbar.navigationIcon = null
     }
 }
 

@@ -4,4 +4,7 @@
     <dimen name="vertical_layout_margin">8dp</dimen>
     <dimen name="translate_text_size">16sp</dimen>
     <dimen name="divider_size">0.25dp</dimen>
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>

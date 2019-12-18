@@ -18,7 +18,7 @@ constructor(
 ) : ViewModel() {
 
     companion object {
-        const val TAG = "FastTranslationService"
+        private const val TAG = "FastTranslationService"
     }
 
     fun translate(translatable: TranslatableText): Flowable<TranslatedData> {
@@ -28,7 +28,7 @@ constructor(
 
     fun addToDictionary(translatedData: TranslatedData) {
         wordsRepository
-                .addWord(
+                .addMyWord(
                     Word(
                         word = translatedData.translatable?.text,
                         translation = translatedData.data?.translations?.get(0)?.translatedText

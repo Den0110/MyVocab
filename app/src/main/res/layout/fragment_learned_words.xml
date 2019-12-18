@@ -6,7 +6,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.vocab.learned_words.LearnedWordsFragment">
+        tools:context=".ui.my_word_sets.learned_words.LearnedWordSetsFragment">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/horizontal_layout_margin"
             android:gravity="center"
-            android:text="@string/message_no_learned_words"
+            android:text="@string/message_no_learned_word_lists"
             android:textSize="16sp"
             android:textColor="@color/secondaryTextColor"
             android:visibility="gone"

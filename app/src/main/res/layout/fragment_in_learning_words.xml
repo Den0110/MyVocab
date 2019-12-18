@@ -6,7 +6,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.vocab.in_learning_words.InLearningWordsFragment">
+        tools:context=".ui.my_word_sets.in_learning_words.InLearningWordSetsFragment">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
@@ -22,7 +22,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/vocab_list_item" />
+                tools:listitem="@layout/word_set_list_item" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/horizontal_layout_margin"
             android:gravity="center"
-            android:text="@string/message_empty_vocab"
+            android:text="@string/message_no_word_lists"
             android:textSize="16sp"
             android:textColor="@color/secondaryTextColor"
             android:visibility="gone"

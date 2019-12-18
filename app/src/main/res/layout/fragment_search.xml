@@ -1,23 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipe_refresh_layout"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/word_sets_recycler_view"
+        <include layout="@layout/toolbar_layout" />
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="true"
-            android:paddingTop="@dimen/vertical_layout_margin"
-            android:paddingBottom="@dimen/vertical_layout_margin"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/word_set_list_item"/>
+            android:layout_height="match_parent">
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/word_sets_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingTop="@dimen/vertical_layout_margin"
+                android:paddingBottom="@dimen/vertical_layout_margin"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                tools:listitem="@layout/word_set_list_item" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    </LinearLayout>
 
 </layout>

@@ -2,14 +2,14 @@ package com.myvocab.myvocab.di
 
 import android.app.Application
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.myvocab.myvocab.BuildConfig
+import com.myvocab.myvocab.data.model.WordSetDbModel
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.data.source.local.Database
-import com.myvocab.myvocab.data.source.local.WordsDao
-import com.myvocab.myvocab.util.Constants
-
-import javax.inject.Singleton
-
+import com.myvocab.myvocab.data.source.local.WordDao
+import com.myvocab.myvocab.data.source.local.WordSetDao
 import dagger.Module
 import dagger.Provides
 import okhttp3.OkHttpClient
@@ -17,6 +17,9 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+import timber.log.Timber
+import java.util.concurrent.Executors
+import javax.inject.Singleton
 
 @Module
 class AppModule {
@@ -36,17 +39,36 @@ class AppModule {
                 .build()
     }
 
-    @Provides
-    @Singleton
-    fun provideWordsDatabase(app: Application): Database =
-            Room.databaseBuilder(app, Database::class.java, "words_db").build()
+    private lateinit var wordsDb: Database
 
     @Provides
     @Singleton
-    fun provideWordsDao(database: Database): WordsDao = database.wordsDao()
+    fun provideWordsDatabase(app: Application): Database {
+        wordsDb = Room.databaseBuilder(app, Database::class.java, "words_db")
+                .fallbackToDestructiveMigration()
+                .addCallback(object : RoomDatabase.Callback() {
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        super.onCreate(db)
+                        Executors.newSingleThreadScheduledExecutor().execute {
+                            Timber.d("AppModule", "Database created")
+                            wordsDb.wordSetsDao().addWordSet(WordSetDbModel(globalId = "my_words", title = "My words")).subscribe()
+                        }
+                    }
+                })
+                .build()
+        return wordsDb
+    }
 
     @Provides
     @Singleton
-    fun provideWordRepository(wordsDao: WordsDao) : WordRepository = WordRepository(wordsDao)
+    fun provideWordsDao(database: Database): WordDao = database.wordsDao()
+
+    @Provides
+    @Singleton
+    fun provideWordSetsDao(database: Database): WordSetDao = database.wordSetsDao()
+
+    @Provides
+    @Singleton
+    fun provideWordRepository(wordDao: WordDao, wordSetDao: WordSetDao) = WordRepository(wordDao, wordSetDao)
 
 }

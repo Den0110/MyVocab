@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.DiffUtil
 
 class WordSetDiffCallback : DiffUtil.ItemCallback<WordSet>() {
 
-    override fun areItemsTheSame(oldItem: WordSet, newItem: WordSet): Boolean = newItem.id == oldItem.id
+    override fun areItemsTheSame(oldItem: WordSet, newItem: WordSet): Boolean = newItem.globalId == oldItem.globalId
 
     override fun areContentsTheSame(oldItem: WordSet, newItem: WordSet): Boolean = newItem == oldItem
 

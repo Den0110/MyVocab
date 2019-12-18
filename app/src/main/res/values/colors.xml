@@ -3,6 +3,8 @@
     <color name="colorPrimary">#FEC60E</color>
     <color name="colorPrimaryDark">#FFA000</color>
     <color name="colorAccent">#0F30FF</color>
+    <color name="colorBackground">#EEE</color>
+    <color name="colorError">#FF7043</color>
 
     <color name="primaryTextColor">#212121</color>
     <color name="secondaryTextColor">#757575</color>

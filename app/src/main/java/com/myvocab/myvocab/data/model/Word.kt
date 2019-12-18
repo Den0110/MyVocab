@@ -22,7 +22,10 @@ data class Word(
         var knowingLevel: Int = 0,
 
         @Json(name = "lastShowTime")
-        var lastShowTime: Long = 0
+        var lastShowTime: Long = 0,
+
+        @Json(name = "wordSetId")
+        var wordSetId: String? = null
 
 ) : Serializable {
         constructor() : this(null, "", "")

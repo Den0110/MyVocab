@@ -4,11 +4,11 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import com.myvocab.myvocab.common.broadcast_receivers.ReminderReceiver
+import timber.log.Timber
 import java.util.*
 
-const val TAG = "ScheduleReminder"
+private const val TAG = "ScheduleReminder"
 
 fun scheduleReminder(context: Context) {
     val manager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -27,6 +27,6 @@ fun scheduleReminder(context: Context) {
         calendar.add(Calendar.DATE, 1)
     }
 
-    Log.d(TAG, "Set reminder at ${calendar.time}")
+    Timber.d(TAG, "Set reminder at ${calendar.time}")
     manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent)
 }

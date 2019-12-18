@@ -20,10 +20,13 @@
 
     <!-- Vocab -->
     <string name="label_vocab">Vocab</string>
+    <string name="label_my_words">My words</string>
+    <string name="label_my_word_lists">My word lists</string>
     <string name="in_learning">In Learning</string>
     <string name="learned">Learned</string>
-    <string name="message_empty_vocab">Your vocab is empty.\nAdd new words manually or using Fast Translation.</string>
-    <string name="message_no_learned_words">You\'ve not learned any words yet.\nLearn them in Learning section.</string>
+    <string name="message_empty_vocab">Your vocab is empty.\nAdd new word manually or using Fast Translation.</string>
+    <string name="message_no_word_lists">No added word lists.\nAdd new word list from Search.</string>
+    <string name="message_no_learned_word_lists">You\'ve not learned any word lists yet.\nLearn them in Learning section.</string>
 
     <!-- Add new word -->
     <string name="label_add_new_word">Add new word</string>
@@ -34,6 +37,10 @@
     <string name="add">Add</string>
     <string name="add_test_word_set">Add test word set</string>
     <string name="import_csv">Import CSV</string>
+
+    <!-- Word set details -->
+    <string name="words_count">%d words</string>
+    <string name="learning_percentage">%d%% learned</string>
 
     <!-- Search -->
     <string name="label_search">Search</string>

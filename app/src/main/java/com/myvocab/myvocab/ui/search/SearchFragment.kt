@@ -1,28 +1,30 @@
 package com.myvocab.myvocab.ui.search
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import com.google.android.material.snackbar.Snackbar
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.databinding.FragmentSearchBinding
-import com.myvocab.myvocab.ui.add_new_word.AddNewWordActivity
+import com.myvocab.myvocab.ui.MainNavigationFragment
+import com.myvocab.myvocab.ui.word_set.WordSetListAdapter
 import com.myvocab.myvocab.util.Resource
-import dagger.android.support.DaggerFragment
-import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.activity_main.*
+import com.myvocab.myvocab.util.findNavController
 import kotlinx.android.synthetic.main.fragment_search.*
+import timber.log.Timber
 import javax.inject.Inject
 
-class SearchFragment : DaggerFragment() {
+class SearchFragment : MainNavigationFragment() {
+
+    companion object {
+        private const val TAG = "SearchFragment"
+    }
 
     private lateinit var binding: FragmentSearchBinding
 
@@ -32,8 +34,6 @@ class SearchFragment : DaggerFragment() {
 
     @Inject
     lateinit var wordSetListAdapter: WordSetListAdapter
-
-    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
@@ -49,19 +49,9 @@ class SearchFragment : DaggerFragment() {
 
         word_sets_recycler_view.adapter = wordSetListAdapter
 
-        wordSetListAdapter.addCallback = object : WordSetListAdapter.OnAddWordSet {
-            override fun onAdd(wordSet: WordSet) {
-                Log.d(AddNewWordActivity.TAG, "Add \"${wordSet.title}\" word set")
-                compositeDisposable.clear()
-                compositeDisposable.add(
-                        viewModel.addWords(wordSet.words).subscribe({
-                            Snackbar.make(view, "${wordSet.words.size} words from ${wordSet.title} was added", Snackbar.LENGTH_SHORT).show()
-                            Navigation.findNavController(view).navigate(R.id.vocabFragment)
-                        }, { e ->
-                            Log.e(AddNewWordActivity.TAG, e.message)
-                            Snackbar.make(view, "Error, words haven't added", Snackbar.LENGTH_SHORT).show()
-                        })
-                )
+        wordSetListAdapter.onClickListenerClickListener = object : WordSetListAdapter.OnWordSetClickListener {
+            override fun onClick(wordSet: WordSet) {
+                findNavController().navigate(R.id.to_word_set_details, bundleOf("word_set" to wordSet))
             }
         }
 
@@ -74,16 +64,11 @@ class SearchFragment : DaggerFragment() {
                 }
                 Resource.Status.ERROR -> {
                     swipe_refresh_layout.isRefreshing = false
-                    Log.e(AddNewWordActivity.TAG, it.error?.message)
+                    Timber.e(TAG, it.error?.message)
                 }
             }
         })
 
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.clear()
     }
 
 }

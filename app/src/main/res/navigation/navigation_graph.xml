@@ -4,30 +4,98 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation_graph"
-    app:startDestination="@id/vocabFragment">
+    app:startDestination="@id/navigation_learning">
 
     <fragment
-        android:id="@+id/learningFragment"
+        android:id="@+id/navigation_learning"
         android:name="com.myvocab.myvocab.ui.learning.LearningFragment"
         android:label="@string/label_learning"
         tools:layout="@layout/fragment_learning"/>
 
     <fragment
-        android:id="@+id/vocabFragment"
+        android:id="@+id/navigation_vocab"
         android:name="com.myvocab.myvocab.ui.vocab.VocabFragment"
         android:label="@string/label_vocab"
-        tools:layout="@layout/fragment_vocab"/>
+        tools:layout="@layout/fragment_vocab">
+
+        <action
+            android:id="@+id/to_my_words"
+            app:destination="@id/navigation_my_words_fragment" />
+
+        <action
+            android:id="@+id/to_my_word_sets"
+            app:destination="@id/navigation_my_word_sets_fragment" />
+
+    </fragment>
 
     <fragment
-        android:id="@+id/searchFragment"
+        android:id="@+id/navigation_search"
         android:name="com.myvocab.myvocab.ui.search.SearchFragment"
         android:label="@string/label_search"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search">
+
+        <action
+            android:id="@+id/to_word_set_details"
+            app:destination="@id/navigation_word_set_details"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
 
     <fragment
-        android:id="@+id/settingsFragment"
+        android:id="@+id/navigation_settings"
         android:name="com.myvocab.myvocab.ui.settings.SettingsFragment"
         android:label="@string/label_settings"
         tools:layout="@layout/fragment_settings"/>
+
+    <fragment
+        android:id="@+id/navigation_word_set_details"
+        android:name="com.myvocab.myvocab.ui.word_set_details.WordSetDetailsFragment"
+        tools:layout="@layout/fragment_word_set_details">
+
+        <argument
+            android:name="word_set"
+            app:argType="com.myvocab.myvocab.data.model.WordSet" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_my_word_sets_fragment"
+        android:name="com.myvocab.myvocab.ui.my_word_sets.MyWordSetsFragment"
+        android:label="@string/label_my_word_lists"
+        tools:layout="@layout/fragment_my_word_sets">
+
+        <action
+            android:id="@+id/to_word_set_details"
+            app:destination="@id/navigation_word_set_details"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_my_words_fragment"
+        android:name="com.myvocab.myvocab.ui.my_words.MyWordsFragment"
+        android:label="@string/label_my_words"
+        tools:layout="@layout/fragment_my_words">
+
+        <action
+            android:id="@+id/to_add_new_word"
+            app:destination="@id/navigation_add_new_word"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_add_new_word"
+        android:name="com.myvocab.myvocab.ui.add_new_word.AddNewWordFragment"
+        android:label="@string/label_add_new_word" />
 
 </navigation>

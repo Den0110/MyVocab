@@ -23,7 +23,7 @@
     <string name="in_learning">В изучении</string>
     <string name="learned">Выучено</string>
     <string name="message_empty_vocab">Ваш словарь пуст.\nДобавьте новые слова вручную или используя Быстрый Перевод.</string>
-    <string name="message_no_learned_words">Вы не выучили еще ни одного слова.\nУчите их в разделе Изучение.</string>
+    <string name="message_no_learned_word_lists">Вы не выучили еще ни одного списка слов.\nУчите их в разделе Изучение.</string>
 
     <!-- Добавить новое слово -->
     <string name="label_add_new_word">Добавить новое слово</string>
@@ -46,5 +46,10 @@
     <string name="dialog_permission_allow">Разрешить</string>
     <string name="dialog_permission_deny">Запретить</string>
     <string name="remove_all_words">Удалить все слова</string>
+    <string name="learning_percentage">%d%% выучено</string>
+    <string name="message_no_word_lists">Нет добавленных списков слов.\nДобавьте их из Поиска</string>
+    <string name="words_count">%d слов</string>
+    <string name="label_my_word_lists">Мои списки слов</string>
+    <string name="label_my_words">Мои слова</string>
 
 </resources>

@@ -1,7 +1,6 @@
 package com.myvocab.myvocab.ui.learning
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.myvocab.myvocab.data.model.Word
@@ -25,11 +24,11 @@ constructor(
 ) : ViewModel() {
 
     companion object {
-        const val TAG = "LearningViewModel"
+        private const val TAG = "LearningViewModel"
 
-        const val UNKNOWN_LEVEL = 0
-        const val RECENTLY_LEARNED_LEVEL = 1
-        const val WELL_KNOWN_LEVEL = 2
+        private const val UNKNOWN_LEVEL = 0
+        private const val RECENTLY_LEARNED_LEVEL = 1
+        private const val WELL_KNOWN_LEVEL = 2
     }
 
     val currentWord: MutableLiveData<Word> = MutableLiveData()

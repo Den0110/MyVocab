@@ -1,24 +1,22 @@
 package com.myvocab.myvocab.ui.settings
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import com.myvocab.myvocab.data.model.Word
+import androidx.lifecycle.ViewModel
 import com.myvocab.myvocab.data.source.WordRepository
 import javax.inject.Inject
 
 class SettingsViewModel
 @Inject
 constructor(
-        private val wordRepository: WordRepository,
-        context: Application
-) : AndroidViewModel(context) {
+        private val wordRepository: WordRepository
+) : ViewModel() {
 
     companion object {
-        private val TAG = "SettingsViewModel"
+        private const val TAG = "SettingsViewModel"
     }
 
     fun removeAllWords() {
         wordRepository.deleteAllWords().subscribe()
+        wordRepository.deleteAllWordSets().subscribe()
     }
 
 }

@@ -1,7 +1,6 @@
 package com.myvocab.myvocab.ui.learning
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +10,14 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.databinding.FragmentLearningBinding
-import com.myvocab.myvocab.ui.BaseFragment
+import com.myvocab.myvocab.ui.MainNavigationFragment
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_learning.*
 import javax.inject.Inject
 
-class LearningFragment : BaseFragment() {
+class LearningFragment : MainNavigationFragment() {
 
     private lateinit var binding: FragmentLearningBinding
 
@@ -35,6 +34,8 @@ class LearningFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
         viewModel = ViewModelProvider(this, viewModelFactory).get(LearningViewModel::class.java)
 
         binding.viewModel = viewModel
