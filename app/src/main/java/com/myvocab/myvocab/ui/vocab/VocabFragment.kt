@@ -13,10 +13,6 @@ import kotlinx.android.synthetic.main.fragment_vocab.*
 
 class VocabFragment : MainNavigationFragment() {
 
-    companion object {
-        private const val TAG = "VocabFragment"
-    }
-
     private lateinit var binding: FragmentVocabBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

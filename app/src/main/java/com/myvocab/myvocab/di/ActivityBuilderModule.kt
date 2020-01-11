@@ -1,6 +1,10 @@
 package com.myvocab.myvocab.di
 
+import com.myvocab.myvocab.common.broadcast_receivers.BootUpReceiver
+import com.myvocab.myvocab.common.broadcast_receivers.ReminderReceiver
+import com.myvocab.myvocab.common.broadcast_receivers.TimeChangedReceiver
 import com.myvocab.myvocab.common.fasttranslation.FastTranslationService
+import com.myvocab.myvocab.common.fasttranslation.FastTranslationServiceStarter
 import com.myvocab.myvocab.di.fast_translation.FastTranslationModule
 import com.myvocab.myvocab.di.fast_translation.FastTranslationViewModelsModule
 import com.myvocab.myvocab.di.my_word_sets.MyWordSetsModule
@@ -18,6 +22,7 @@ import com.myvocab.myvocab.ui.settings.SettingsFragment
 import com.myvocab.myvocab.di.settings.SettingsViewModelsModule
 import com.myvocab.myvocab.di.word_set_details.WordSetDetailsModule
 import com.myvocab.myvocab.di.word_set_details.WordSetDetailsViewModelsModule
+import com.myvocab.myvocab.ui.MainActivity
 import com.myvocab.myvocab.ui.my_word_sets.MyWordSetsFragment
 import com.myvocab.myvocab.ui.my_word_sets.in_learning_words.InLearningWordSetsFragment
 import com.myvocab.myvocab.ui.my_words.MyWordsFragment
@@ -29,6 +34,16 @@ import dagger.android.ContributesAndroidInjector
 
 @Module
 abstract class ActivityBuilderModule {
+
+    /*
+    *   MainActivity
+    */
+    @ContributesAndroidInjector
+    abstract fun contributeMainActivity(): MainActivity
+
+    /*
+    *   Fragments
+    */
 
     @ContributesAndroidInjector(modules = [FastTranslationModule::class, FastTranslationViewModelsModule::class])
     abstract fun contributeTranslationService(): FastTranslationService
@@ -55,12 +70,29 @@ abstract class ActivityBuilderModule {
     abstract fun contributeAddNewWordFragment(): AddNewWordFragment
 
     @ContributesAndroidInjector(modules = [WordSetDetailsModule::class, WordSetDetailsViewModelsModule::class])
-    abstract fun contributeWordSetDetailsActivity(): WordSetDetailsFragment
+    abstract fun contributeWordSetDetailsFragment(): WordSetDetailsFragment
 
     @ContributesAndroidInjector(modules = [SearchModule::class, SearchViewModelsModule::class])
     abstract fun contributeSearchFragment(): SearchFragment
 
     @ContributesAndroidInjector(modules = [SettingsViewModelsModule::class])
     abstract fun contributeSettingsFragment(): SettingsFragment
+
+
+    /*
+    *   Broadcast receivers
+    */
+
+    @ContributesAndroidInjector
+    abstract fun contributeReminderReceiver(): ReminderReceiver
+
+    @ContributesAndroidInjector
+    abstract fun contributeBootUpReceiver(): BootUpReceiver
+
+    @ContributesAndroidInjector
+    abstract fun contributeTimeChanchedReceiver(): TimeChangedReceiver
+
+    @ContributesAndroidInjector
+    abstract fun contributeFastTranslationServiceStarter(): FastTranslationServiceStarter
 
 }

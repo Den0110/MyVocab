@@ -51,5 +51,8 @@
     <string name="words_count">%d слов</string>
     <string name="label_my_word_lists">Мои списки слов</string>
     <string name="label_my_words">Мои слова</string>
+    <string name="remind_to_learn_words">Напоминать учить слова</string>
+    <string name="reminding_time">Время напоминания</string>
+    <string name="remind_only_if_there_are_words_to_learn">Напоминать только если есть слова для изучения</string>
 
 </resources>

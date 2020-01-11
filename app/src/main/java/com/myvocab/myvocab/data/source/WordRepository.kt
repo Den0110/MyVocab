@@ -24,10 +24,6 @@ constructor(
         private val wordSetDao: WordSetDao
 ) {
 
-    companion object {
-        private const val TAG = "WordRepository"
-    }
-
     //  To concat network and local db
     //  return Observable.concatArrayEager(observableFromApi, observableFromDb)
 

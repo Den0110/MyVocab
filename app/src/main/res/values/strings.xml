@@ -53,5 +53,8 @@
     <string name="dialog_permission_allow">Allow</string>
     <string name="dialog_permission_deny">Deny</string>
     <string name="remove_all_words">Remove all words</string>
+    <string name="remind_to_learn_words">Remind to learn words</string>
+    <string name="reminding_time">Reminding time</string>
+    <string name="remind_only_if_there_are_words_to_learn">Remind only if there are words to learn</string>
 
 </resources>

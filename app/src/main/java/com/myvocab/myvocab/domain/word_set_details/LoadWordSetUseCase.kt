@@ -8,7 +8,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import javax.inject.Inject
 
-open class LoadWordSetUseCase
+class LoadWordSetUseCase
 @Inject
 constructor(
         private val wordRepository: WordRepository

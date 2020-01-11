@@ -24,7 +24,6 @@ import javax.inject.Inject
 class AddNewWordFragment : MainNavigationFragment() {
 
     companion object {
-        private const val TAG = "AddNewWordFragment"
         private const val CHOOSE_FILE_RESULT_CODE = 1
         private const val PERMISSION_REQUEST_CODE = 2
     }
@@ -75,7 +74,7 @@ class AddNewWordFragment : MainNavigationFragment() {
                         viewModel.addWord().subscribe({
                             findNavController().navigateUp()
                         }, { e ->
-                            Timber.e(TAG, e.message)
+                            Timber.e(e)
                             Snackbar.make(it, "Error, word wasn't added", Snackbar.LENGTH_SHORT).show()
                         })
                 )

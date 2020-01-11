@@ -14,12 +14,8 @@ class FastTranslationWidgetViewModel
 @Inject
 constructor(
         private val translationApi: TranslationApi,
-        private val wordsRepository: WordRepository
+        private val wordRepository: WordRepository
 ) : ViewModel() {
-
-    companion object {
-        private const val TAG = "FastTranslationService"
-    }
 
     fun translate(translatable: TranslatableText): Flowable<TranslatedData> {
         return translationApi.translate(BuildConfig.GOOGLE_API_KEY, translatable.text, translatable.lang)
@@ -27,7 +23,7 @@ constructor(
     }
 
     fun addToDictionary(translatedData: TranslatedData) {
-        wordsRepository
+        wordRepository
                 .addMyWord(
                     Word(
                         word = translatedData.translatable?.text,

@@ -22,10 +22,6 @@ constructor(
         private val context: Context
 ) : ViewModel() {
 
-    companion object {
-        private const val TAG = "WordSetDetailsViewModel"
-    }
-
     val wordSet: MutableLiveData<Resource<WordSet>> = MutableLiveData()
     val isSavedLocally: MutableLiveData<Boolean> = MutableLiveData()
     val subtitle: MutableLiveData<String> = MutableLiveData()

@@ -22,10 +22,6 @@ import javax.inject.Inject
 
 class SearchFragment : MainNavigationFragment() {
 
-    companion object {
-        private const val TAG = "SearchFragment"
-    }
-
     private lateinit var binding: FragmentSearchBinding
 
     @Inject
@@ -64,7 +60,7 @@ class SearchFragment : MainNavigationFragment() {
                 }
                 Resource.Status.ERROR -> {
                     swipe_refresh_layout.isRefreshing = false
-                    Timber.e(TAG, it.error?.message)
+                    Timber.e(it.error)
                 }
             }
         })

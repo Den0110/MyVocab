@@ -1,23 +1,27 @@
 package com.myvocab.myvocab.common.broadcast_receivers
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.myvocab.myvocab.common.fasttranslation.FastTranslationServiceStarter
-import com.myvocab.myvocab.util.scheduleReminder
+import com.myvocab.myvocab.common.FastTranslationServiceManager
+import com.myvocab.myvocab.common.ReminderScheduler
+import dagger.android.DaggerBroadcastReceiver
 import timber.log.Timber
+import javax.inject.Inject
 
-class BootUpReceiver : BroadcastReceiver() {
+class BootUpReceiver : DaggerBroadcastReceiver() {
 
-    companion object {
-        private const val TAG = "BootUpReceiver"
-    }
+    @Inject
+    lateinit var reminderScheduler: ReminderScheduler
+
+    @Inject
+    lateinit var translationServiceManager: FastTranslationServiceManager
 
     override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
         if(intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == "android.intent.action.QUICKBOOT_POWERON") {
-            Timber.d(TAG, "Boot up")
-            context.sendBroadcast(Intent(context, FastTranslationServiceStarter::class.java))
-            scheduleReminder(context)
+            Timber.d("Boot up")
+            translationServiceManager.startIfEnabled()
+            reminderScheduler.scheduleIfEnabled()
         }
     }
 

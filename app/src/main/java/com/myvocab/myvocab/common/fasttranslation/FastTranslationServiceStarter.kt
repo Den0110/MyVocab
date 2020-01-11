@@ -1,33 +1,19 @@
 package com.myvocab.myvocab.common.fasttranslation
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.myvocab.myvocab.util.getFastTranslationState
-import com.myvocab.myvocab.util.isServiceRunning
-import timber.log.Timber
+import com.myvocab.myvocab.common.FastTranslationServiceManager
+import dagger.android.DaggerBroadcastReceiver
+import javax.inject.Inject
 
-class FastTranslationServiceStarter : BroadcastReceiver() {
+class FastTranslationServiceStarter : DaggerBroadcastReceiver() {
 
-    companion object {
-        private const val TAG = "FastTranslationService"
-
-        fun start(context: Context){
-            context.sendBroadcast(Intent(context, FastTranslationServiceStarter::class.java))
-        }
-    }
+    @Inject
+    lateinit var translationServiceManager: FastTranslationServiceManager
 
     override fun onReceive(context: Context, intent: Intent) {
-        val state = getFastTranslationState(context)
-        if(state) {
-            Timber.v(TAG, "FastTranslationServiceStarter: checking service state...")
-            if (!isServiceRunning(context, FastTranslationService::class.java)) {
-                FastTranslationService.start(context)
-                Timber.d(TAG, "Restart service")
-            } else {
-                Timber.v(TAG, "Service running")
-            }
-        }
+        super.onReceive(context, intent)
+        translationServiceManager.startIfEnabled()
     }
 
 }

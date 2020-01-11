@@ -31,10 +31,6 @@ constructor(
         private val inflater: LayoutInflater
 ) : LifecycleOwner, ViewModelStoreOwner {
 
-    companion object {
-        private const val TAG = "FastTranslationWidget"
-    }
-
     private val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
     private val viewModelStore: ViewModelStore = ViewModelStore()
 
@@ -92,7 +88,7 @@ constructor(
             translatedTextView!!.visibility = View.VISIBLE
             translationProgressBar!!.visibility = View.GONE
         }, {
-            Timber.e(TAG, it.toString())
+            Timber.e(it)
             Toast.makeText(context, R.string.could_not_translate, Toast.LENGTH_SHORT).show()
             translationProgressBar!!.visibility = View.GONE
         })

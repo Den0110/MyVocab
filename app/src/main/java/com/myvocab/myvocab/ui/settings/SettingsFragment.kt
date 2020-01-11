@@ -1,28 +1,29 @@
 package com.myvocab.myvocab.ui.settings
 
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.myvocab.myvocab.BuildConfig
 import com.myvocab.myvocab.R
-import com.myvocab.myvocab.common.fasttranslation.FastTranslationService
 import com.myvocab.myvocab.databinding.FragmentSettingsBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.util.PackageUtils
-import com.myvocab.myvocab.util.getFastTranslationState
-import com.myvocab.myvocab.util.isServiceRunning
-import com.myvocab.myvocab.util.setFastTranslationState
 import kotlinx.android.synthetic.main.fragment_settings.*
+import java.util.Calendar
 import javax.inject.Inject
+
 
 class SettingsFragment : MainNavigationFragment() {
 
@@ -47,51 +48,65 @@ class SettingsFragment : MainNavigationFragment() {
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(SettingsViewModel::class.java)
 
-        if(BuildConfig.DEBUG){
+        binding.apply {
+            lifecycleOwner = viewLifecycleOwner
+            viewmodel = viewModel
+        }
+
+        if (BuildConfig.DEBUG) {
             remove_all_words.visibility = View.VISIBLE
             remove_all_words.setOnClickListener { viewModel.removeAllWords() }
         }
 
-        service_switch.setOnCheckedChangeListener { _, isChecked ->
-            val isRunning = isServiceRunning(context!!, FastTranslationService::class.java)
-            if (isChecked) {
-                if (!isRunning){
-                    startTranslationService()
+        service_switch.setOnCheckedChangeListener(viewModel.translationListener)
+        reminder_mode_switch.setOnCheckedChangeListener(viewModel.remindOnlyWordsToLearnListener)
+        reminder_switch.setOnCheckedChangeListener(viewModel.reminderListener)
+
+        viewModel.reminderEnabled.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                reminding_time.alpha = 1f
+                reminding_time.setOnClickListener {
+                    TimePickerDialog(
+                            context,
+                            viewModel.remindingTimeListener,
+                            viewModel.remindingTime.value?.get(Calendar.HOUR_OF_DAY)!!,
+                            viewModel.remindingTime.value?.get(Calendar.MINUTE)!!,
+                            true
+                    ).show()
                 }
             } else {
-                if (isRunning){
-                    stopTranslationService()
-                }
+                reminding_time.alpha = 0.5f
+                reminding_time.setOnClickListener(null)
             }
-        }
+        })
+
+        viewModel.remindingTime.observe(viewLifecycleOwner, Observer {
+            reminding_time_value.text = DateUtils.formatDateTime(context,
+                    viewModel.remindingTime.value?.timeInMillis!!, DateUtils.FORMAT_SHOW_TIME)
+        })
+
+        viewModel.startTranslationServiceMessage.observe(viewLifecycleOwner, Observer {
+            it.getContentIfNotHandled()?.let {
+                startTranslationService()
+            }
+        })
+
     }
 
-    override fun onResume() {
-        super.onResume()
-        val state = getFastTranslationState(context!!)
-        val isRunning = isServiceRunning(context!!, FastTranslationService::class.java)
-        service_switch.isChecked = state
-        if(state && !isRunning){
-            startTranslationService()
-        } else if (!state && isRunning){
-            stopTranslationService()
-        }
-    }
-
-    private fun startTranslationService(){
+    private fun startTranslationService() {
         if (Build.VERSION.SDK_INT < 23 || Settings.canDrawOverlays(context)) {
-            FastTranslationService.start(context!!)
-            setFastTranslationState(context!!, true)
+            viewModel.startTranslationService()
         } else {
             AlertDialog.Builder(context!!)
                     .setMessage(R.string.dialog_permission_draw_overlay)
                     .setPositiveButton(R.string.dialog_permission_allow) { _, _ ->
                         val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                                 Uri.parse("package:" + context!!.packageName))
-                        if(PackageUtils.isIntentCallable(context!!, intent))
+                        if (PackageUtils.isIntentCallable(context!!, intent))
                             startActivityForResult(intent, REQUEST_CODE_DRAW_OVERLAYS)
                     }
                     .setNegativeButton(R.string.dialog_permission_deny) { dialog, _ ->
+                        viewModel.stopTranslationService()
                         dialog.dismiss()
                     }
                     .create()
@@ -99,16 +114,10 @@ class SettingsFragment : MainNavigationFragment() {
         }
     }
 
-    private fun stopTranslationService(){
-        FastTranslationService.stop(context!!)
-        setFastTranslationState(context!!, false)
-    }
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_DRAW_OVERLAYS) {
-            FastTranslationService.start(context!!)
-            setFastTranslationState(context!!, true)
+            viewModel.startTranslationService()
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 AlertDialog.Builder(context!!)
                         .setMessage(R.string.dialog_permission_battery_settings)
@@ -125,7 +134,7 @@ class SettingsFragment : MainNavigationFragment() {
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    private fun openBatterySettings(){
+    private fun openBatterySettings() {
         val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
         if (PackageUtils.isIntentCallable(context!!, intent)) {
             startActivityForResult(intent, REQUEST_CODE_BATTERY)

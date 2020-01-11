@@ -20,10 +20,6 @@ constructor(
         private val wordRepository: WordRepository
 ) : ViewModel() {
 
-    companion object {
-        private const val TAG = "AddNewWordViewModel"
-    }
-
     val newWord: MutableLiveData<String> = MutableLiveData()
     val translation: MutableLiveData<String> = MutableLiveData()
 

@@ -19,10 +19,6 @@ constructor(
         context: Application
 ) : AndroidViewModel(context) {
 
-    companion object {
-        private const val TAG = "LearnedWordsViewModel"
-    }
-
     var wordSets: MutableLiveData<Resource<List<WordSet>>> = MutableLiveData()
 
     private var getWordsDisposable: Disposable? = null

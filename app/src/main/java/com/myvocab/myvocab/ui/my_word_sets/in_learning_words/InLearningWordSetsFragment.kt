@@ -24,10 +24,6 @@ import javax.inject.Inject
 
 class InLearningWordSetsFragment : MainNavigationFragment() {
 
-    companion object {
-        private const val TAG = "InLearningWordsFragment"
-    }
-
     private lateinit var binding: FragmentInLearningWordsBinding
 
     @Inject

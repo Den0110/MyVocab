@@ -1,23 +1,27 @@
 package com.myvocab.myvocab.common.broadcast_receivers
 
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.myvocab.myvocab.common.fasttranslation.FastTranslationServiceStarter
-import com.myvocab.myvocab.util.scheduleReminder
+import com.myvocab.myvocab.common.FastTranslationServiceManager
+import com.myvocab.myvocab.common.ReminderScheduler
+import dagger.android.DaggerBroadcastReceiver
 import timber.log.Timber
+import javax.inject.Inject
 
-class TimeChangedReceiver : BroadcastReceiver() {
+class TimeChangedReceiver : DaggerBroadcastReceiver() {
 
-    companion object {
-        private const val TAG = "TimeChangedReceiver"
-    }
+    @Inject
+    lateinit var reminderScheduler: ReminderScheduler
+
+    @Inject
+    lateinit var translationServiceManager: FastTranslationServiceManager
 
     override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
         if(intent.action == Intent.ACTION_TIME_CHANGED || intent.action == Intent.ACTION_TIMEZONE_CHANGED) {
-            Timber.d(TAG, "Time changed")
-            context.sendBroadcast(Intent(context, FastTranslationServiceStarter::class.java))
-            scheduleReminder(context)
+            Timber.d("Time changed")
+            translationServiceManager.startIfEnabled()
+            reminderScheduler.scheduleIfEnabled()
         }
     }
 

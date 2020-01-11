@@ -21,10 +21,6 @@ constructor(
         context: Application
 ) : AndroidViewModel(context) {
 
-    companion object {
-        private const val TAG = "SearchViewModel"
-    }
-
     val wordSets: MutableLiveData<Resource<List<WordSet>>> = MutableLiveData()
 
     private val compositeDisposable = CompositeDisposable()

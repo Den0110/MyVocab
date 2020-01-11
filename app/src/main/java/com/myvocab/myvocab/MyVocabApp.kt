@@ -2,21 +2,25 @@ package com.myvocab.myvocab
 
 import android.content.Context
 import androidx.multidex.MultiDex
+import com.myvocab.myvocab.common.FastTranslationServiceManager
+import com.myvocab.myvocab.common.ReminderScheduler
 import com.myvocab.myvocab.data.source.local.Database
-import dagger.android.AndroidInjector
-import dagger.android.support.DaggerApplication
 import com.myvocab.myvocab.di.DaggerAppComponent
 import com.myvocab.myvocab.util.createFastTranslationNotificationChannel
 import com.myvocab.myvocab.util.createReminderNotificationChannel
 import com.squareup.leakcanary.LeakCanary
-import com.myvocab.myvocab.util.scheduleReminder
+import dagger.android.AndroidInjector
+import dagger.android.support.DaggerApplication
+import timber.log.Timber
+import timber.log.Timber.DebugTree
 import javax.inject.Inject
 
 
 class MyVocabApp : DaggerApplication() {
 
-    @Inject
-    lateinit var wordsDb: Database
+    @Inject lateinit var wordsDb: Database
+    @Inject lateinit var reminderScheduler: ReminderScheduler
+    @Inject lateinit var translationServiceManager: FastTranslationServiceManager
 
     override fun onCreate() {
         super.onCreate()
@@ -29,13 +33,18 @@ class MyVocabApp : DaggerApplication() {
             LeakCanary.install(this)
         }
 
+        if (BuildConfig.DEBUG) {
+            Timber.plant(DebugTree())
+        }
+
         createFastTranslationNotificationChannel(this)
         createReminderNotificationChannel(this)
 
-        scheduleReminder(this)
+        translationServiceManager.startIfEnabled()
+        reminderScheduler.scheduleIfEnabled()
 
         // just to create and pre-populate database
-        wordsDb.wordSetsDao().getWordSets().subscribe()
+        wordsDb.wordSetsDao().getWordSets().subscribe({},{})
 
     }
 

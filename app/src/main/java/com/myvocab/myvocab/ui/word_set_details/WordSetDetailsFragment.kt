@@ -6,7 +6,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import com.fromaggio.fromaggio.util.getViewModel
 import com.google.android.material.snackbar.Snackbar
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.source.WordRepository
@@ -15,6 +14,7 @@ import com.myvocab.myvocab.domain.word_set_details.LoadWordSetUseCase
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.ui.word.WordListAdapter
 import com.myvocab.myvocab.util.Resource
+import com.myvocab.myvocab.util.getViewModel
 import kotlinx.android.synthetic.main.fragment_word_set_details.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import timber.log.Timber
@@ -106,7 +106,7 @@ class WordSetDetailsFragment : MainNavigationFragment() {
                 Resource.Status.ERROR -> {
                     swipe_refresh_layout.isRefreshing = false
                     Toast.makeText(context, it.error?.message, Toast.LENGTH_SHORT).show()
-                    Timber.e(TAG, it.error?.message)
+                    Timber.e(it.error)
                 }
             }
         })
@@ -114,7 +114,7 @@ class WordSetDetailsFragment : MainNavigationFragment() {
         viewModel.addingWordSet.observe(viewLifecycleOwner, Observer {
             when (it.status) {
                 Resource.Status.LOADING -> {
-                    Timber.d(TAG, "Adding \"${it.data?.title}\" word set")
+                    Timber.d("Adding \"${it.data?.title}\" word set")
                     menu.findItem(R.id.add)?.isEnabled = false
                 }
                 Resource.Status.SUCCESS -> {
@@ -124,7 +124,7 @@ class WordSetDetailsFragment : MainNavigationFragment() {
                 }
                 Resource.Status.ERROR -> {
                     Snackbar.make(container, "Error, words weren't added", Snackbar.LENGTH_SHORT).show()
-                    Timber.e(TAG, it.error?.message)
+                    Timber.e(it.error)
                 }
             }
         })
@@ -132,7 +132,7 @@ class WordSetDetailsFragment : MainNavigationFragment() {
         viewModel.removingWordSet.observe(viewLifecycleOwner, Observer {
             when (it.status) {
                 Resource.Status.LOADING -> {
-                    Timber.d(TAG, "Removing \"${it.data?.title}\" word set")
+                    Timber.d("Removing \"${it.data?.title}\" word set")
                     menu.findItem(R.id.remove)?.isEnabled = false
                 }
                 Resource.Status.SUCCESS -> {
@@ -142,7 +142,7 @@ class WordSetDetailsFragment : MainNavigationFragment() {
                 }
                 Resource.Status.ERROR -> {
                     Snackbar.make(container, "Error, words weren't removed", Snackbar.LENGTH_SHORT).show()
-                    Timber.e(TAG, it.error?.message)
+                    Timber.e(it.error)
                 }
             }
         })

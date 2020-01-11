@@ -18,10 +18,14 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+
+        <meta-data
+            android:name="firebase_crashlytics_collection_enabled"
+            android:value="${enableCrashReporting}" />
+
         <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -37,6 +41,7 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
+
         <receiver android:name=".common.broadcast_receivers.TimeChangedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_TICK" />
@@ -44,8 +49,10 @@
                 <action android:name="android.intent.action.TIME_SET" />
             </intent-filter>
         </receiver>
+
         <receiver android:name=".common.fasttranslation.FastTranslationServiceStarter" />
         <receiver android:name=".common.broadcast_receivers.ReminderReceiver" />
+
     </application>
 
 </manifest>

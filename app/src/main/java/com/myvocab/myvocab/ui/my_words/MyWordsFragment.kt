@@ -26,10 +26,6 @@ import javax.inject.Inject
 
 class MyWordsFragment : MainNavigationFragment() {
 
-    companion object {
-        private const val TAG = "MyWordsFragment"
-    }
-
     private lateinit var binding: FragmentMyWordsBinding
 
     @Inject
@@ -83,14 +79,14 @@ class MyWordsFragment : MainNavigationFragment() {
                 Resource.Status.ERROR -> {
                     swipe_refresh_layout.isRefreshing = false
                     Toast.makeText(context, it.error?.message, Toast.LENGTH_SHORT).show()
-                    Timber.e(TAG, it.error?.message)
+                    Timber.e(it.error)
                 }
             }
         })
 
         viewModel.deleteWordError.observe(viewLifecycleOwner, Observer {
             if (it != null) {
-                Timber.e(TAG, it.message)
+                Timber.e(it)
                 Snackbar.make(view, "Error, word wasn't added", Snackbar.LENGTH_SHORT).show()
             }
         })
