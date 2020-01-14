@@ -1,25 +1,22 @@
 package com.myvocab.myvocab.ui.my_word_sets.learned_words
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.myvocab.myvocab.data.model.WordSetUseCaseResult
 import javax.inject.Inject
-import com.myvocab.myvocab.data.model.WordSet
-import com.myvocab.myvocab.data.source.WordRepository
+import com.myvocab.myvocab.domain.my_word_sets.learned_words.GetLearnedWordSetsUseCase
 import com.myvocab.myvocab.util.Resource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import java.util.concurrent.TimeUnit
 
 class LearnedWordSetsViewModel
 @Inject
 constructor(
-        private val wordRepository: WordRepository,
-        context: Application
-) : AndroidViewModel(context) {
+        private val learnedWordSetsUseCase: GetLearnedWordSetsUseCase
+) : ViewModel() {
 
-    var wordSets: MutableLiveData<Resource<List<WordSet>>> = MutableLiveData()
+    var wordSets: MutableLiveData<Resource<List<WordSetUseCaseResult>>> = MutableLiveData()
 
     private var getWordsDisposable: Disposable? = null
     private var compositeDisposable = CompositeDisposable()
@@ -30,11 +27,13 @@ constructor(
 
     fun loadLearnedWords(){
         getWordsDisposable?.dispose()
-        getWordsDisposable = wordRepository
-                .getLearnedWordSets()
+        getWordsDisposable = learnedWordSetsUseCase
+                .getWordSets()
                 .observeOn(AndroidSchedulers.mainThread())
-                .debounce(400, TimeUnit.MILLISECONDS)
                 .subscribe({
+//                    // there is no sense to show 100% learned status for all word sets
+//                    // so, null learningPercentage for all ones
+//                    it.forEach { ws -> ws.learningPercentage = null }
                     wordSets.postValue(Resource.success(it))
                 },{
                     wordSets.postValue(Resource.error(it))

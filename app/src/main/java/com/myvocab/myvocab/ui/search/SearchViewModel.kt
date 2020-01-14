@@ -3,12 +3,9 @@ package com.myvocab.myvocab.ui.search
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.FirebaseFirestore
-import com.myvocab.myvocab.data.model.WordSet
-import com.myvocab.myvocab.data.source.WordRepository
+import com.myvocab.myvocab.data.model.WordSetUseCaseResult
+import com.myvocab.myvocab.domain.search.GetSearchWordSetsUseCase
 import com.myvocab.myvocab.util.Resource
-import durdinapps.rxfirebase2.RxFirestore
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import java.util.concurrent.TimeUnit
@@ -17,11 +14,11 @@ import javax.inject.Inject
 class SearchViewModel
 @Inject
 constructor(
-        private val wordRepository: WordRepository,
+        private val getSearchWordSetsUseCase: GetSearchWordSetsUseCase,
         context: Application
 ) : AndroidViewModel(context) {
 
-    val wordSets: MutableLiveData<Resource<List<WordSet>>> = MutableLiveData()
+    val wordSets: MutableLiveData<Resource<List<WordSetUseCaseResult>>> = MutableLiveData()
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -29,29 +26,20 @@ constructor(
         loadWordSets()
     }
 
-    fun loadWordSets(){
-        val wordSetsDisposable = RxFirestore
-                .getCollection(FirebaseFirestore.getInstance().collection("word_sets"))
-                .map {
-                    val wordSets = mutableListOf<WordSet>()
-                    for (doc: DocumentSnapshot in it.documents){
-                        val obj = doc.toObject(WordSet::class.java)!!
-                        val wordSet = WordSet(doc.id, null, obj.title, obj.words.reversed())
-                        wordSets.add(wordSet)
-                    }
-                    wordSets
-                }
+    fun loadWordSets() {
+        val wordSetsDisposable = getSearchWordSetsUseCase
+                .getWordSets()
                 .toObservable()
                 .publish {
                     it
-                            .timeout(500, TimeUnit.MILLISECONDS, Observable.create<MutableList<WordSet>>{
+                            .timeout(500, TimeUnit.MILLISECONDS, Observable.create<MutableList<WordSetUseCaseResult>> {
                                 wordSets.postValue(Resource.loading())
                             })
                             .mergeWith(it)
                 }
                 .subscribe({
                     wordSets.postValue(Resource.success(it))
-                },{
+                }, {
                     wordSets.postValue(Resource.error(it))
                 })
         compositeDisposable.clear()

@@ -13,6 +13,7 @@ import com.myvocab.myvocab.R
 import com.myvocab.myvocab.domain.learning.GetNextWordToLearnUseCase
 import com.myvocab.myvocab.ui.MainActivity
 import com.myvocab.myvocab.util.Constants
+import com.myvocab.myvocab.util.PreferencesManager
 import com.myvocab.myvocab.util.REMINDER_CHANNEL_ID
 import dagger.android.DaggerBroadcastReceiver
 import timber.log.Timber
@@ -22,6 +23,9 @@ class ReminderReceiver : DaggerBroadcastReceiver() {
 
     @Inject
     lateinit var getNextWordUseCase: GetNextWordToLearnUseCase
+
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
@@ -35,8 +39,10 @@ class ReminderReceiver : DaggerBroadcastReceiver() {
             text = Html.fromHtml("Do you know, what does <strong>${it.word}</strong> mean?")
             showNotification(context, title, ticker, text)
         },{
-            text = Html.fromHtml("Add new words to your vocab and start learning")
-            showNotification(context, title, ticker, text)
+            if(!preferencesManager.remindOnlyWordsToLearn) {
+                text = Html.fromHtml("Add new words to your vocab and start learning")
+                showNotification(context, title, ticker, text)
+            }
         })
 
     }

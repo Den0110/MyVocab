@@ -14,18 +14,14 @@ constructor(
         private val prefManager: PreferencesManager
 ){
 
-    companion object {
-        private const val TAG = "FastTranslationServiceManager"
-    }
-
     fun start() {
-        prefManager.setFastTranslationState(true)
+        prefManager.fastTranslationState = true
         if(!isServiceRunning())
             FastTranslationService.start(context)
     }
 
     fun startIfEnabled() {
-        val state = prefManager.getFastTranslationState()
+        val state = prefManager.fastTranslationState
         if(state) {
             Timber.v("FastTranslationServiceStarter: checking service state...")
             if (!isServiceRunning()) {
@@ -49,7 +45,7 @@ constructor(
     }
 
     fun cancel() {
-        prefManager.setFastTranslationState(false)
+        prefManager.fastTranslationState = false
         if(isServiceRunning())
             FastTranslationService.stop(context)
     }

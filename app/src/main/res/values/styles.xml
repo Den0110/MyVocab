@@ -7,6 +7,7 @@
         <item name="android:textColor">@color/primaryTextColor</item>
         <item name="snackbarTextViewStyle">@style/AppTheme.SnackBar</item>
         <item name="snackbarButtonStyle">@style/AppTheme.SnackBar</item>
+        <item name="android:windowBackground">@color/colorBackground</item>
     </style>
 
     <style name="AppTheme.AppBarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">

@@ -48,7 +48,16 @@
     <string name="remove_all_words">Удалить все слова</string>
     <string name="learning_percentage">%d%% выучено</string>
     <string name="message_no_word_lists">Нет добавленных списков слов.\nДобавьте их из Поиска</string>
-    <string name="words_count">%d слов</string>
+
+    <plurals name="word_count">
+        <item quantity="zero">Нет слов</item>
+        <item quantity="one">%d слово</item>
+        <item quantity="two">%d слова</item>
+        <item quantity="few">%d слова</item>
+        <item quantity="many">%d слов</item>
+        <item quantity="other">%d слов</item>
+    </plurals>
+
     <string name="label_my_word_lists">Мои списки слов</string>
     <string name="label_my_words">Мои слова</string>
     <string name="remind_to_learn_words">Напоминать учить слова</string>

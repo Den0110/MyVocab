@@ -26,9 +26,9 @@ constructor(
     private var lastWordId: Int? = null
 
     override fun execute(parameter: Boolean): Observable<Word> =
-            if (parameter && currentWord == null && prefManager.getLastWordToLearnId() != -1) {
+            if (parameter && currentWord == null && prefManager.lastWordToLearnId != -1) {
                 wordRepository
-                        .getWordById(prefManager.getLastWordToLearnId())
+                        .getWordById(prefManager.lastWordToLearnId)
                         .flatMap {
                             if (it.knowingLevel > WELL_KNOWN_LEVEL) {
                                 loadNextWord()
@@ -41,8 +41,8 @@ constructor(
                 loadNextWord()
             }
                     .toObservable()
-                    .doOnNext { prefManager.setLastWordToLearnId(it.id!!) }
-                    .doOnError { prefManager.setLastWordToLearnId(-1) }
+                    .doOnNext { prefManager.lastWordToLearnId = it.id!! }
+                    .doOnError { prefManager.lastWordToLearnId = -1 }
 
 
     private fun loadNextWord(): Single<Word> {
@@ -80,12 +80,12 @@ constructor(
 
     private fun setLastLearnedWordId(id: Int?) {
         lastWordId = id
-        prefManager.setLastLearnedWordId(id ?: -1)
+        prefManager.lastLearnedWordId = id ?: -1
     }
 
     private fun getLastLearnedWordId(): Int? {
-        if (lastWordId == null && prefManager.getLastLearnedWordId() != -1)
-            lastWordId = prefManager.getLastLearnedWordId()
+        if (lastWordId == null && prefManager.lastLearnedWordId != -1)
+            lastWordId = prefManager.lastLearnedWordId
         return lastWordId
     }
 

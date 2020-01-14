@@ -39,7 +39,11 @@
     <string name="import_csv">Import CSV</string>
 
     <!-- Word set details -->
-    <string name="words_count">%d words</string>
+    <plurals name="word_count">
+        <item quantity="zero">No words</item>
+        <item quantity="one">%d word</item>
+        <item quantity="other">%d words</item>
+    </plurals>
     <string name="learning_percentage">%d%% learned</string>
 
     <!-- Search -->

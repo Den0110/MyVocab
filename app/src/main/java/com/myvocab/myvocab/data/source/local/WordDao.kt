@@ -15,6 +15,9 @@ interface WordDao {
     @Query("SELECT * FROM words WHERE wordSetId = :globalId")
     fun getWordsByWordSetId(globalId: String): Single<List<Word>>
 
+    @Query("SELECT COUNT(*) FROM words WHERE wordSetId = :globalId")
+    fun getWordsCountInWordSet(globalId: String): Single<Int>
+
     @Query("SELECT (SUM(knowingLevel) + 0.0)/COUNT(knowingLevel)/3.0*100.0 FROM words WHERE wordSetId = :globalId")
     fun getLearningPercentageByWordSetId(globalId: String): Single<Int>
 

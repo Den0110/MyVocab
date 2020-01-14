@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.data.source.WordRepository
-import com.myvocab.myvocab.domain.word_set_details.LoadWordSetUseCase
+import com.myvocab.myvocab.domain.word_set_details.GetWordSetUseCase
 import com.myvocab.myvocab.util.Resource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -17,19 +17,19 @@ class WordSetDetailsViewModel
 @Inject
 constructor(
         private val wordRepository: WordRepository,
-        private val loadWordSetUseCase: LoadWordSetUseCase,
+        private val getWordSetUseCase: GetWordSetUseCase,
         data: Bundle,
         private val context: Context
 ) : ViewModel() {
 
-    val wordSet: MutableLiveData<Resource<WordSet>> = MutableLiveData()
+    private val initialWordSet = WordSetDetailsFragmentArgs.fromBundle(data).wordSet
+
+    val wordSet: MutableLiveData<Resource<WordSet>> = MutableLiveData(Resource.success(initialWordSet))
     val isSavedLocally: MutableLiveData<Boolean> = MutableLiveData()
     val subtitle: MutableLiveData<String> = MutableLiveData()
 
     val addingWordSet: MutableLiveData<Resource<WordSet>> = MutableLiveData()
     val removingWordSet: MutableLiveData<Resource<WordSet>> = MutableLiveData()
-
-    val initialWordSet = WordSetDetailsFragmentArgs.fromBundle(data).wordSet
 
     private val compositeDisposable = CompositeDisposable()
 
@@ -40,8 +40,8 @@ constructor(
     fun loadWordSet() {
         wordSet.value = Resource.loading()
         compositeDisposable.add(
-                loadWordSetUseCase
-                        .execute(initialWordSet.globalId)
+                getWordSetUseCase
+                        .getWordSet(initialWordSet.globalId)
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe({
                             isSavedLocally.value = it.savedLocally
@@ -49,7 +49,13 @@ constructor(
                                     if (it.savedLocally) {
                                         context.getString(R.string.learning_percentage, it.learningPercentage)
                                     } else {
-                                        context.getString(R.string.words_count, it.wordSet.words.size)
+                                        context
+                                                .resources
+                                                .getQuantityString(
+                                                        R.plurals.word_count,
+                                                        it.wordSet.words.size,
+                                                        it.wordSet.words.size
+                                                )
                                     }
                             wordSet.value = Resource.success(it.wordSet)
                         }, {

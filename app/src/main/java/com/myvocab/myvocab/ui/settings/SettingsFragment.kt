@@ -53,10 +53,10 @@ class SettingsFragment : MainNavigationFragment() {
             viewmodel = viewModel
         }
 
-        if (BuildConfig.DEBUG) {
-            remove_all_words.visibility = View.VISIBLE
-            remove_all_words.setOnClickListener { viewModel.removeAllWords() }
-        }
+//        if (BuildConfig.DEBUG) {
+//            remove_all_words.visibility = View.VISIBLE
+//            remove_all_words.setOnClickListener { viewModel.removeAllWords() }
+//        }
 
         service_switch.setOnCheckedChangeListener(viewModel.translationListener)
         reminder_mode_switch.setOnCheckedChangeListener(viewModel.remindOnlyWordsToLearnListener)

@@ -11,16 +11,16 @@ import io.reactivex.Single
 interface WordSetDao {
 
     @Query("SELECT * FROM word_sets ORDER BY id DESC")
-    fun getWordSets(): Flowable<List<WordSetDbModel>>
+    fun getWordSets(): Single<List<WordSetDbModel>>
 
     @Query("""
-        SELECT ws.id, ws.globalId, ws.title 
+        SELECT ws.id, ws.globalId, ws.title
         FROM word_sets ws 
         LEFT OUTER JOIN words w ON (ws.globalId = w.wordSetId) 
         WHERE w.knowingLevel < 3 and ws.globalId != "my_words"
         GROUP BY ws.globalId"""
     )
-    fun getInLearningWordSets(): Flowable<List<WordSetDbModel>>
+    fun getInLearningWordSets(): Single<List<WordSetDbModel>>
 
     @Query("""
         SELECT ws.id, ws.globalId, ws.title 
@@ -31,10 +31,10 @@ interface WordSetDao {
         GROUP BY ws.globalId 
         HAVING COUNT(w.knowingLevel >= 3 OR NULL) = COUNT(*)"""
     )
-    fun getLearnedWordSets(): Flowable<List<WordSetDbModel>>
+    fun getLearnedWordSets(): Single<List<WordSetDbModel>>
 
     @Query("SELECT COUNT(*) FROM word_sets WHERE globalId = :globalId")
-    fun isWordSetExist(globalId: String): Single<Int>
+    fun getWordSetsCount(globalId: String): Single<Int>
 
     @Query("SELECT * FROM word_sets WHERE globalId = :globalId LIMIT 1")
     fun getWordSetById(globalId: String): Single<WordSetDbModel>

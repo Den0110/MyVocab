@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.myvocab.myvocab.common.FastTranslationServiceManager
 import com.myvocab.myvocab.common.ReminderScheduler
-import com.myvocab.myvocab.common.moveTimeToNextDayIfNeeded
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.util.Event
 import java.util.*
@@ -54,7 +53,6 @@ constructor(
         time.apply {
             set(Calendar.HOUR_OF_DAY, hourOfDay)
             set(Calendar.MINUTE, minute)
-            moveTimeToNextDayIfNeeded()
         }
         remindingTime.value = time
         reminderScheduler.scheduleIfEnabled(time.timeInMillis)

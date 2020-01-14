@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 import org.junit.*
 import java.util.*
 import com.myvocab.myvocab.common.ReminderScheduler
-import com.myvocab.myvocab.common.moveTimeToNextDayIfNeeded
+import com.myvocab.myvocab.common.nextRemindTime
 import com.myvocab.myvocab.util.PreferencesManager
 
 @Config(sdk = [Build.VERSION_CODES.O_MR1])
@@ -45,30 +45,29 @@ class ReminderSchedulerTest {
         // write time to the memory
         // like previous run of the app
         val time = Calendar.getInstance().apply {
-            set(Calendar.HOUR_OF_DAY, 21)
-            moveTimeToNextDayIfNeeded()
+            set(Calendar.HOUR_OF_DAY, 23)
         }
-        prefManager.setRemindingTime(time.timeInMillis)
+
+        prefManager.remindingTime = time.timeInMillis
 
         // check will it restore it for current run
         reminderScheduler.schedule()
         val nextAlarm = getNextReminder()
-        Assert.assertEquals(nextAlarm?.triggerAtTime, time.timeInMillis)
+        Assert.assertEquals(nextAlarm?.triggerAtTime, nextRemindTime(time.timeInMillis))
     }
 
     @Test
     fun `schedule for specified time`() {
         val time = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 23)
-            moveTimeToNextDayIfNeeded()
         }
 
         // schedule for specified time
         reminderScheduler.schedule(time.timeInMillis)
         val nextAlarm = getNextReminder()
         // check if it set and wrote time to the memory correctly
-        Assert.assertEquals(nextAlarm?.triggerAtTime, time.timeInMillis)
-        Assert.assertEquals(prefManager.getRemindingTime(), time.timeInMillis)
+        Assert.assertEquals(nextAlarm?.triggerAtTime, nextRemindTime(time.timeInMillis))
+        Assert.assertEquals(prefManager.remindingTime, nextRemindTime(time.timeInMillis))
     }
 
     //
@@ -81,12 +80,11 @@ class ReminderSchedulerTest {
         // like previous run of the app
         val time = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 15)
-            moveTimeToNextDayIfNeeded()
         }
-        prefManager.setRemindingTime(time.timeInMillis)
+        prefManager.remindingTime = time.timeInMillis
 
         // enable reminder
-        prefManager.setRemindingState(true)
+        prefManager.remindingState = true
 
         // check will it schedule and restore time for current run
         `schedule for time from memory if reminder enabled`()
@@ -95,7 +93,7 @@ class ReminderSchedulerTest {
     @Test
     fun `schedule for time from memory when reminder disabled`(){
         // disable reminder
-        prefManager.setRemindingState(false)
+        prefManager.remindingState = false
 
         // check won't it schedule
         `schedule for time from memory if reminder enabled`()
@@ -103,14 +101,14 @@ class ReminderSchedulerTest {
 
     private fun `schedule for time from memory if reminder enabled`(){
         // save init state of reminder
-        val isAlarmEnabled = prefManager.getRemindingState()
+        val isAlarmEnabled = prefManager.remindingState
 
         reminderScheduler.scheduleIfEnabled()
         val alarm = getNextReminder()
 
         if(isAlarmEnabled){
             // check if it scheduled for time from the memory
-            Assert.assertEquals(alarm?.triggerAtTime, prefManager.getRemindingTime())
+            Assert.assertEquals(alarm?.triggerAtTime, nextRemindTime(prefManager.remindingTime))
         } else {
             // check if it didn't schedule
             Assert.assertNull(alarm)
@@ -120,7 +118,7 @@ class ReminderSchedulerTest {
     @Test
     fun `schedule for specified time when reminder enabled`(){
         // enable reminder
-        prefManager.setRemindingState(true)
+        prefManager.remindingState = true
         // check will it schedule it
         `schedule for specified time if reminder enabled`()
     }
@@ -128,18 +126,17 @@ class ReminderSchedulerTest {
     @Test
     fun `schedule for specified time when reminder disabled`(){
         // disable reminder
-        prefManager.setRemindingState(false)
+        prefManager.remindingState = false
         // check won't it schedule it
         `schedule for specified time if reminder enabled`()
     }
 
     private fun `schedule for specified time if reminder enabled`(){
         // save init state of reminder
-        val isAlarmEnabled = prefManager.getRemindingState()
+        val isAlarmEnabled = prefManager.remindingState
 
         val time = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 13)
-            moveTimeToNextDayIfNeeded()
         }
 
         reminderScheduler.scheduleIfEnabled(time.timeInMillis)
@@ -147,8 +144,8 @@ class ReminderSchedulerTest {
 
         if(isAlarmEnabled){
             // check if it scheduled, and set and wrote specified time to the memory correctly
-            Assert.assertEquals(alarm?.triggerAtTime, time.timeInMillis)
-            Assert.assertEquals(prefManager.getRemindingTime(), time.timeInMillis)
+            Assert.assertEquals(alarm?.triggerAtTime, nextRemindTime(time.timeInMillis))
+            Assert.assertEquals(prefManager.remindingTime, nextRemindTime(time.timeInMillis))
         } else {
             // check if it didn't schedule
             Assert.assertNull(alarm)

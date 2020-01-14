@@ -1,5 +1,6 @@
 package com.myvocab.myvocab.data.model
 
+import androidx.recyclerview.widget.DiffUtil
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.squareup.moshi.Json
@@ -29,4 +30,12 @@ data class Word(
 
 ) : Serializable {
         constructor() : this(null, "", "")
+}
+
+class WordDiffCallback : DiffUtil.ItemCallback<Word>() {
+
+        override fun areItemsTheSame(oldItem: Word, newItem: Word): Boolean = newItem.id == oldItem.id
+
+        override fun areContentsTheSame(oldItem: Word, newItem: Word): Boolean = newItem == oldItem
+
 }

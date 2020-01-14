@@ -4,59 +4,50 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingStart="16dp"
+    android:paddingEnd="@dimen/horizontal_layout_margin"
     android:paddingTop="@dimen/vertical_layout_margin"
     android:paddingBottom="@dimen/vertical_layout_margin">
 
-    <ImageView
-        android:id="@+id/knowing_level"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:layout_alignParentStart="true"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="@dimen/horizontal_layout_margin"
-        tools:src="@drawable/ic_brain_green_18dp"/>
-
-    <LinearLayout
+    <CheckBox
+        android:id="@+id/checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginStart="@dimen/horizontal_layout_margin"
-        android:layout_toEndOf="@+id/knowing_level">
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"/>
+
+    <LinearLayout
+        android:id="@+id/reminding_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/checkbox"
+        android:layout_marginStart="16dp"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/word_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:textColor="@color/primaryTextColor"
             android:textSize="16sp"
-            tools:text="@tools:sample/cities"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-"
-            android:textSize="20sp"
-            tools:ignore="HardcodedText"/>
+            tools:text="especially"/>
 
         <TextView
             android:id="@+id/translate_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:textSize="16sp"
-            tools:text="@tools:sample/cities"/>
+            android:textColor="@color/secondaryTextColor"
+            tools:text="особенно"/>
 
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/delete_btn"
+        android:id="@+id/knowing_level"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true"
         android:padding="4dp"
-        android:layout_marginEnd="8dp"
-        android:src="@drawable/ic_delete_24dp"
-        android:visibility="gone"/>
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        tools:src="@drawable/ic_brain_green_18dp"/>
 
 </RelativeLayout>

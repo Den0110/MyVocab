@@ -24,7 +24,6 @@ constructor(
             set(Calendar.HOUR_OF_DAY, 18)
             set(Calendar.MINUTE, 0)
             set(Calendar.SECOND, 0)
-            moveTimeToNextDayIfNeeded()
         }.timeInMillis
     }
 
@@ -33,47 +32,58 @@ constructor(
     private val pendingIntent = PendingIntent.getBroadcast(context, REMINDER_REQUEST_CODE, alarmIntent, 0)
 
     fun schedule() {
-        schedule(prefManager.getRemindingTime())
+        schedule(prefManager.remindingTime)
     }
 
     fun schedule(remindingTime: Long) {
-        prefManager.setRemindingState(true)
-        prefManager.setRemindingTime(remindingTime)
-        Timber.d("Set reminder at ${Date(remindingTime)}")
+        prefManager.remindingState = true
+        prefManager.remindingTime = remindingTime
+        Timber.d("Set reminder at ${Date(nextRemindTime(remindingTime))}")
         manager.cancel(pendingIntent)
-        manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, remindingTime, AlarmManager.INTERVAL_DAY, pendingIntent)
+        manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, nextRemindTime(remindingTime), AlarmManager.INTERVAL_DAY, pendingIntent)
     }
 
     fun scheduleIfEnabled(){
-        if(prefManager.getRemindingState())
+        if(prefManager.remindingState)
             schedule()
     }
 
     fun scheduleIfEnabled(remindingTime: Long){
-        if(prefManager.getRemindingState())
+        if(prefManager.remindingState)
             schedule(remindingTime)
     }
 
     fun cancel() {
-        prefManager.setRemindingState(false)
+        prefManager.remindingState = false
         manager.cancel(pendingIntent)
         pendingIntent.cancel()
     }
 
-    fun isReminderEnabled() = prefManager.getRemindingState()
+    fun isReminderEnabled() = prefManager.remindingState
 
-    fun isRemindOnlyWordsToLearn() = prefManager.getRemindOnlyWordsToLearn()
+    fun isRemindOnlyWordsToLearn() = prefManager.remindOnlyWordsToLearn
 
-    fun setRemindOnlyWordsToLearn(state: Boolean) = prefManager.setRemindOnlyWordsToLearn(state)
+    fun setRemindOnlyWordsToLearn(state: Boolean) { prefManager.remindOnlyWordsToLearn = state }
 
-    fun getRemindingTime() = prefManager.getRemindingTime()
+    fun getRemindingTime() = prefManager.remindingTime
 
 }
 
-fun Calendar.moveTimeToNextDayIfNeeded(){
+fun nextRemindTime(time: Long): Long {
+    val now = Calendar.getInstance()
+    val cal = Calendar.getInstance().apply { timeInMillis = time }
+    val inCal = Calendar.getInstance().apply { timeInMillis = time }
+
+    cal.apply {
+        set(Calendar.HOUR_OF_DAY, inCal.get(Calendar.HOUR_OF_DAY))
+        set(Calendar.MINUTE, inCal.get(Calendar.MINUTE))
+        set(Calendar.DATE, now.get(Calendar.DATE))
+    }
+
     // check whether the time is earlier than current time. If so, set it to tomorrow.
     // otherwise, all alarms for earlier time will fire
-    if(before(Calendar.getInstance())){
-        add(Calendar.DATE, 1)
+    if(cal.before(now)){
+        cal.add(Calendar.DATE, 1)
     }
+    return cal.timeInMillis
 }

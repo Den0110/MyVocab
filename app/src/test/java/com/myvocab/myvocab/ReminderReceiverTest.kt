@@ -4,8 +4,6 @@ import android.app.AlarmManager
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
-import com.myvocab.myvocab.util.PreferencesManager
-import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

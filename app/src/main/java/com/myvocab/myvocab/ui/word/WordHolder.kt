@@ -13,7 +13,6 @@ class WordHolder(view: View) : RecyclerView.ViewHolder(view) {
     private var knowingLevel: ImageView = view.findViewById(R.id.knowing_level)
     private var wordView: TextView = view.findViewById(R.id.word_view)
     private var translateView: TextView = view.findViewById(R.id.translate_view)
-    private var deleteBtn: ImageView = view.findViewById(R.id.delete_btn)
 
     fun bind(word: Word, removeCallback: WordListAdapter.OnRemoveWordCallback? = null){
         wordView.text = word.word?.toLowerCase()
@@ -25,10 +24,6 @@ class WordHolder(view: View) : RecyclerView.ViewHolder(view) {
             word.knowingLevel > 2 -> ContextCompat.getDrawable(knowingLevel.context, R.drawable.ic_brain_green_18dp)
             else -> null
         })
-        if(removeCallback != null) {
-            deleteBtn.visibility = View.VISIBLE
-            deleteBtn.setOnClickListener { removeCallback.onRemove(word) }
-        }
     }
 
 }

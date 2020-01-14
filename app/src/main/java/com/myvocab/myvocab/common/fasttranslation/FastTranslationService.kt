@@ -20,7 +20,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.myvocab.myvocab.ui.fast_translation.FastTranslationWidget
-import com.myvocab.myvocab.ui.fast_translation.FastTranslationWidgetViewModel
 import com.myvocab.myvocab.util.*
 import dagger.android.DaggerService
 import io.reactivex.Observable

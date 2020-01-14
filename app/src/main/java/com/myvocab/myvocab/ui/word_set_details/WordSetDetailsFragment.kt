@@ -10,7 +10,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.databinding.FragmentWordSetDetailsBinding
-import com.myvocab.myvocab.domain.word_set_details.LoadWordSetUseCase
+import com.myvocab.myvocab.domain.word_set_details.GetWordSetUseCase
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.ui.word.WordListAdapter
 import com.myvocab.myvocab.util.Resource
@@ -22,19 +22,15 @@ import javax.inject.Inject
 
 class WordSetDetailsFragment : MainNavigationFragment() {
 
-    companion object {
-        private const val TAG = "WordSetDetailsActivity"
-    }
-
     private lateinit var binding: FragmentWordSetDetailsBinding
 
     @Inject
     lateinit var wordRepository: WordRepository
     @Inject
-    lateinit var loadWordSetUseCase: LoadWordSetUseCase
+    lateinit var getWordSetUseCase: GetWordSetUseCase
 
     private val viewModel: WordSetDetailsViewModel
-            by lazy { getViewModel { WordSetDetailsViewModel(wordRepository, loadWordSetUseCase, arguments!!, context!!) } }
+            by lazy { getViewModel { WordSetDetailsViewModel(wordRepository, getWordSetUseCase, arguments!!, context!!) } }
 
     @Inject
     lateinit var wordListAdapter: WordListAdapter
@@ -50,9 +46,9 @@ class WordSetDetailsFragment : MainNavigationFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        toolbar.title = viewModel.initialWordSet.title
         toolbar.inflateMenu(R.menu.word_set_details)
         menu = toolbar.menu
+
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.add -> {

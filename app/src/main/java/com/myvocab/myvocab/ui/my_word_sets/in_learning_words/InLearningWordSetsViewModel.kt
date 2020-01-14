@@ -1,25 +1,22 @@
 package com.myvocab.myvocab.ui.my_word_sets.in_learning_words
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import com.myvocab.myvocab.data.model.WordSetUseCaseResult
 import javax.inject.Inject
-import com.myvocab.myvocab.data.model.WordSet
-import com.myvocab.myvocab.data.source.WordRepository
+import com.myvocab.myvocab.domain.my_word_sets.in_learning_words.GetInLearningWordSetsUseCase
 import com.myvocab.myvocab.util.Resource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import java.util.concurrent.TimeUnit
 
 class InLearningWordSetsViewModel
 @Inject
 constructor(
-        private val wordRepository: WordRepository,
-        context: Application
-) : AndroidViewModel(context) {
+        private val inLearningWordSetsUseCase: GetInLearningWordSetsUseCase
+) : ViewModel() {
 
-    var wordSets: MutableLiveData<Resource<List<WordSet>>> = MutableLiveData()
+    var wordSets: MutableLiveData<Resource<List<WordSetUseCaseResult>>> = MutableLiveData()
 
     private var getWordsDisposable: Disposable? = null
     private var compositeDisposable = CompositeDisposable()
@@ -30,10 +27,9 @@ constructor(
 
     fun loadInLearningWords(){
         getWordsDisposable?.dispose()
-        getWordsDisposable = wordRepository
-                .getInLearningWordSets()
+        getWordsDisposable = inLearningWordSetsUseCase
+                .getWordSets()
                 .observeOn(AndroidSchedulers.mainThread())
-                .debounce(400, TimeUnit.MILLISECONDS)
                 .subscribe({
                     wordSets.postValue(Resource.success(it))
                 },{

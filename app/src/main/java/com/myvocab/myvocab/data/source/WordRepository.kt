@@ -14,7 +14,6 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import timber.log.Timber
 import javax.inject.Singleton
 
 @Singleton
@@ -27,39 +26,42 @@ constructor(
     //  To concat network and local db
     //  return Observable.concatArrayEager(observableFromApi, observableFromDb)
 
-    fun getWordSets(): Observable<List<WordSet>> {
+    fun getWordSets(): Single<List<RepositoryData<WordSet>>> {
         return wordSetDao
                 .getWordSets()
-                .toObservable()
                 .map { modelsToWordSets(it) }
                 .subscribeOn(Schedulers.io())
     }
 
-    fun getInLearningWordSets(): Observable<List<WordSet>> {
+    fun getInLearningWordSets(): Single<List<RepositoryData<WordSet>>> {
         return wordSetDao
                 .getInLearningWordSets()
-                .toObservable()
                 .map { modelsToWordSets(it) }
                 .subscribeOn(Schedulers.io())
     }
 
-    fun getLearnedWordSets(): Observable<List<WordSet>> {
+    fun getLearnedWordSets(): Single<List<RepositoryData<WordSet>>> {
         return wordSetDao
                 .getLearnedWordSets()
-                .toObservable()
                 .map { modelsToWordSets(it) }
                 .subscribeOn(Schedulers.io())
     }
 
-    fun wordSetSavedLocally(globalId: String): Single<Boolean> {
+    fun isWordSetSavedLocally(globalId: String): Single<Boolean> {
         return wordSetDao
-                .isWordSetExist(globalId)
+                .getWordSetsCount(globalId)
                 .map { it > 0 }
                 .subscribeOn(Schedulers.io())
     }
 
+    fun getWordsCountInWordSet(globalId: String): Single<Int> {
+        return wordDao
+                .getWordsCountInWordSet(globalId)
+                .subscribeOn(Schedulers.io())
+    }
+
     private fun modelsToWordSets(models: List<WordSetDbModel>) =
-            models.map { WordSet(it.globalId, it.id, it.title) }
+            models.map { RepositoryData(WordSet(it.globalId, it.id, it.title), Source.LOCAL) }
 
     fun getWordSet(globalId: String): Single<RepositoryData<WordSet>> =
             wordSetDao

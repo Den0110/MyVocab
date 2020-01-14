@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -18,69 +18,84 @@
 
         <include layout="@layout/toolbar_layout" />
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/service_switch"
+
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:checked="@{viewmodel.translationEnabled}"
-            android:text="@string/enable_fast_translation"
-            android:textColor="@color/primaryTextColor"
-            android:textSize="16sp" />
+            android:layout_marginTop="16dp">
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/reminder_switch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:checked="@{viewmodel.reminderEnabled}"
-            android:text="@string/remind_to_learn_words"
-            android:textColor="@color/primaryTextColor"
-            android:textSize="16sp" />
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/reminder_mode_switch"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:checked="@{viewmodel.remindOnlyWordsToLearn}"
-            android:text="@string/remind_only_if_there_are_words_to_learn"
-            android:textColor="@color/primaryTextColor"
-            android:textSize="16sp" />
-
-        <LinearLayout
-            android:id="@+id/reminding_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/service_switch"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/reminding_time"
+                android:checked="@{viewmodel.translationEnabled}"
+                android:padding="16dp"
+                android:text="@string/enable_fast_translation"
                 android:textColor="@color/primaryTextColor"
-                android:textSize="16sp"/>
+                android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/reminding_time_value"
-                android:layout_width="wrap_content"
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/reminder_switch"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="13:00"
-                android:textColor="@color/secondaryTextColor"/>
+                android:checked="@{viewmodel.reminderEnabled}"
+                android:padding="16dp"
+                android:text="@string/remind_to_learn_words"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="16sp" />
 
-        </LinearLayout>
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/reminder_mode_switch"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="@{viewmodel.remindOnlyWordsToLearn}"
+                android:padding="16dp"
+                android:text="@string/remind_only_if_there_are_words_to_learn"
+                android:textColor="@color/primaryTextColor"
+                android:textSize="16sp" />
 
-        <Button
-            android:id="@+id/remove_all_words"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/horizontal_layout_margin"
-            android:layout_marginTop="@dimen/vertical_layout_margin"
-            android:layout_marginEnd="@dimen/horizontal_layout_margin"
-            android:text="@string/remove_all_words"
-            android:visibility="gone"
-            tools:visibility="visible" />
+            <LinearLayout
+                android:id="@+id/reminding_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reminding_time"
+                    android:textColor="@color/primaryTextColor"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/reminding_time_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="13:00"
+                    android:textColor="@color/secondaryTextColor" />
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/remove_all_words"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/horizontal_layout_margin"
+                android:layout_marginTop="@dimen/vertical_layout_margin"
+                android:layout_marginEnd="@dimen/horizontal_layout_margin"
+                android:layout_marginBottom="@dimen/vertical_layout_margin"
+                android:text="@string/remove_all_words"
+                android:visibility="gone" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
 
     </LinearLayout>
 

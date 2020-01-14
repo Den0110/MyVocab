@@ -34,9 +34,9 @@ class MyVocabAppTest {
     @Test
     fun `schedule reminder if enabled for time from memory`(){
         val nextAlarm = shadowAlarmManager.nextScheduledAlarm
-        val isAlarmEnabled = prefManager.getRemindingState()
+        val isAlarmEnabled = prefManager.remindingState
         if(isAlarmEnabled) {
-            Assert.assertEquals(nextAlarm?.triggerAtTime, prefManager.getRemindingTime())
+            Assert.assertEquals(nextAlarm?.triggerAtTime, prefManager.remindingTime)
         } else {
             Assert.assertNull(nextAlarm)
         }

@@ -14,10 +14,6 @@ import kotlinx.android.synthetic.main.fragment_my_word_sets.*
 
 class MyWordSetsFragment: MainNavigationFragment() {
 
-    companion object {
-        private const val TAG = "MyWordSetsFragment"
-    }
-
     private lateinit var binding: FragmentMyWordSetsBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

@@ -1,6 +1,6 @@
 package com.myvocab.myvocab.di.my_word_sets
 
-import com.myvocab.myvocab.data.model.WordSetDiffCallback
+import com.myvocab.myvocab.data.model.LoadWordSetUseCaseResultDiffCallback
 import dagger.Module
 import dagger.Provides
 
@@ -8,6 +8,7 @@ import dagger.Provides
 class MyWordSetsModule {
 
     @Provides
-    fun provideWordSetDiffCallback(): WordSetDiffCallback = WordSetDiffCallback()
+    fun provideLoadWordSetUseCaseResultDiffCallback(): LoadWordSetUseCaseResultDiffCallback =
+            LoadWordSetUseCaseResultDiffCallback()
 
 }
