@@ -29,11 +29,11 @@ constructor(
                             val wordSet = WordSet(doc.id, null, obj.title, obj.words.reversed())
                             wordSetResults.add(wordSet)
                         }
-                        wordSetResults.toList()
+                        wordSetResults
                     }
                     .toObservable()
                     .flatMapIterable { it }
-                    .flatMapSingle { wordSet ->
+                    .concatMapSingle { wordSet ->
                         wordRepository
                                 .isWordSetSavedLocally(wordSet.globalId)
                                 .map {
@@ -44,7 +44,7 @@ constructor(
                                     }
                                 }
                     }
-                    .flatMapSingle {
+                    .concatMapSingle {
                         wordSetUseCase.execute(it)
                     }
                     .toList()
