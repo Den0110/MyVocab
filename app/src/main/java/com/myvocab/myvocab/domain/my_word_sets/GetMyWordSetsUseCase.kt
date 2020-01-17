@@ -12,9 +12,9 @@ abstract class GetMyWordSetsUseCase (private val getWordSetUseCase: GetWordSetUs
     fun getWordSets(): Single<List<WordSetUseCaseResult>> {
         return fetchWordSets()
                 .toObservable()
-                .flatMapIterable { it }
-                .flatMapSingle { getWordSetUseCase.getWordSet(it.data.globalId) }
-                .toSortedList()
+                .concatMapIterable { it }
+                .concatMapSingle { getWordSetUseCase.getWordSet(it.data.globalId) }
+                .toList()
     }
 
     protected abstract fun fetchWordSets(): Single<List<RepositoryData<WordSet>>>
