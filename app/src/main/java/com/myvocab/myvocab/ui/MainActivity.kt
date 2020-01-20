@@ -6,6 +6,7 @@ import androidx.navigation.NavController
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import com.myvocab.myvocab.MyVocabApp
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.util.setupToolbar
@@ -36,31 +37,32 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val navHostFragment = nav_host as NavHostFragment
-        val inflater = navHostFragment.navController.navInflater
-        val graph = inflater.inflate(R.navigation.navigation_graph)
-
-
-        wordCountDisposable = wordRepository.getInLearningWordsCount().subscribe({
-            graph.startDestination = if (it > 0) {
-                R.id.navigation_learning
-            } else {
-                R.id.navigation_vocab
-            }
-            navHostFragment.navController.graph = graph
-        }, {
-            graph.startDestination = R.id.navigation_vocab
-            navHostFragment.navController.graph = graph
-        })
-
         navController = findNavController(this, R.id.nav_host)
+
+        val graph = navController.navInflater.inflate(R.navigation.navigation_graph)
+
+        if(!(application as MyVocabApp).started) {
+            wordCountDisposable = wordRepository.getInLearningWordsCount().subscribe({
+                graph.startDestination = if (it > 0) {
+                    R.id.navigation_learning
+                } else {
+                    R.id.navigation_vocab
+                }
+                navController.graph = graph
+            }, {
+                graph.startDestination = R.id.navigation_vocab
+                navController.graph = graph
+            })
+            (application as MyVocabApp).started = true
+        }
 
         NavigationUI.setupWithNavController(bottom_navigation, navController)
 
     }
 
-    override fun onSupportNavigateUp() =
-            navController.navigateUp()
+    override fun onBackPressed() {
+        navController.navigateUp()
+    }
 
     override fun registerToolbarWithNavigation(toolbar: Toolbar) =
             setupToolbar(toolbar, navController, TOP_LEVEL_DESTINATIONS)

@@ -12,7 +12,7 @@ fun Fragment.findNavController() = Navigation.findNavController(this.view!!)
 
 fun setupToolbar(toolbar: Toolbar, navController: NavController, topLevelDests: Set<Int>){
     toolbar.title = navController.currentDestination?.label
-    if(!matchDestinations(navController.currentDestination!!, topLevelDests)) {
+    if(!matchDestinations(navController.currentDestination, topLevelDests)) {
         toolbar.navigationIcon =
                 ContextCompat.getDrawable(toolbar.context, R.drawable.ic_arrow_back)
         toolbar.setNavigationOnClickListener { navController.navigateUp() }
@@ -21,13 +21,13 @@ fun setupToolbar(toolbar: Toolbar, navController: NavController, topLevelDests: 
     }
 }
 
-private fun matchDestinations(destination: NavDestination, destinationIds: Set<Int>): Boolean {
+private fun matchDestinations(destination: NavDestination?, destinationIds: Set<Int>): Boolean {
     var currentDestination: NavDestination? = destination
     do {
-        if (destinationIds.contains(currentDestination!!.id)) {
+        if (destinationIds.contains(currentDestination?.id)) {
             return true
         }
-        currentDestination = currentDestination.parent
+        currentDestination = currentDestination?.parent
     } while (currentDestination != null)
     return false
 }
