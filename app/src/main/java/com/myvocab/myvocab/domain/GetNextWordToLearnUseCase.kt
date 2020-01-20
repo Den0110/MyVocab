@@ -1,8 +1,7 @@
-package com.myvocab.myvocab.domain.learning
+package com.myvocab.myvocab.domain
 
 import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.source.WordRepository
-import com.myvocab.myvocab.domain.UseCase
 import com.myvocab.myvocab.util.PreferencesManager
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -14,7 +13,7 @@ class GetNextWordToLearnUseCase
 constructor(
         private val wordRepository: WordRepository,
         private val prefManager: PreferencesManager
-) : UseCase<Boolean, Word>() {
+) {
 
     companion object {
         const val UNKNOWN_LEVEL = 0
@@ -25,8 +24,8 @@ constructor(
     private var currentWord: Word? = null
     private var lastWordId: Int? = null
 
-    override fun execute(parameter: Boolean): Observable<Word> =
-            if (parameter && currentWord == null && prefManager.lastWordToLearnId != -1) {
+    fun execute(considerLastWordToLearn: Boolean): Single<Word> =
+            if (considerLastWordToLearn && currentWord == null && prefManager.lastWordToLearnId != -1) {
                 wordRepository
                         .getWordById(prefManager.lastWordToLearnId)
                         .flatMap {
@@ -40,8 +39,7 @@ constructor(
             } else {
                 loadNextWord()
             }
-                    .toObservable()
-                    .doOnNext { prefManager.lastWordToLearnId = it.id!! }
+                    .doOnSuccess { prefManager.lastWordToLearnId = it.id!! }
                     .doOnError { prefManager.lastWordToLearnId = -1 }
 
 

@@ -45,6 +45,19 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <TextView
+                    android:id="@+id/word_set_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:text="@{viewModel.wordSetTitle}"
+                    android:textColor="@color/secondaryTextColor"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/question"
+                    tools:text="Forward 10 WB Unit 5 Vocab" />
+
                 <ImageView
                     android:id="@+id/knowing_level"
                     android:layout_width="wrap_content"
@@ -61,14 +74,13 @@
                     android:id="@+id/word"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
                     android:text="@{viewModel.currentWord.word.toLowerCase()}"
                     android:textAppearance="@style/LabelTextAppearance"
                     android:textColor="@color/colorAccent"
                     android:textSize="36sp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/knowing_level"
-                    app:layout_constraintTop_toBottomOf="@+id/question"
+                    app:layout_constraintTop_toBottomOf="@+id/word_set_title"
                     tools:text="Especially" />
 
                 <TextView
@@ -218,7 +230,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     app:constraint_referenced_ids="know_container,dont_know_container"
-                    tools:visibility="gone" />
+                    tools:visibility="visible" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

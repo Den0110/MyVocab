@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.source.WordRepository
-import com.myvocab.myvocab.domain.learning.GetNextWordToLearnUseCase
+import com.myvocab.myvocab.domain.learning.GetLearningWordUseCase
 import io.reactivex.Completable
 import io.reactivex.disposables.CompositeDisposable
 import javax.inject.Inject
@@ -13,10 +13,11 @@ class LearningViewModel
 @Inject
 constructor(
         private val wordRepository: WordRepository,
-        private val getNextWordUseCase: GetNextWordToLearnUseCase
+        private val getLearningWordUseCase: GetLearningWordUseCase
 ) : ViewModel() {
 
     val currentWord: MutableLiveData<Word> = MutableLiveData()
+    val wordSetTitle: MutableLiveData<String> = MutableLiveData()
 
     private var compositeDisposable = CompositeDisposable()
 
@@ -30,11 +31,15 @@ constructor(
     }
 
     private fun loadNextWord() =
-            getNextWordUseCase.execute(true).subscribe({
-                currentWord.postValue(it)
-            }, {
-                currentWord.postValue(null)
-            })
+            getLearningWordUseCase
+                    .execute(true)
+                    .subscribe({
+                        currentWord.postValue(it.word)
+                        wordSetTitle.postValue(it.wordSetTitle)
+                    }, {
+                        currentWord.postValue(null)
+                        wordSetTitle.postValue(null)
+                    })
 
     fun increaseKnowingLevel(): Completable {
         currentWord.value!!.apply {

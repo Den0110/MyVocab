@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.navigation.NavDeepLinkBuilder
 import com.myvocab.myvocab.R
-import com.myvocab.myvocab.domain.learning.GetNextWordToLearnUseCase
+import com.myvocab.myvocab.domain.GetNextWordToLearnUseCase
 import com.myvocab.myvocab.ui.MainActivity
 import com.myvocab.myvocab.util.Constants
 import com.myvocab.myvocab.util.PreferencesManager

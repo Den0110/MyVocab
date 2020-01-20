@@ -93,6 +93,9 @@ constructor(
                     })
                     .subscribeOn(Schedulers.io())
 
+    fun getWordSetEntityFromDb(globalId: String) =
+            wordSetDao.getWordSetById(globalId)
+
     fun addWordSet(wordSet: WordSet): Completable {
         val model = WordSetDbModel(globalId = wordSet.globalId, title = wordSet.title)
         return wordSetDao
