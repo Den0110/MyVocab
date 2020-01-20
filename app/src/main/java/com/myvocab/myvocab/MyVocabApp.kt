@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.multidex.MultiDex
 import com.myvocab.myvocab.common.FastTranslationServiceManager
 import com.myvocab.myvocab.common.ReminderScheduler
+import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.data.source.local.Database
 import com.myvocab.myvocab.di.DaggerAppComponent
 import com.myvocab.myvocab.util.createFastTranslationNotificationChannel
@@ -19,8 +20,11 @@ import javax.inject.Inject
 class MyVocabApp : DaggerApplication() {
 
     @Inject lateinit var wordsDb: Database
+    @Inject lateinit var wordRepository: WordRepository
     @Inject lateinit var reminderScheduler: ReminderScheduler
     @Inject lateinit var translationServiceManager: FastTranslationServiceManager
+
+    var started: Boolean = false
 
     override fun onCreate() {
         super.onCreate()

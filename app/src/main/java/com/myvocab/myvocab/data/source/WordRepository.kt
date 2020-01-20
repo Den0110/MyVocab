@@ -10,7 +10,6 @@ import com.myvocab.myvocab.util.RepositoryData
 import com.myvocab.myvocab.util.Source
 import durdinapps.rxfirebase2.RxFirestore
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
@@ -122,8 +121,8 @@ constructor(
         return getInLearningWordsCountFromDb().subscribeOn(Schedulers.io())
     }
 
-    fun getWordsByKnowingLevel(knowingLevel: Int): Single<List<Word>> {
-        return getWordByKnowingLevelFromDb(knowingLevel).subscribeOn(Schedulers.io())
+    fun getInLearningWordsByKnowingLevel(knowingLevel: Int): Single<List<Word>> {
+        return getWordsInLearningByKnowingLevelFromDb(knowingLevel).subscribeOn(Schedulers.io())
     }
 
     fun getWordById(id: Int): Single<Word> {
@@ -142,6 +141,10 @@ constructor(
         return addWord(word.apply { wordSetId = "my_words" })
     }
 
+    fun updateWord(word: Word): Completable {
+        return updateWordInDb(word).subscribeOn(Schedulers.io())
+    }
+
     fun deleteWord(word: Word): Completable {
         return deleteWordFromDb(word).subscribeOn(Schedulers.io())
     }
@@ -153,8 +156,8 @@ constructor(
     private fun getInLearningWordsCountFromDb(): Single<Int> =
             wordDao.getInLearningWordsCount()
 
-    private fun getWordByKnowingLevelFromDb(knowingLevel: Int): Single<List<Word>> =
-            wordDao.getWordByKnowingLevel(knowingLevel)
+    private fun getWordsInLearningByKnowingLevelFromDb(knowingLevel: Int): Single<List<Word>> =
+            wordDao.getWordsInLearningByKnowingLevel(knowingLevel)
 
     private fun getWordByIdFromDb(id: Int): Single<Word> =
             wordDao.getWordById(id)
@@ -164,6 +167,9 @@ constructor(
 
     private fun addWordsToDb(words: List<Word>) =
             wordDao.addWords(words)
+
+    private fun updateWordInDb(word: Word) =
+            wordDao.updateWord(word)
 
     private fun deleteWordFromDb(word: Word) =
             wordDao.deleteWord(word)

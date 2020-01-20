@@ -8,7 +8,7 @@
 
     <!-- Learning -->
     <string name="label_learning">Learning</string>
-    <string name="do_you_know">Do you this word?</string>
+    <string name="do_you_know">Do you know this word?</string>
     <string name="was_you_right">Was you right?</string>
     <string name="i_know">I know</string>
     <string name="i_dont_know">I don\'t know</string>
@@ -60,5 +60,9 @@
     <string name="remind_to_learn_words">Remind to learn words</string>
     <string name="reminding_time">Reminding time</string>
     <string name="remind_only_if_there_are_words_to_learn">Remind only if there are words to learn</string>
+    <string name="words">Words</string>
+    <string name="word_lists">Word lists</string>
+    <string name="dialog_select_all_words_to_learn">Select all the words to learn?</string>
+    <string name="dialog_deselect_all_words_to_learn">Deselect all the words to learn?</string>
 
 </resources>

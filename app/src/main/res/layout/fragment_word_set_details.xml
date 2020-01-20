@@ -24,7 +24,7 @@
                 android:paddingTop="@dimen/vertical_layout_margin"
                 android:paddingBottom="@dimen/vertical_layout_margin"
                 android:clipToPadding="false"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                app:layoutManager=".ui.common.NpaLinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/separator"

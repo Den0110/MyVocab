@@ -26,7 +26,10 @@ data class Word(
         var lastShowTime: Long = 0,
 
         @Json(name = "wordSetId")
-        var wordSetId: String? = null
+        var wordSetId: String? = null,
+
+        @Json(name = "needToLearn")
+        var needToLearn: Boolean = true
 
 ) : Serializable {
         constructor() : this(null, "", "")

@@ -10,18 +10,21 @@
     android:paddingBottom="@dimen/vertical_layout_margin">
 
     <CheckBox
-        android:id="@+id/checkbox"
+        android:id="@+id/need_to_learn_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_alignParentStart="true"/>
+        android:layout_alignParentStart="true"
+        android:layout_marginEnd="16dp"
+        android:visibility="gone"
+        tools:visibility="visible"/>
 
     <LinearLayout
-        android:id="@+id/reminding_time"
+        android:id="@+id/word"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/checkbox"
-        android:layout_marginStart="16dp"
+        android:layout_toEndOf="@+id/need_to_learn_checkbox"
+        android:layout_centerVertical="true"
         android:orientation="vertical">
 
         <TextView
@@ -48,6 +51,8 @@
         android:padding="4dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        tools:src="@drawable/ic_brain_green_18dp"/>
+        android:visibility="gone"
+        tools:src="@drawable/ic_brain_green_18dp"
+        tools:visibility="visible"/>
 
 </RelativeLayout>

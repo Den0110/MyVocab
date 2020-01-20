@@ -30,7 +30,7 @@ constructor(
                 wordRepository
                         .getWordById(prefManager.lastWordToLearnId)
                         .flatMap {
-                            if (it.knowingLevel > WELL_KNOWN_LEVEL) {
+                            if (!it.needToLearn || it.knowingLevel > WELL_KNOWN_LEVEL) {
                                 loadNextWord()
                             } else {
                                 Single.fromCallable { it }
@@ -53,13 +53,14 @@ constructor(
                     else -> listOf(UNKNOWN_LEVEL, RECENTLY_LEARNED_LEVEL, WELL_KNOWN_LEVEL)
                 }
         return Observable.fromIterable(levels)
-                .concatMapSingleDelayError { wordRepository.getWordsByKnowingLevel(it) }
+                .concatMapSingleDelayError { wordRepository.getInLearningWordsByKnowingLevel(it) }
                 .takeUntil { it.isNotEmpty() }
                 .filter { it.isNotEmpty() }
                 .firstOrError()
                 .map {
                     when {
                         it.size > 1 -> {
+                            // любой из первых трех
                             var i: Int
                             do {
                                 i = Random.nextInt(if (it.size < 3) it.size else 3)

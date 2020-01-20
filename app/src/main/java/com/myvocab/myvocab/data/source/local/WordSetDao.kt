@@ -13,24 +13,66 @@ interface WordSetDao {
     @Query("SELECT * FROM word_sets ORDER BY id DESC")
     fun getWordSets(): Single<List<WordSetDbModel>>
 
+//    @Query("""
+//        SELECT ws.id, ws.globalId, ws.title
+//        FROM word_sets ws
+//        LEFT OUTER JOIN words w
+//        ON (ws.globalId = w.wordSetId)
+//        WHERE ws.globalId != "my_words"
+//        GROUP BY ws.globalId
+//        HAVING COUNT(w.knowingLevel >= 3 OR NULL) < COUNT(w.needToLearn = 1 OR NULL)"""
+//    )
     @Query("""
-        SELECT ws.id, ws.globalId, ws.title
-        FROM word_sets ws 
-        LEFT OUTER JOIN words w ON (ws.globalId = w.wordSetId) 
-        WHERE w.knowingLevel < 3 and ws.globalId != "my_words"
-        GROUP BY ws.globalId"""
-    )
+        SELECT *
+        FROM word_sets ws
+        WHERE (
+            (
+                SELECT COUNT(*)
+                FROM words w 
+                WHERE w.wordSetId = ws.globalId AND w.needToLearn = 1 AND w.knowingLevel >= 3
+            ) < (
+                SELECT COUNT(*) 
+                FROM words w 
+                WHERE w.wordSetId = ws.globalId AND w.needToLearn = 1
+            )
+            OR (
+                SELECT COUNT(*)
+                FROM words w 
+                WHERE w.wordSetId = ws.globalId AND w.needToLearn = 1 AND w.knowingLevel >= 3
+            ) = 0
+        ) AND ws.globalId != "my_words"
+    """)
     fun getInLearningWordSets(): Single<List<WordSetDbModel>>
 
+//    @Query("""
+//        SELECT ws.id, ws.globalId, ws.title
+//        FROM word_sets ws
+//        LEFT OUTER JOIN words w
+//        ON (ws.globalId = w.wordSetId)
+//        WHERE ws.globalId != "my_words"
+//        GROUP BY ws.globalId
+//        HAVING COUNT(w.knowingLevel >= 3 OR NULL) >= COUNT(w.needToLearn = 1 OR NULL)"""
+//    )
     @Query("""
-        SELECT ws.id, ws.globalId, ws.title 
-        FROM word_sets ws 
-        LEFT OUTER JOIN words w 
-        ON (ws.globalId = w.wordSetId)
-        WHERE ws.globalId != "my_words"
-        GROUP BY ws.globalId 
-        HAVING COUNT(w.knowingLevel >= 3 OR NULL) = COUNT(*)"""
-    )
+        SELECT *
+        FROM word_sets ws
+        WHERE (
+            (
+                SELECT COUNT(*)
+                FROM words w
+                WHERE w.wordSetId = ws.globalId AND w.needToLearn = 1 AND w.knowingLevel >= 3
+            ) >= (
+                SELECT COUNT(*)
+                FROM words w
+                WHERE w.wordSetId = ws.globalId AND w.needToLearn = 1
+            )
+            AND (
+                SELECT COUNT(*)
+                FROM words w 
+                WHERE w.wordSetId = ws.globalId AND w.needToLearn = 1 AND w.knowingLevel >= 3
+            ) > 0
+        ) AND ws.globalId != "my_words"
+    """)
     fun getLearnedWordSets(): Single<List<WordSetDbModel>>
 
     @Query("SELECT COUNT(*) FROM word_sets WHERE globalId = :globalId")

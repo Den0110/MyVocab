@@ -35,6 +35,7 @@ class ReminderReceiver : DaggerBroadcastReceiver() {
         val ticker = "Time to learn new words!"
         var text: Spanned
 
+        @Suppress("DEPRECATION")
         var getWordDisposable = getNextWordUseCase.execute(false).subscribe({
             text = Html.fromHtml("Do you know, what does <strong>${it.word}</strong> mean?")
             showNotification(context, title, ticker, text)

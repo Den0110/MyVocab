@@ -33,7 +33,7 @@
                     android:padding="24dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:text="Words"
+                    android:text="@string/words"
                     android:textSize="16sp" />
 
                 <include layout="@layout/layout_separator"/>
@@ -45,7 +45,7 @@
                     android:padding="24dp"
                     android:paddingStart="16dp"
                     android:paddingEnd="16dp"
-                    android:text="Word lists"
+                    android:text="@string/word_lists"
                     android:textSize="16sp"/>
 
             </LinearLayout>

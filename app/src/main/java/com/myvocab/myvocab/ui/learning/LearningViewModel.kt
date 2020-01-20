@@ -37,15 +37,19 @@ constructor(
             })
 
     fun increaseKnowingLevel(): Completable {
-        currentWord.value!!.knowingLevel = currentWord.value!!.knowingLevel + 1
-        currentWord.value!!.lastShowTime = System.currentTimeMillis()
-        return wordRepository.addWord(currentWord.value!!)
+        currentWord.value!!.apply {
+            knowingLevel += 1
+            lastShowTime = System.currentTimeMillis()
+        }
+        return wordRepository.updateWord(currentWord.value!!)
     }
 
     fun zeroizeKnowingLevel(): Completable {
-        currentWord.value!!.knowingLevel = 0
-        currentWord.value!!.lastShowTime = System.currentTimeMillis()
-        return wordRepository.addWord(currentWord.value!!)
+        currentWord.value!!.apply {
+            knowingLevel = 0
+            lastShowTime = System.currentTimeMillis()
+        }
+        return wordRepository.updateWord(currentWord.value!!)
     }
 
     override fun onCleared() {

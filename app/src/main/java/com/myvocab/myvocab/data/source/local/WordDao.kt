@@ -24,20 +24,23 @@ interface WordDao {
     @Query("SELECT * FROM words WHERE knowingLevel < 3 ORDER BY id DESC")
     fun getInLearningWords(): Flowable<List<Word>>
 
-    @Query("SELECT COUNT(id) FROM words WHERE knowingLevel < 3")
+    @Query("SELECT COUNT(id) FROM words WHERE knowingLevel < 3 and needToLearn = 1")
     fun getInLearningWordsCount(): Single<Int>
+
+    @Query("SELECT * FROM words WHERE knowingLevel = :knowingLevel and needToLearn = 1 ORDER BY lastShowTime ASC")
+    fun getWordsInLearningByKnowingLevel(knowingLevel: Int): Single<List<Word>>
 
     @Query("SELECT * FROM words WHERE knowingLevel >= 3 ORDER BY id DESC")
     fun getLearnedWords(): Flowable<List<Word>>
-
-    @Query("SELECT * FROM words WHERE knowingLevel = :knowingLevel ORDER BY lastShowTime ASC")
-    fun getWordByKnowingLevel(knowingLevel: Int): Single<List<Word>>
 
     @Query("SELECT * FROM words WHERE id = :id LIMIT 1")
     fun getWordById(id: Int): Single<Word>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addWord(word: Word): Completable
+
+    @Update
+    fun updateWord(word: Word): Completable
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addWords(words: List<Word>): Completable

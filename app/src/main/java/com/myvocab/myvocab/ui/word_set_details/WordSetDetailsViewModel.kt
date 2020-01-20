@@ -5,12 +5,15 @@ import android.os.Bundle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.myvocab.myvocab.R
+import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.domain.word_set_details.GetWordSetUseCase
+import com.myvocab.myvocab.ui.word.WordCallback
 import com.myvocab.myvocab.util.Resource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
+import timber.log.Timber
 import javax.inject.Inject
 
 class WordSetDetailsViewModel
@@ -32,6 +35,21 @@ constructor(
     val removingWordSet: MutableLiveData<Resource<WordSet>> = MutableLiveData()
 
     private val compositeDisposable = CompositeDisposable()
+    private val updateWordDisposable = CompositeDisposable()
+
+    val wordCallback = object : WordCallback() {
+        override fun onNeedToLearnChanged(word: Word, state: Boolean) {
+            if (word.needToLearn != state) {
+                wordSet.value = (Resource.success(wordSet.value?.data?.apply {
+                    words.toMutableList().apply {
+                        first { w -> w.id == word.id }.apply { needToLearn = state }
+                        updateWord(word)
+
+                    }
+                }))
+            }
+        }
+    }
 
     init {
         loadWordSet()
@@ -98,8 +116,17 @@ constructor(
         }
     }
 
+    fun updateWord(word: Word){
+        updateWordDisposable.add(wordRepository
+                .updateWord(word)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe()
+        )
+    }
+
     override fun onCleared() {
         compositeDisposable.clear()
+        updateWordDisposable.clear()
     }
 
 }

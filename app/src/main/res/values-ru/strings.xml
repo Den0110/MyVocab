@@ -52,7 +52,6 @@
     <plurals name="word_count">
         <item quantity="zero">Нет слов</item>
         <item quantity="one">%d слово</item>
-        <item quantity="two">%d слова</item>
         <item quantity="few">%d слова</item>
         <item quantity="many">%d слов</item>
         <item quantity="other">%d слов</item>
@@ -63,5 +62,7 @@
     <string name="remind_to_learn_words">Напоминать учить слова</string>
     <string name="reminding_time">Время напоминания</string>
     <string name="remind_only_if_there_are_words_to_learn">Напоминать только если есть слова для изучения</string>
+    <string name="word_lists">Списки слов</string>
+    <string name="words">Слова</string>
 
 </resources>
