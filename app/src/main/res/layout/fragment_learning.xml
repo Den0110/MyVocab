@@ -17,15 +17,15 @@
         android:orientation="vertical"
         tools:background="@color/secondaryTextColor">
 
-        <include layout="@layout/toolbar_layout"/>
+        <include layout="@layout/toolbar_layout" />
 
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
+            app:cardBackgroundColor="@color/learningCardColor"
             app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="@color/learningCardColor">
+            app:cardElevation="4dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -63,11 +63,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
-                    app:layout_constraintBaseline_toBaselineOf="@+id/word"
-                    app:layout_constraintHorizontal_chainStyle="packed"
-                    app:layout_constraintEnd_toStartOf="@+id/word"
-                    app:layout_constraintStart_toStartOf="parent"
                     android:baselineAlignBottom="true"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/word"
+                    app:layout_constraintEnd_toStartOf="@+id/word"
+                    app:layout_constraintHorizontal_chainStyle="packed"
+                    app:layout_constraintStart_toStartOf="parent"
                     tools:src="@drawable/ic_brain_red_24dp" />
 
                 <TextView
@@ -203,8 +203,8 @@
                         app:layout_constraintTop_toBottomOf="@+id/word" />
 
                     <TextView
-                        style="@style/AppTheme.Caption.LearningAskButtonCaption"
                         android:id="@+id/next_label"
+                        style="@style/AppTheme.Caption.LearningAskButtonCaption"
                         android:layout_width="match_parent"
                         android:layout_height="32dp"
                         android:layout_marginTop="8dp"
@@ -212,18 +212,46 @@
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/no_words_view"
+                <LinearLayout
+                    android:id="@+id/no_words_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/no_words_to_learn"
-                    android:textColor="@color/secondaryTextColor"
-                    android:textSize="18sp"
+                    android:gravity="center"
+                    android:orientation="vertical"
                     android:visibility="gone"
+                    android:padding="@dimen/horizontal_layout_margin"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <TextView
+                        android:id="@+id/no_words_view"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/no_words_to_learn"
+                        android:textColor="@color/secondaryTextColor"
+                        android:textSize="18sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_marginTop="@dimen/vertical_layout_margin"
+                        android:text="@string/select_words_you_want_to_learn_or_add_new_words"
+                        android:textColor="@color/secondaryTextColor" />
+
+                    <TextView
+                        android:id="@+id/search_words_btn"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="16sp"
+                        android:text="@string/find_words"
+                        android:padding="8dp"
+                        android:layout_marginTop="@dimen/vertical_layout_margin"/>
+
+                </LinearLayout>
 
                 <androidx.constraintlayout.widget.Group
                     android:id="@+id/knowing_views"

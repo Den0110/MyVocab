@@ -64,5 +64,9 @@
     <string name="remind_only_if_there_are_words_to_learn">Напоминать только если есть слова для изучения</string>
     <string name="word_lists">Списки слов</string>
     <string name="words">Слова</string>
+    <string name="find_words">Найти слова</string>
+    <string name="select_words_you_want_to_learn_or_add_new_words">Выберите слова, которые вы хотите изучать, или добавьте новые</string>
+    <string name="dialog_deselect_all_words_to_learn">Отменить изучение всех слов?</string>
+    <string name="dialog_select_all_words_to_learn">Изучать все слова?</string>
 
 </resources>

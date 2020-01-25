@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.databinding.FragmentLearningBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
+import com.myvocab.myvocab.util.findNavController
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -45,6 +46,8 @@ class LearningFragment : MainNavigationFragment() {
         hideNoWordsView()
         hideNextViews()
         hideChooseViews()
+
+        search_words_btn.setOnClickListener { findNavController().navigate(R.id.navigation_search) }
 
         viewModel.currentWord.observe(viewLifecycleOwner, Observer {
             hideTranslation()
@@ -158,11 +161,11 @@ class LearningFragment : MainNavigationFragment() {
     }
 
     private fun showNoWordsView() {
-        no_words_view.visibility = View.VISIBLE
+        no_words_container.visibility = View.VISIBLE
     }
 
     private fun hideNoWordsView() {
-        no_words_view.visibility = View.GONE
+        no_words_container.visibility = View.GONE
     }
 
 }

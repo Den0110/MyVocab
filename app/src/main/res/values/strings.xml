@@ -64,5 +64,7 @@
     <string name="word_lists">Word lists</string>
     <string name="dialog_select_all_words_to_learn">Select all the words to learn?</string>
     <string name="dialog_deselect_all_words_to_learn">Deselect all the words to learn?</string>
+    <string name="select_words_you_want_to_learn_or_add_new_words">Select words you want to learn or add new words</string>
+    <string name="find_words">Find words</string>
 
 </resources>
