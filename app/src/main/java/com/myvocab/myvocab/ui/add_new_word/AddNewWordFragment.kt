@@ -50,7 +50,8 @@ class AddNewWordFragment : MainNavigationFragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-        toolbar.inflateMenu(R.menu.add_new_word)
+//        TODO: Fix import, temporarily disabled
+//        toolbar.inflateMenu(R.menu.add_new_word)
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.import_csv -> {
