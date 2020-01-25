@@ -32,7 +32,10 @@ constructor(
                             if (!it.needToLearn || it.knowingLevel > WELL_KNOWN_LEVEL) {
                                 loadNextWord()
                             } else {
-                                Single.fromCallable { it }
+                                Single.fromCallable {
+                                    currentWord = it
+                                    it
+                                }
                             }
                         }
                         .onErrorResumeNext { loadNextWord() }
