@@ -38,7 +38,8 @@ constructor(wordDiffCallback: WordDiffCallback) : ListAdapter<Word, RecyclerView
             if (position == 0) {
                 (holder as LearnAllHolder).bind(needToLearnAll, learnAllCallback)
             } else {
-                (holder as WordHolder).bind(getItem(position - 1), callback, isSavedLocally)
+                val word = getItem(position - 1)
+                (holder as WordHolder).bind(word, callback, isSavedLocally)
             }
         } else {
             (holder as WordHolder).bind(getItem(position), callback, isSavedLocally)
@@ -61,10 +62,10 @@ constructor(wordDiffCallback: WordDiffCallback) : ListAdapter<Word, RecyclerView
         }
     }
 
-    fun checkIfAllNeedToLearn(words: List<Word>?){
+    fun checkIfAllNeedToLearn(words: List<Word>?) {
         var allNeedToLearn = true
 
-        if(words.isNullOrEmpty()){
+        if (words.isNullOrEmpty()) {
             allNeedToLearn = false
         } else {
             for (word in words) {
@@ -75,8 +76,10 @@ constructor(wordDiffCallback: WordDiffCallback) : ListAdapter<Word, RecyclerView
             }
         }
 
-        needToLearnAll = allNeedToLearn
-        notifyItemChanged(0)
+        if (needToLearnAll != allNeedToLearn) {
+            needToLearnAll = allNeedToLearn
+            notifyItemChanged(0)
+        }
     }
 
 }

@@ -2,18 +2,16 @@ package com.myvocab.myvocab.ui.word_set_details
 
 import android.content.Context
 import android.os.Bundle
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import com.myvocab.myvocab.R
-import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.domain.word_set_details.GetWordSetUseCase
-import com.myvocab.myvocab.ui.word.WordCallback
+import com.myvocab.myvocab.ui.word.BaseWordListViewModel
 import com.myvocab.myvocab.util.Resource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import timber.log.Timber
 import javax.inject.Inject
 
 class WordSetDetailsViewModel
@@ -23,40 +21,35 @@ constructor(
         private val getWordSetUseCase: GetWordSetUseCase,
         data: Bundle,
         private val context: Context
-) : ViewModel() {
+) : BaseWordListViewModel(wordRepository) {
 
     private val initialWordSet = WordSetDetailsFragmentArgs.fromBundle(data).wordSet
 
-    val wordSet: MutableLiveData<Resource<WordSet>> = MutableLiveData(Resource.success(initialWordSet))
-    val isSavedLocally: MutableLiveData<Boolean> = MutableLiveData()
+    private val _wordSet: MutableLiveData<Resource<WordSet>> = MutableLiveData(Resource.success(initialWordSet))
+
+    val title: MediatorLiveData<String> = MediatorLiveData()
     val subtitle: MutableLiveData<String> = MutableLiveData()
+    val isSavedLocally: MutableLiveData<Boolean> = MutableLiveData()
 
     val addingWordSet: MutableLiveData<Resource<WordSet>> = MutableLiveData()
     val removingWordSet: MutableLiveData<Resource<WordSet>> = MutableLiveData()
 
     private val compositeDisposable = CompositeDisposable()
-    private val updateWordDisposable = CompositeDisposable()
-
-    val wordCallback = object : WordCallback() {
-        override fun onNeedToLearnChanged(word: Word, state: Boolean) {
-            if (word.needToLearn != state) {
-                wordSet.value = (Resource.success(wordSet.value?.data?.apply {
-                    words.toMutableList().apply {
-                        first { w -> w.id == word.id }.apply { needToLearn = state }
-                        updateWord(word)
-
-                    }
-                }))
-            }
-        }
-    }
 
     init {
+        words.addSource(_wordSet) {
+            words.value = Resource(it.status, it.data?.words?.toMutableList(), it.error)
+        }
+
+        title.addSource(_wordSet) {
+            title.value = it.data?.title
+        }
+
         loadWordSet()
     }
 
     fun loadWordSet() {
-        wordSet.value = Resource.loading()
+        _wordSet.value = Resource.loading(initialWordSet)
         compositeDisposable.add(
                 getWordSetUseCase
                         .getWordSet(initialWordSet.globalId)
@@ -75,16 +68,16 @@ constructor(
                                                         it.wordSet.words.size
                                                 )
                                     }
-                            wordSet.value = Resource.success(it.wordSet)
+                            _wordSet.value = Resource.success(it.wordSet)
                         }, {
-                            wordSet.value = Resource.error(it)
+                            _wordSet.value = Resource.error(it)
                         })
         )
     }
 
     fun addWordSet() {
-        if (wordSet.value?.data != null) {
-            val ws = wordSet.value!!.data!!
+        if (_wordSet.value?.data != null) {
+            val ws = _wordSet.value!!.data!!
             addingWordSet.postValue(Resource.loading())
             compositeDisposable.add(
                     wordRepository
@@ -100,8 +93,8 @@ constructor(
     }
 
     fun removeWordSet() {
-        if (wordSet.value?.data != null) {
-            val ws = wordSet.value!!.data!!
+        if (_wordSet.value?.data != null) {
+            val ws = _wordSet.value!!.data!!
             removingWordSet.postValue(Resource.loading(ws))
             compositeDisposable.add(
                     wordRepository
@@ -116,17 +109,9 @@ constructor(
         }
     }
 
-    fun updateWord(word: Word){
-        updateWordDisposable.add(wordRepository
-                .updateWord(word)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe()
-        )
-    }
-
     override fun onCleared() {
+        super.onCleared()
         compositeDisposable.clear()
-        updateWordDisposable.clear()
     }
 
 }

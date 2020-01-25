@@ -46,7 +46,7 @@ class WordHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
         if (callback != null) {
             view.setOnClickListener {
-                callback.onClick(word)
+                callback.onClick(word, savedLocally == true)
             }
 
             needToLearnCheckBox.setOnClickListener {

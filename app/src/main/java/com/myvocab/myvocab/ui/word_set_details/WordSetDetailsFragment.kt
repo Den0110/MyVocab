@@ -11,10 +11,7 @@ import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.databinding.FragmentWordSetDetailsBinding
 import com.myvocab.myvocab.domain.word_set_details.GetWordSetUseCase
-import com.myvocab.myvocab.ui.MainNavigationFragment
-import com.myvocab.myvocab.ui.common.NpaLinearLayoutManager
-import com.myvocab.myvocab.ui.word.LearnAllCallback
-import com.myvocab.myvocab.ui.word.WordListAdapter
+import com.myvocab.myvocab.ui.word.BaseWordListFragment
 import com.myvocab.myvocab.util.Resource
 import com.myvocab.myvocab.util.getViewModel
 import kotlinx.android.synthetic.main.fragment_word_set_details.*
@@ -24,7 +21,7 @@ import kotlinx.android.synthetic.main.toolbar_layout.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class WordSetDetailsFragment : MainNavigationFragment() {
+class WordSetDetailsFragment : BaseWordListFragment() {
 
     private lateinit var binding: FragmentWordSetDetailsBinding
 
@@ -33,11 +30,8 @@ class WordSetDetailsFragment : MainNavigationFragment() {
     @Inject
     lateinit var getWordSetUseCase: GetWordSetUseCase
 
-    private val viewModel: WordSetDetailsViewModel
+    override val viewModel: WordSetDetailsViewModel
             by lazy { getViewModel { WordSetDetailsViewModel(wordRepository, getWordSetUseCase, arguments!!, context!!) } }
-
-    @Inject
-    lateinit var wordListAdapter: WordListAdapter
 
     private lateinit var menu: Menu
 
@@ -79,39 +73,9 @@ class WordSetDetailsFragment : MainNavigationFragment() {
             true
         }
 
-        wordListAdapter.callback = viewModel.wordCallback
-        wordListAdapter.learnAllCallback = object : LearnAllCallback() {
-            override fun onNeedToLearnAll(state: Boolean) {
-                val title =
-                        if (state)
-                            getString(R.string.dialog_select_all_words_to_learn)
-                        else
-                            getString(R.string.dialog_deselect_all_words_to_learn)
-                AlertDialog.Builder(context!!)
-                        .setMessage(title)
-                        .setPositiveButton("Yes") { dialog, _ ->
-                            wordListAdapter.currentList.forEach {
-                                it.needToLearn = state
-                                viewModel.updateWord(it)
-                            }
-                            wordListAdapter.needToLearnAll = state
-                            recycler_view.post { wordListAdapter.notifyDataSetChanged() }
-                            dialog.dismiss()
-                        }
-                        .setNegativeButton("No") { dialog, _ ->
-                            recycler_view.post { wordListAdapter.notifyDataSetChanged() }
-                            dialog.dismiss()
-                        }
-                        .setOnDismissListener {
-                            recycler_view.post { wordListAdapter.notifyDataSetChanged() }
-                        }
-                        .create().show()
-            }
-        }
+        swipe_refresh_layout.setOnRefreshListener { viewModel.loadWordSet() }
 
         recycler_view.adapter = wordListAdapter
-
-        swipe_refresh_layout.setOnRefreshListener { viewModel.loadWordSet() }
 
         viewModel.isSavedLocally.observe(viewLifecycleOwner, Observer {
             if (it) {
@@ -121,20 +85,20 @@ class WordSetDetailsFragment : MainNavigationFragment() {
             }
         })
 
+        viewModel.title.observe(viewLifecycleOwner, Observer { toolbar.title = it })
         viewModel.subtitle.observe(viewLifecycleOwner, Observer { toolbar.subtitle = it })
 
-        viewModel.wordSet.observe(viewLifecycleOwner, Observer {
+        viewModel.words.observe(viewLifecycleOwner, Observer {
             when (it.status) {
                 Resource.Status.LOADING -> {
                     swipe_refresh_layout.isRefreshing = true
                 }
                 Resource.Status.SUCCESS -> {
                     swipe_refresh_layout.isRefreshing = false
-                    toolbar.title = it.data!!.title
                     wordListAdapter.isSavedLocally = viewModel.isSavedLocally.value
                     if (wordListAdapter.isSavedLocally == true)
-                        recycler_view.post { wordListAdapter.checkIfAllNeedToLearn(it.data.words) }
-                    wordListAdapter.submitList(it.data.words)
+                        recycler_view.post { wordListAdapter.checkIfAllNeedToLearn(it.data) }
+                    wordListAdapter.submitList(it.data)
                 }
                 Resource.Status.ERROR -> {
                     swipe_refresh_layout.isRefreshing = false

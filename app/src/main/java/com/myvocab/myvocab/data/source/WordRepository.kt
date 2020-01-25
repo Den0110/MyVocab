@@ -65,7 +65,7 @@ constructor(
     fun getWordSet(globalId: String): Single<RepositoryData<WordSet>> =
             wordSetDao
                     .getWordSetById(globalId)
-                    .zipWith(wordDao.getWordsByWordSetId(globalId), BiFunction { model: WordSetDbModel, words: List<Word> ->
+                    .zipWith(getWordsByWordSetId(globalId), BiFunction { model: WordSetDbModel, words: List<Word> ->
                         RepositoryData(WordSet(model.globalId, model.id, model.title, words), Source.LOCAL)
                     })
                     .onErrorResumeNext {
@@ -88,7 +88,7 @@ constructor(
     fun getWordSetFromDb(globalId: String): Single<WordSet> =
             wordSetDao
                     .getWordSetById(globalId)
-                    .zipWith(wordDao.getWordsByWordSetId(globalId), BiFunction { model: WordSetDbModel, words: List<Word> ->
+                    .zipWith(getWordsByWordSetId(globalId), BiFunction { model: WordSetDbModel, words: List<Word> ->
                         WordSet(model.globalId, model.id, model.title, words)
                     })
                     .subscribeOn(Schedulers.io())
@@ -130,6 +130,10 @@ constructor(
 
     fun getWordById(id: Int): Single<Word> {
         return getWordByIdFromDb(id).subscribeOn(Schedulers.io())
+    }
+
+    fun getWordsByWordSetId(wordSetId: String): Single<List<Word>> {
+        return wordDao.getWordsByWordSetId(wordSetId).subscribeOn(Schedulers.io())
     }
 
     fun addWords(words: List<Word>): Completable {
