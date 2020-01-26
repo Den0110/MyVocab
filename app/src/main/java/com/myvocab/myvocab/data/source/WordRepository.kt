@@ -13,9 +13,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import javax.inject.Singleton
 
-@Singleton
 class WordRepository
 constructor(
         private val wordDao: WordDao,
@@ -24,6 +22,12 @@ constructor(
 
     //  To concat network and local db
     //  return Observable.concatArrayEager(observableFromApi, observableFromDb)
+
+    /**
+     *
+     * WORD SET
+     *
+     */
 
     fun getWordSets(): Single<List<RepositoryData<WordSet>>> {
         return wordSetDao
@@ -63,34 +67,30 @@ constructor(
             models.map { RepositoryData(WordSet(it.globalId, it.id, it.title), Source.LOCAL) }
 
     fun getWordSet(globalId: String): Single<RepositoryData<WordSet>> =
-            wordSetDao
-                    .getWordSetById(globalId)
+            getWordSetFromDb(globalId)
+                    .onErrorResumeNext { getWordSetFromServer(globalId) }
+                    .subscribeOn(Schedulers.io())
+
+    private fun getWordSetFromDb(globalId: String): Single<RepositoryData<WordSet>> =
+            getWordSetEntityFromDb(globalId)
                     .zipWith(getWordsByWordSetId(globalId), BiFunction { model: WordSetDbModel, words: List<Word> ->
                         RepositoryData(WordSet(model.globalId, model.id, model.title, words), Source.LOCAL)
                     })
-                    .onErrorResumeNext {
-                        RxFirestore
-                                .getDocument(FirebaseFirestore.getInstance().collection("word_sets").document(globalId))
-                                .map {
-                                    val obj = it.toObject(WordSet::class.java)!!
-                                    val wordSet = WordSet(it.id, null, obj.title, obj.words)
-                                    RepositoryData(wordSet, Source.REMOTE)
-                                }
-                                .toSingle()
-                    }
                     .subscribeOn(Schedulers.io())
+
+    private fun getWordSetFromServer(globalId: String): Single<RepositoryData<WordSet>> =
+            RxFirestore
+                    .getDocument(FirebaseFirestore.getInstance().collection("word_sets").document(globalId))
+                    .map {
+                        val obj = it.toObject(WordSet::class.java)!!
+                        val wordSet = WordSet(it.id, null, obj.title, obj.words)
+                        RepositoryData(wordSet, Source.REMOTE)
+                    }
+                    .toSingle()
 
     fun getWordSetLearningPercentage(globalId: String) =
             wordDao
                     .getLearningPercentageByWordSetId(globalId)
-                    .subscribeOn(Schedulers.io())
-
-    fun getWordSetFromDb(globalId: String): Single<WordSet> =
-            wordSetDao
-                    .getWordSetById(globalId)
-                    .zipWith(getWordsByWordSetId(globalId), BiFunction { model: WordSetDbModel, words: List<Word> ->
-                        WordSet(model.globalId, model.id, model.title, words)
-                    })
                     .subscribeOn(Schedulers.io())
 
     fun getWordSetEntityFromDb(globalId: String) =
@@ -116,36 +116,47 @@ constructor(
     }
 
     fun deleteAllWordSets(): Completable =
-        wordSetDao
-                .deleteAll()
-                .subscribeOn(Schedulers.io())
+            wordSetDao
+                    .deleteAll()
+                    .subscribeOn(Schedulers.io())
 
-    fun getInLearningWordsCount(): Single<Int> {
-        return getInLearningWordsCountFromDb().subscribeOn(Schedulers.io())
-    }
 
-    fun getInLearningWordsByKnowingLevel(knowingLevel: Int): Single<List<Word>> {
-        return getWordsInLearningByKnowingLevelFromDb(knowingLevel).subscribeOn(Schedulers.io())
-    }
+    /**
+     *
+     * WORD
+     *
+     */
 
     fun getWordById(id: Int): Single<Word> {
         return getWordByIdFromDb(id).subscribeOn(Schedulers.io())
+    }
+
+    fun getWordByContent(content: String): Single<Word> {
+        return wordDao.getWordByContent(content).subscribeOn(Schedulers.io())
     }
 
     fun getWordsByWordSetId(wordSetId: String): Single<List<Word>> {
         return wordDao.getWordsByWordSetId(wordSetId).subscribeOn(Schedulers.io())
     }
 
-    fun addWords(words: List<Word>): Completable {
-        return addWordsToDb(words).subscribeOn(Schedulers.io())
+    fun getInLearningWordsByKnowingLevel(knowingLevel: Int): Single<List<Word>> {
+        return getWordsInLearningByKnowingLevelFromDb(knowingLevel).subscribeOn(Schedulers.io())
+    }
+
+    fun getInLearningWordsCount(): Single<Int> {
+        return getInLearningWordsCountFromDb().subscribeOn(Schedulers.io())
+    }
+
+    fun addMyWord(word: Word): Completable {
+        return addWord(word.apply { wordSetId = "my_words" })
     }
 
     fun addWord(word: Word): Completable {
         return addWordToDb(word).subscribeOn(Schedulers.io())
     }
 
-    fun addMyWord(word: Word): Completable {
-        return addWord(word.apply { wordSetId = "my_words" })
+    fun addWords(words: List<Word>): Completable {
+        return addWordsToDb(words).subscribeOn(Schedulers.io())
     }
 
     fun updateWord(word: Word): Completable {

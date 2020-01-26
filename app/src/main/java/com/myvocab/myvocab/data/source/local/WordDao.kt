@@ -36,6 +36,9 @@ interface WordDao {
     @Query("SELECT * FROM words WHERE id = :id LIMIT 1")
     fun getWordById(id: Int): Single<Word>
 
+    @Query("SELECT * FROM words WHERE word = :content LIMIT 1")
+    fun getWordByContent(content: String): Single<Word>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addWord(word: Word): Completable
 

@@ -1,33 +1,31 @@
 package com.myvocab.myvocab.ui.fast_translation
 
 import androidx.lifecycle.*
-import com.myvocab.myvocab.BuildConfig
 import com.myvocab.myvocab.data.model.TranslatableText
-import com.myvocab.myvocab.data.model.TranslatedData
+import com.myvocab.myvocab.data.model.TranslateUseCaseResult
 import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.source.WordRepository
-import com.myvocab.myvocab.data.source.remote.translation.TranslationApi
-import io.reactivex.Flowable
+import com.myvocab.myvocab.domain.TranslateUseCase
+import io.reactivex.Single
 import javax.inject.Inject
 
 class FastTranslationWidgetViewModel
 @Inject
 constructor(
-        private val translationApi: TranslationApi,
+        private val translateUseCase: TranslateUseCase,
         private val wordRepository: WordRepository
 ) : ViewModel() {
 
-    fun translate(translatable: TranslatableText): Flowable<TranslatedData> {
-        return translationApi.translate(BuildConfig.GOOGLE_API_KEY, translatable.text, translatable.lang)
-                .doOnNext { it.translatable = translatable }
+    fun translate(translatable: TranslatableText): Single<TranslateUseCaseResult> {
+        return translateUseCase.execute(translatable)
     }
 
-    fun addToDictionary(translatedData: TranslatedData) {
+    fun addToDictionary(translateResult: TranslateUseCaseResult) {
         wordRepository
                 .addMyWord(
                     Word(
-                        word = translatedData.translatable?.text,
-                        translation = translatedData.data?.translations?.get(0)?.translatedText
+                        word = translateResult.text.text,
+                        translation = translateResult.translations[0]
                     )
                 )
                 .subscribe()

@@ -15,6 +15,7 @@ import androidx.cardview.widget.CardView
 import androidx.lifecycle.*
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.TranslatableText
+import com.myvocab.myvocab.data.model.TranslationSource
 import com.myvocab.myvocab.util.AnimationListenerAdapter
 import com.myvocab.myvocab.util.getDefaultWindowParams
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -68,30 +69,30 @@ constructor(
         translatedTextView!!.visibility = View.GONE
         translationProgressBar!!.visibility = View.VISIBLE
 
-        val translatableText = TranslatableText(text, "ru")
+        val translatableText = TranslatableText(text, "en-ru")
         val translateDisposable = viewModel
                 .translate(translatableText)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ translatedText ->
-            if (translatedText.translatable?.text?.contains(' ') != true) {
-                addToDictionaryBtn!!.visibility = View.VISIBLE
-                addToDictionaryBtn!!.setOnClickListener {
-                    viewModel.addToDictionary(translatedText)
-                    destroy()
-                }
-            } else {
-                addToDictionaryBtn!!.visibility = View.GONE
-                addToDictionaryBtn!!.setOnClickListener(null)
-            }
-            translatedTextView!!.text = translatedText.data?.translations?.get(0)?.translatedText
-            translatedTextView!!.visibility = View.VISIBLE
-            translationProgressBar!!.visibility = View.GONE
-        }, {
-            Timber.e(it)
-            Toast.makeText(context, R.string.could_not_translate, Toast.LENGTH_SHORT).show()
-            translationProgressBar!!.visibility = View.GONE
-        })
+                .subscribe({ translateResult ->
+                    if (translateResult.source == TranslationSource.DICTIONARY) {
+                        addToDictionaryBtn!!.visibility = View.VISIBLE
+                        addToDictionaryBtn!!.setOnClickListener {
+                            viewModel.addToDictionary(translateResult)
+                            destroy()
+                        }
+                    } else {
+                        addToDictionaryBtn!!.visibility = View.GONE
+                        addToDictionaryBtn!!.setOnClickListener(null)
+                    }
+                    translatedTextView!!.text = translateResult.translations.joinToString (separator = ", ", limit = 4)
+                    translatedTextView!!.visibility = View.VISIBLE
+                    translationProgressBar!!.visibility = View.GONE
+                }, {
+                    Timber.e(it)
+                    Toast.makeText(context, R.string.could_not_translate, Toast.LENGTH_SHORT).show()
+                    translationProgressBar!!.visibility = View.GONE
+                })
         disposables.add(translateDisposable)
 
         showTranslationView()

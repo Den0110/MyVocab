@@ -12,6 +12,9 @@ import com.myvocab.myvocab.data.source.local.Database
 import com.myvocab.myvocab.data.source.local.WordDao
 import com.myvocab.myvocab.data.source.local.WordSetDao
 import com.myvocab.myvocab.common.ReminderScheduler
+import com.myvocab.myvocab.data.source.TranslationRepository
+import com.myvocab.myvocab.data.source.remote.translation.DictionaryApi
+import com.myvocab.myvocab.data.source.remote.translation.TranslatorApi
 import com.myvocab.myvocab.util.PreferencesManager
 import dagger.Module
 import dagger.Provides
@@ -22,21 +25,39 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.util.concurrent.Executors
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
 class AppModule {
 
-    @Singleton
     @Provides
-    fun provideRetrofitInstance(): Retrofit {
+    @Singleton
+    @Named("translator")
+    fun provideTranslatorRetrofitInstance(): Retrofit {
         val logging = HttpLoggingInterceptor()
         logging.level = HttpLoggingInterceptor.Level.BODY
         val httpClient = OkHttpClient.Builder()
         httpClient.addInterceptor(logging)
         return Retrofit.Builder()
                 .client(httpClient.build())
-                .baseUrl(BuildConfig.GOOGLE_API_BASE_URL)
+                .baseUrl(BuildConfig.YANDEX_TRANSLATE_API_BASE_URL)
+                .addConverterFactory(MoshiConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
+    }
+
+    @Provides
+    @Singleton
+    @Named("dictionary")
+    fun provideDictionaryRetrofitInstance(): Retrofit {
+        val logging = HttpLoggingInterceptor()
+        logging.level = HttpLoggingInterceptor.Level.BODY
+        val httpClient = OkHttpClient.Builder()
+        httpClient.addInterceptor(logging)
+        return Retrofit.Builder()
+                .client(httpClient.build())
+                .baseUrl(BuildConfig.YANDEX_DICTIONARY_API_BASE_URL)
                 .addConverterFactory(MoshiConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
@@ -75,17 +96,26 @@ class AppModule {
     fun provideWordRepository(wordDao: WordDao, wordSetDao: WordSetDao) = WordRepository(wordDao, wordSetDao)
 
     @Provides
+    fun provideTranslateApi(@Named("translator") retrofit: Retrofit): TranslatorApi = retrofit.create(TranslatorApi::class.java)
+
+    @Provides
+    fun provideDictionaryApi(@Named("dictionary") retrofit: Retrofit): DictionaryApi = retrofit.create(DictionaryApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideTranslationRepository(translatorApi: TranslatorApi, dictionaryApi: DictionaryApi) =
+            TranslationRepository(translatorApi, dictionaryApi)
+
+    @Provides
     @Singleton
     fun providePreferencesManager(app: Application) = PreferencesManager(app)
 
     @Provides
     @Singleton
-    fun provideReminderScheduler(app: Application, prefManager: PreferencesManager)
-            = ReminderScheduler(app, prefManager)
+    fun provideReminderScheduler(app: Application, prefManager: PreferencesManager) = ReminderScheduler(app, prefManager)
 
     @Provides
     @Singleton
-    fun provideFastTranslationServiceManager(app: Application, prefManager: PreferencesManager)
-            = FastTranslationServiceManager(app, prefManager)
+    fun provideFastTranslationServiceManager(app: Application, prefManager: PreferencesManager) = FastTranslationServiceManager(app, prefManager)
 
 }

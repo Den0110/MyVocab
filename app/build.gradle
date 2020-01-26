@@ -29,11 +29,23 @@ android {
         def GOOGLE_API_BASE_URL = "GOOGLE_API_BASE_URL"
         def GOOGLE_API_KEY = "GOOGLE_API_KEY"
 
+        def YANDEX_TRANSLATE_API_BASE_URL = "YANDEX_TRANSLATE_API_BASE_URL"
+        def YANDEX_TRANSLATE_API_KEY = "YANDEX_TRANSLATE_API_KEY"
+
+        def YANDEX_DICTIONARY_API_BASE_URL = "YANDEX_DICTIONARY_API_BASE_URL"
+        def YANDEX_DICTIONARY_API_KEY = "YANDEX_DICTIONARY_API_KEY"
+
         def USE_LEAK_CANARY = "USE_LEAK_CANARY"
 
         buildTypes.each {
             it.buildConfigField "String", GOOGLE_API_BASE_URL, "\"https://translation.googleapis.com\""
             it.buildConfigField "String", GOOGLE_API_KEY, GoogleAPIKey
+
+            it.buildConfigField "String", YANDEX_TRANSLATE_API_BASE_URL, "\"https://translate.yandex.net\""
+            it.buildConfigField "String", YANDEX_TRANSLATE_API_KEY, YandexTranslateAPIKey
+
+            it.buildConfigField "String", YANDEX_DICTIONARY_API_BASE_URL, "\"https://dictionary.yandex.net\""
+            it.buildConfigField "String", YANDEX_DICTIONARY_API_KEY, YandexDictionaryAPIKey
         }
 
         debug {
