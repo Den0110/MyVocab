@@ -30,12 +30,10 @@ open class BaseWordListViewModel(
         }
 
         override fun onNeedToLearnChanged(word: Word, state: Boolean) {
-            if (word.needToLearn != state) {
-                words.value = Resource.success(words.value?.data?.toMutableList()?.apply {
-                    val w = first { w -> w.id == word.id }.apply { needToLearn = state }
-                    update(w)
-                })
-            }
+            words.value = Resource.success(words.value?.data?.toMutableList()?.apply {
+                val w = first { w -> w.id == word.id }.apply { needToLearn = state }
+                update(w)
+            })
         }
 
     }
@@ -81,7 +79,7 @@ open class BaseWordListViewModel(
         wordOperationsDisposable.add(wordRepository
                 .addMyWord(w)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe ({
+                .subscribe({
                     addToMyWordsResultEvent.value = Event(Pair(w, true))
                 }, {
                     addToMyWordsResultEvent.value = Event(Pair(w, false))
@@ -93,12 +91,12 @@ open class BaseWordListViewModel(
         wordOperationsDisposable.add(wordRepository
                 .deleteWord(word)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe ({
+                .subscribe({
                     words.value?.data?.let {
                         val i = it.indexOfFirst { w -> w.id == word.id }
                         it.remove(word)
 
-                        if(it.size == 0){
+                        if (it.size == 0) {
                             words.value = Resource.success(mutableListOf())
                         }
                         notifyWordRemovedEvent.value = Event(i)
