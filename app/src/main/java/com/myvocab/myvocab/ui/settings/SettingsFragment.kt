@@ -1,10 +1,12 @@
 package com.myvocab.myvocab.ui.settings
 
 import android.app.TimePickerDialog
+import android.content.Context.POWER_SERVICE
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
 import android.provider.Settings
 import android.text.format.DateUtils
 import android.view.LayoutInflater
@@ -15,13 +17,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.myvocab.myvocab.BuildConfig
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.databinding.FragmentSettingsBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.util.PackageUtils
 import kotlinx.android.synthetic.main.fragment_settings.*
-import java.util.Calendar
+import java.util.*
 import javax.inject.Inject
 
 
@@ -94,8 +95,9 @@ class SettingsFragment : MainNavigationFragment() {
     }
 
     private fun startTranslationService() {
-        if (Build.VERSION.SDK_INT < 23 || Settings.canDrawOverlays(context)) {
+        if (canDrawOverlays()) {
             viewModel.startTranslationService()
+            openBatteryDialog()
         } else {
             AlertDialog.Builder(context!!)
                     .setMessage(R.string.dialog_permission_draw_overlay)
@@ -109,6 +111,9 @@ class SettingsFragment : MainNavigationFragment() {
                         viewModel.stopTranslationService()
                         dialog.dismiss()
                     }
+                    .setOnDismissListener {
+                        viewModel.stopTranslationService()
+                    }
                     .create()
                     .show()
         }
@@ -117,19 +122,27 @@ class SettingsFragment : MainNavigationFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_DRAW_OVERLAYS) {
-            viewModel.startTranslationService()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                AlertDialog.Builder(context!!)
-                        .setMessage(R.string.dialog_permission_battery_settings)
-                        .setPositiveButton(R.string.dialog_permission_allow) { _, _ ->
-                            openBatterySettings()
-                        }
-                        .setNegativeButton(R.string.dialog_permission_deny) { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .create()
-                        .show()
+            if(canDrawOverlays()) {
+                viewModel.startTranslationService()
+                openBatteryDialog()
+            } else {
+                viewModel.stopTranslationService()
             }
+        }
+    }
+
+    private fun openBatteryDialog(){
+        if (!ignoresPowerOptimization()) {
+            AlertDialog.Builder(context!!)
+                    .setMessage(R.string.dialog_permission_battery_settings)
+                    .setPositiveButton(R.string.dialog_permission_allow) { _, _ ->
+                        openBatterySettings()
+                    }
+                    .setNegativeButton(R.string.dialog_permission_deny) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .create()
+                    .show()
         }
     }
 
@@ -140,5 +153,13 @@ class SettingsFragment : MainNavigationFragment() {
             startActivityForResult(intent, REQUEST_CODE_BATTERY)
         }
     }
+
+    private fun ignoresPowerOptimization() =
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
+                    (context!!.getSystemService(POWER_SERVICE) as PowerManager)
+                            .isIgnoringBatteryOptimizations(context!!.packageName)
+
+    private fun canDrawOverlays() =
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(context)
 
 }
