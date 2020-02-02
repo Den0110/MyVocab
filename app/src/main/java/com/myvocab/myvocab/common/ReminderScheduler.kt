@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.myvocab.myvocab.BuildConfig
 import com.myvocab.myvocab.common.broadcast_receivers.ReminderReceiver
 import com.myvocab.myvocab.util.*
 import timber.log.Timber
@@ -36,11 +37,16 @@ constructor(
     }
 
     fun schedule(remindingTime: Long) {
+        val time = nextRemindTime(remindingTime)
         prefManager.remindingState = true
-        prefManager.remindingTime = remindingTime
-        Timber.d("Set reminder at ${Date(nextRemindTime(remindingTime))}")
+        prefManager.remindingTime = time
+        Timber.d("Set reminder at ${Date(time)}")
         manager.cancel(pendingIntent)
-        manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, nextRemindTime(remindingTime), AlarmManager.INTERVAL_DAY, pendingIntent)
+        if(BuildConfig.EXACT_REMINDING) {
+            manager.setRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pendingIntent)
+        } else {
+            manager.setInexactRepeating(AlarmManager.RTC_WAKEUP, time, AlarmManager.INTERVAL_DAY, pendingIntent)
+        }
     }
 
     fun scheduleIfEnabled(){

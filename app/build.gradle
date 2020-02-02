@@ -11,8 +11,8 @@ android {
         applicationId "com.myvocab.myvocab"
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 4
-        versionName "1.0.4"
+        versionCode 5
+        versionName "1.0.5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         testOptions.unitTests.includeAndroidResources = true
@@ -37,6 +37,8 @@ android {
 
         def USE_LEAK_CANARY = "USE_LEAK_CANARY"
 
+        def EXACT_REMINDING = "EXACT_REMINDING"
+
         buildTypes.each {
             it.buildConfigField "String", GOOGLE_API_BASE_URL, "\"https://translation.googleapis.com\""
             it.buildConfigField "String", GOOGLE_API_KEY, GoogleAPIKey
@@ -52,6 +54,7 @@ android {
             ext.alwaysUpdateBuildId = false
             manifestPlaceholders = [enableCrashReporting : "false"]
             buildConfigField "Boolean", USE_LEAK_CANARY, "false"
+            buildConfigField "Boolean", EXACT_REMINDING, "true"
         }
 
         release {
@@ -59,6 +62,7 @@ android {
             manifestPlaceholders = [enableCrashReporting : "true"]
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             buildConfigField "Boolean", USE_LEAK_CANARY, "false"
+            buildConfigField "Boolean", EXACT_REMINDING, "false"
         }
 
     }
@@ -84,7 +88,7 @@ dependencies {
 
     // Firebase
     implementation 'com.google.firebase:firebase-firestore:21.3.1'
-    implementation 'com.google.firebase:firebase-analytics:17.2.1'
+    implementation 'com.google.firebase:firebase-analytics:17.2.2'
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
 
     // RxFirebase
@@ -110,7 +114,7 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:$glide_ver"
     kapt "com.github.bumptech.glide:compiler:$glide_ver"
 
-    def material_ver = "1.2.0-alpha02"
+    def material_ver = "1.2.0-alpha04"
     implementation "com.google.android.material:material:$material_ver"
 
     // Moshi
@@ -118,12 +122,12 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:$moshi_ver"
 
     // Room
-    def room_ver = '2.2.2'
+    def room_ver = '2.2.3'
     implementation "androidx.room:room-rxjava2:$room_ver"
     kapt "androidx.room:room-compiler:$room_ver"
 
     // ViewModel and LiveData
-    def lifecycle_ver = '2.2.0-rc03'
+    def lifecycle_ver = '2.2.0'
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_ver"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_ver"
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_ver"
