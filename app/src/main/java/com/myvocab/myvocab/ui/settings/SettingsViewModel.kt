@@ -53,6 +53,7 @@ constructor(
         time.apply {
             set(Calendar.HOUR_OF_DAY, hourOfDay)
             set(Calendar.MINUTE, minute)
+            set(Calendar.SECOND, 0)
         }
         remindingTime.value = time
         reminderScheduler.scheduleIfEnabled(time.timeInMillis)
