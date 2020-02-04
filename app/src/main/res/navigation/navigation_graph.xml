@@ -96,6 +96,7 @@
     <fragment
         android:id="@+id/navigation_add_new_word"
         android:name="com.myvocab.myvocab.ui.add_new_word.AddNewWordFragment"
-        android:label="@string/label_add_new_word" />
+        android:label="@string/label_add_new_word"
+        tools:layout="@layout/fragment_add_new_word"/>
 
 </navigation>

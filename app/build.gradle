@@ -104,7 +104,7 @@ dependencies {
     implementation "com.google.dagger:dagger:$dagger_ver"
     implementation "com.google.dagger:dagger-android:$dagger_ver"
     implementation "com.google.dagger:dagger-android-support:$dagger_ver"
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.1.0'
     kapt "com.google.dagger:dagger-compiler:$dagger_ver"
     kapt "com.google.dagger:dagger-android-processor:$dagger_ver"
     annotationProcessor "com.google.dagger:dagger-compiler:$dagger_ver"

@@ -3,7 +3,6 @@ package com.myvocab.myvocab.ui
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
-import androidx.navigation.Navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.myvocab.myvocab.MyVocabApp
@@ -37,11 +36,13 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        navController = findNavController(this, R.id.nav_host)
+        val navHostFragment = nav_host as NavHostFragment
+        val inflater = navHostFragment.navController.navInflater
+        val graph = inflater.inflate(R.navigation.navigation_graph)
 
-        val graph = navController.navInflater.inflate(R.navigation.navigation_graph)
+        navController = navHostFragment.navController
 
-        if(!(application as MyVocabApp).started) {
+        if (!(application as MyVocabApp).started) {
             wordCountDisposable = wordRepository.getInLearningWordsCount().subscribe({
                 graph.startDestination = if (it > 0) {
                     R.id.navigation_learning
@@ -54,6 +55,8 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
                 navController.graph = graph
             })
             (application as MyVocabApp).started = true
+        } else {
+            navController.graph = graph
         }
 
         NavigationUI.setupWithNavController(bottom_navigation, navController)
@@ -61,7 +64,11 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
     }
 
     override fun onBackPressed() {
-        navController.navigateUp()
+        if (navController.currentDestination?.id != navController.graph.startDestination) {
+            navController.navigateUp()
+        } else {
+            finish()
+        }
     }
 
     override fun registerToolbarWithNavigation(toolbar: Toolbar) =
