@@ -68,5 +68,15 @@
     <string name="select_words_you_want_to_learn_or_add_new_words">Выберите слова, которые вы хотите изучать, или добавьте новые</string>
     <string name="dialog_deselect_all_words_to_learn">Отменить изучение всех слов?</string>
     <string name="dialog_select_all_words_to_learn">Изучать все слова?</string>
+    <string name="dialog_sure_want_learn_this_word_list">Вы уверены, что хотите изучать этот список слов?</string>
+    <string name="add_to_my_vocab">Добавить в мой словарь</string>
+    <string name="reset_the_progress">Сбросить прогресс</string>
+    <string name="learn_all_words">Учить все слова</string>
+    <string name="mark_as_learned">Пометить как выученное</string>
+    <string name="delete_word">Удалить</string>
+    <string name="dialog_action_cancel">Отмена</string>
+    <string name="dialog_action_no">Нет</string>
+    <string name="dialog_action_yes">Да</string>
+    <string name="dialog_sure_want_remove_this_word_list">Вы уверены, что хотите удалить этот список слов из вашего словаря?</string>
 
 </resources>

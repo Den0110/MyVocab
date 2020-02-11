@@ -56,15 +56,31 @@
     <string name="dialog_permission_battery_settings">"Allow MyVocab work in background:\nOn the next screen choose \"All applications\", find MyVocab and choose \"Don't optimize\""</string>
     <string name="dialog_permission_allow">Allow</string>
     <string name="dialog_permission_deny">Deny</string>
+
+    <string name="dialog_action_yes">Yes</string>
+    <string name="dialog_action_no">No</string>
+    <string name="dialog_action_cancel">Cancel</string>
+
     <string name="remove_all_words">Remove all words</string>
     <string name="remind_to_learn_words">Remind to learn words</string>
     <string name="reminding_time">Reminding time</string>
     <string name="remind_only_if_there_are_words_to_learn">Remind only if there are words to learn</string>
     <string name="words">Words</string>
     <string name="word_lists">Word lists</string>
+
     <string name="dialog_select_all_words_to_learn">Select all the words to learn?</string>
     <string name="dialog_deselect_all_words_to_learn">Deselect all the words to learn?</string>
     <string name="select_words_you_want_to_learn_or_add_new_words">Select words you want to learn or add new words</string>
     <string name="find_words">Find words</string>
+
+    <string name="dialog_sure_want_learn_this_word_list">Are you sure you want to learn this word list?</string>
+    <string name="dialog_sure_want_remove_this_word_list">Are you sure you want to remove this word list from your vocab?</string>
+
+    <string name="learn_all_words">Learn all words</string>
+
+    <string name="mark_as_learned">Mark as learned</string>
+    <string name="reset_the_progress">Reset the progress</string>
+    <string name="add_to_my_vocab">Add to my vocab</string>
+    <string name="delete_word">Delete</string>
 
 </resources>

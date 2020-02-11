@@ -12,9 +12,12 @@ import javax.inject.Inject
 
 abstract class BaseWordListFragment : MainNavigationFragment() {
 
-    companion object {
-        private val WORD_MENU_ITEMS = arrayOf("Mark as learned", "Reset the progress", "Add to my word list", "Delete")
-    }
+    private val WORD_MENU_ITEMS: Array<String> by lazy { arrayOf(
+            getString(R.string.mark_as_learned),
+            getString(R.string.reset_the_progress),
+            getString(R.string.add_to_my_vocab),
+            getString(R.string.delete_word)
+    ) }
 
     abstract val viewModel: BaseWordListViewModel
 
@@ -30,7 +33,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
                         getString(R.string.dialog_deselect_all_words_to_learn)
             AlertDialog.Builder(context!!)
                     .setMessage(title)
-                    .setPositiveButton("Yes") { dialog, _ ->
+                    .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
                         wordListAdapter.currentList.forEach {
                             it.needToLearn = state
                             viewModel.update(it)
@@ -38,7 +41,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
                         wordListAdapter.needToLearnAll = state
                         dialog.dismiss()
                     }
-                    .setNegativeButton("No") { dialog, _ ->
+                    .setNegativeButton(R.string.dialog_action_no) { dialog, _ ->
                         dialog.dismiss()
                     }
                     .setOnDismissListener {
@@ -84,7 +87,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
                                 WORD_MENU_ITEMS[3] -> viewModel.delete(word)
                             }
                         }
-                        .setNegativeButton("Cancel") { dialog, _ ->
+                        .setNegativeButton(R.string.dialog_action_cancel) { dialog, _ ->
                             dialog.dismiss()
                         }
                         .create().show()

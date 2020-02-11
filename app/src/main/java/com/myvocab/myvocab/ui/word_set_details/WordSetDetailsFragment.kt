@@ -51,22 +51,22 @@ class WordSetDetailsFragment : BaseWordListFragment() {
             when (it.itemId) {
                 R.id.add -> {
                     AlertDialog.Builder(context!!)
-                            .setMessage("Are you sure want to add this word list to your vocab?")
-                            .setPositiveButton("Yes") { dialog, _ ->
+                            .setMessage(R.string.dialog_sure_want_learn_this_word_list)
+                            .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
                                 viewModel.addWordSet()
                                 dialog.dismiss()
                             }
-                            .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
+                            .setNegativeButton(R.string.dialog_action_no) { dialog, _ -> dialog.dismiss() }
                             .create().show()
                 }
                 R.id.remove -> {
                     AlertDialog.Builder(context!!)
-                            .setMessage("Are you sure want to remove this word list from your vocab?")
-                            .setPositiveButton("Yes") { dialog, _ ->
+                            .setMessage(R.string.dialog_sure_want_remove_this_word_list)
+                            .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
                                 viewModel.removeWordSet()
                                 dialog.dismiss()
                             }
-                            .setNegativeButton("No") { dialog, _ -> dialog.dismiss() }
+                            .setNegativeButton(R.string.dialog_action_no) { dialog, _ -> dialog.dismiss() }
                             .create().show()
                 }
             }
