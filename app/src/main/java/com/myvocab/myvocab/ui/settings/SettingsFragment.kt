@@ -21,6 +21,7 @@ import com.myvocab.myvocab.R
 import com.myvocab.myvocab.databinding.FragmentSettingsBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.util.PackageUtils
+import com.myvocab.myvocab.util.canDrawOverlays
 import kotlinx.android.synthetic.main.fragment_settings.*
 import java.util.*
 import javax.inject.Inject
@@ -54,30 +55,17 @@ class SettingsFragment : MainNavigationFragment() {
             viewmodel = viewModel
         }
 
-//        if (BuildConfig.DEBUG) {
-//            remove_all_words.visibility = View.VISIBLE
-//            remove_all_words.setOnClickListener { viewModel.removeAllWords() }
-//        }
-
-        service_switch.setOnCheckedChangeListener(viewModel.translationListener)
-        reminder_mode_switch.setOnCheckedChangeListener(viewModel.remindOnlyWordsToLearnListener)
+        service_switch.setOnCheckedChangeListener(viewModel.translationStateListener)
+        service_switch.setOnClickListener(viewModel.translationClickListener)
         reminder_switch.setOnCheckedChangeListener(viewModel.reminderListener)
 
         viewModel.reminderEnabled.observe(viewLifecycleOwner, Observer {
             if (it) {
-                reminding_time.alpha = 1f
-                reminding_time.setOnClickListener {
-                    TimePickerDialog(
-                            context,
-                            viewModel.remindingTimeListener,
-                            viewModel.remindingTime.value?.get(Calendar.HOUR_OF_DAY)!!,
-                            viewModel.remindingTime.value?.get(Calendar.MINUTE)!!,
-                            true
-                    ).show()
-                }
+                enableReminderTimeSwitch()
+                enableReminderModeSwitch()
             } else {
-                reminding_time.alpha = 0.5f
-                reminding_time.setOnClickListener(null)
+                disableReminderTimeSwitch()
+                disableReminderModeSwitch()
             }
         })
 
@@ -94,10 +82,39 @@ class SettingsFragment : MainNavigationFragment() {
 
     }
 
+    private fun enableReminderTimeSwitch(){
+        reminding_time.alpha = 1f
+        reminding_time.setOnClickListener {
+            TimePickerDialog(
+                    context,
+                    viewModel.remindingTimeListener,
+                    viewModel.remindingTime.value?.get(Calendar.HOUR_OF_DAY)!!,
+                    viewModel.remindingTime.value?.get(Calendar.MINUTE)!!,
+                    true
+            ).show()
+        }
+    }
+
+    private fun disableReminderTimeSwitch(){
+        reminding_time.alpha = 0.5f
+        reminding_time.setOnClickListener(null)
+    }
+
+    private fun enableReminderModeSwitch(){
+        reminder_mode_switch.alpha = 1f
+        reminder_mode_switch.isClickable = true
+        reminder_mode_switch.setOnCheckedChangeListener(viewModel.remindOnlyWordsToLearnListener)
+    }
+
+    private fun disableReminderModeSwitch(){
+        reminder_mode_switch.alpha = 0.5f
+        reminder_mode_switch.isClickable = false
+        reminder_mode_switch.setOnCheckedChangeListener(null)
+    }
+
     private fun startTranslationService() {
-        if (canDrawOverlays()) {
+        if (canDrawOverlays(context)) {
             viewModel.startTranslationService()
-            openBatteryDialog()
         } else {
             AlertDialog.Builder(context!!)
                     .setMessage(R.string.dialog_permission_draw_overlay)
@@ -122,7 +139,7 @@ class SettingsFragment : MainNavigationFragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_CODE_DRAW_OVERLAYS) {
-            if(canDrawOverlays()) {
+            if(canDrawOverlays(context)) {
                 viewModel.startTranslationService()
                 openBatteryDialog()
             } else {
@@ -158,8 +175,5 @@ class SettingsFragment : MainNavigationFragment() {
             Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
                     (context!!.getSystemService(POWER_SERVICE) as PowerManager)
                             .isIgnoringBatteryOptimizations(context!!.packageName)
-
-    private fun canDrawOverlays() =
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(context)
 
 }

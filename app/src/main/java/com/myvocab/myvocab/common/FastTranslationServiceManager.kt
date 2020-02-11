@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.content.Context
 import com.myvocab.myvocab.common.fasttranslation.FastTranslationService
 import com.myvocab.myvocab.util.PreferencesManager
+import com.myvocab.myvocab.util.canStartFastTranslation
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -23,12 +24,16 @@ constructor(
     fun startIfEnabled() {
         val state = prefManager.fastTranslationState
         if(state) {
-            Timber.v("FastTranslationServiceStarter: checking service state...")
-            if (!isServiceRunning()) {
-                Timber.d("Restarting service")
-                start()
+            if(canStartFastTranslation(context)) {
+                Timber.v("FastTranslationServiceStarter: checking service state...")
+                if (!isServiceRunning()) {
+                    Timber.d("Restarting service")
+                    start()
+                } else {
+                    Timber.v("Service running")
+                }
             } else {
-                Timber.v("Service running")
+                cancel()
             }
         }
     }

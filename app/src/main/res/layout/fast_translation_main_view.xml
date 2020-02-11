@@ -64,6 +64,8 @@
                         android:layout_marginBottom="8dp"
                         android:textColor="#444"
                         android:textSize="@dimen/translate_text_size"
+                        android:ellipsize="end"
+                        android:maxLines="10"
                         tools:text="Especially"/>
 
                     <include layout="@layout/layout_separator"/>
@@ -81,6 +83,8 @@
                         android:layout_height="wrap_content"
                         android:textColor="#444"
                         android:textSize="@dimen/translate_text_size"
+                        android:ellipsize="end"
+                        android:maxLines="10"
                         android:visibility="gone"
                         tools:text="Особенно"/>
 

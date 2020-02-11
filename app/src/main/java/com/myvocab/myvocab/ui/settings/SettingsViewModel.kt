@@ -1,6 +1,7 @@
 package com.myvocab.myvocab.ui.settings
 
 import android.app.TimePickerDialog
+import android.view.View
 import android.widget.CompoundButton
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,8 +27,14 @@ constructor(
 
     val startTranslationServiceMessage: MutableLiveData<Event<Unit>> = MutableLiveData()
 
-    val translationListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
-        if (isChecked) {
+    private var isTranslationSwitchEnabled = false
+
+    val translationStateListener = CompoundButton.OnCheckedChangeListener { _, isChecked ->
+        isTranslationSwitchEnabled = isChecked
+    }
+
+    val translationClickListener = View.OnClickListener {
+        if (isTranslationSwitchEnabled) {
             startTranslationServiceMessage.value = Event(Unit)
         } else {
             stopTranslationService()
@@ -74,11 +81,6 @@ constructor(
     fun stopTranslationService() {
         translationServiceManager.cancel()
         translationEnabled.value = false
-    }
-
-    fun removeAllWords() {
-        wordRepository.deleteAllWords().subscribe()
-        wordRepository.deleteAllWordSets().subscribe()
     }
 
 }
