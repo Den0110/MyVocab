@@ -1,12 +1,10 @@
 package com.myvocab.myvocab.ui.settings
 
 import android.app.TimePickerDialog
-import android.content.Context.POWER_SERVICE
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.PowerManager
 import android.provider.Settings
 import android.text.format.DateUtils
 import android.view.LayoutInflater
@@ -20,25 +18,25 @@ import androidx.lifecycle.ViewModelProvider
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.databinding.FragmentSettingsBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
-import com.myvocab.myvocab.util.PackageUtils
-import com.myvocab.myvocab.util.canDrawOverlays
+import com.myvocab.myvocab.util.*
 import kotlinx.android.synthetic.main.fragment_settings.*
+import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import java.util.*
 import javax.inject.Inject
 
 
 class SettingsFragment : MainNavigationFragment() {
 
-    companion object {
-        const val REQUEST_CODE_DRAW_OVERLAYS = 1
-        const val REQUEST_CODE_BATTERY = 2
-    }
-
     private lateinit var binding: FragmentSettingsBinding
+
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: SettingsViewModel
+
+    private var prompt: MaterialTapTargetPrompt? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
@@ -58,6 +56,23 @@ class SettingsFragment : MainNavigationFragment() {
         service_switch.setOnCheckedChangeListener(viewModel.translationStateListener)
         service_switch.setOnClickListener(viewModel.translationClickListener)
         reminder_switch.setOnCheckedChangeListener(viewModel.reminderListener)
+
+        if(!preferencesManager.fastTranslationGuideShowed) {
+            prompt = MaterialTapTargetPrompt.Builder(this)
+                    .setTarget(service_switch)
+                    .setPrimaryText(getString(R.string.enable_fast_translation))
+                    .setSecondaryText(getString(R.string.settings_fast_translate_guide_description))
+                    .setBackgroundColour(resources.getColor(R.color.guideBgColor))
+                    .setPrimaryTextColour(resources.getColor(R.color.primaryTextColor))
+                    .setSecondaryTextColour(resources.getColor(R.color.secondaryTextColor))
+                    .setPromptStateChangeListener { prompt, state ->
+                        if (state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED) {
+                            prompt.finish()
+                        }
+                    }
+                    .show()
+            preferencesManager.fastTranslationGuideShowed = true
+        }
 
         viewModel.reminderEnabled.observe(viewLifecycleOwner, Observer {
             if (it) {
@@ -80,6 +95,11 @@ class SettingsFragment : MainNavigationFragment() {
             }
         })
 
+    }
+
+    override fun onStop() {
+        super.onStop()
+        prompt?.finish()
     }
 
     private fun enableReminderTimeSwitch(){
@@ -149,7 +169,7 @@ class SettingsFragment : MainNavigationFragment() {
     }
 
     private fun openBatteryDialog(){
-        if (!ignoresPowerOptimization()) {
+        if (!ignoresPowerOptimization(context)) {
             AlertDialog.Builder(context!!)
                     .setMessage(R.string.dialog_permission_battery_settings)
                     .setPositiveButton(R.string.dialog_permission_allow) { _, _ ->
@@ -170,10 +190,5 @@ class SettingsFragment : MainNavigationFragment() {
             startActivityForResult(intent, REQUEST_CODE_BATTERY)
         }
     }
-
-    private fun ignoresPowerOptimization() =
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.M ||
-                    (context!!.getSystemService(POWER_SERVICE) as PowerManager)
-                            .isIgnoringBatteryOptimizations(context!!.packageName)
 
 }

@@ -11,9 +11,27 @@ class PreferencesManager(context: Context) {
 
     private val preferences = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
 
-    /*
-    *   Fast Translation
-    */
+    /**
+     *  First Start of App
+     */
+
+    var introShowed: Boolean
+        set(value) = preferences
+                .edit()
+                .putBoolean("intro_showed", value)
+                .apply()
+        get() = preferences.getBoolean("intro_showed", false)
+
+    var fastTranslationGuideShowed: Boolean
+        set(value) = preferences
+                .edit()
+                .putBoolean("fast_translation_guide_showed", value)
+                .apply()
+        get() = preferences.getBoolean("fast_translation_guide_showed", false)
+
+    /**
+     *  Fast Translation
+     */
 
     var fastTranslationState: Boolean
         set(value) = preferences
@@ -22,9 +40,9 @@ class PreferencesManager(context: Context) {
                 .apply()
         get() = preferences.getBoolean("fast_translation_state", false)
 
-    /*
-    *   Reminder
-    */
+    /**
+     *  Reminder
+     */
 
     var remindingState: Boolean
         set(value) = preferences
@@ -49,9 +67,9 @@ class PreferencesManager(context: Context) {
                     .apply()
         get() = preferences.getLong("reminding_time", ReminderScheduler.REMINDER_DEFAULT_TIME)
 
-    /*
-    *   Learning
-    */
+    /**
+     *  Learning
+     */
 
     // last word that was chosen (to show the same word if user didn't learned it, but close the screen)
     var lastWordToLearnId: Int

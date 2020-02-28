@@ -78,5 +78,12 @@
     <string name="dialog_action_no">Нет</string>
     <string name="dialog_action_yes">Да</string>
     <string name="dialog_sure_want_remove_this_word_list">Вы уверены, что хотите удалить этот список слов из вашего словаря?</string>
+    <string name="splash_learn_only_what_you_need">Учите только \nнужные Вам слова</string>
+    <string name="intro_word_lists_label">Добавляйте и учите интересующие вас подборки слов. Они регулярно дополняются.</string>
+    <string name="select_and_copy_unfamiliar_word">Выделите и скопируйте незнакомое слово</string>
+    <string name="intro_fast_translate_label">Переводите незнакомые слова не отвлекаясь от чтения, просто выделяйте и копируйте их</string>
+    <string name="settings_fast_translate_guide_description">Вы сможете переводить не отвлекаясь от чтения, просто выделите и скопируйте незнакомое слово</string>
+    <string name="progress_will_be_increased">Прогресс будет повышен</string>
+    <string name="progress_will_be_reset">Прогресс сбросится</string>
 
 </resources>

@@ -29,69 +29,97 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/service_switch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="@{viewmodel.translationEnabled}"
-                android:padding="16dp"
-                android:text="@string/enable_fast_translation"
-                android:textColor="@color/primaryTextColor"
-                android:textSize="16sp" />
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/reminder_switch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="@{viewmodel.reminderEnabled}"
-                android:padding="16dp"
-                android:text="@string/remind_to_learn_words"
-                android:textColor="@color/primaryTextColor"
-                android:textSize="16sp" />
-
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/reminder_mode_switch"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checked="@{viewmodel.remindOnlyWordsToLearn}"
-                android:padding="16dp"
-                android:text="@string/remind_only_if_there_are_words_to_learn"
-                android:textColor="@color/primaryTextColor"
-                android:textSize="16sp" />
-
-            <LinearLayout
-                android:id="@+id/reminding_time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/reminding_time"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/primaryTextColor"
+                            android:textSize="16sp"
+                            android:text="@string/enable_fast_translation"/>
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textColor="@color/secondaryTextColor"
+                            android:text="@string/select_and_copy_unfamiliar_word"/>
+
+                    </LinearLayout>
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/service_switch"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:checked="@{viewmodel.translationEnabled}" />
+
+                </LinearLayout>
+
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/reminder_switch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:checked="@{viewmodel.reminderEnabled}"
+                    android:padding="16dp"
+                    android:text="@string/remind_to_learn_words"
                     android:textColor="@color/primaryTextColor"
                     android:textSize="16sp" />
 
-                <TextView
-                    android:id="@+id/reminding_time_value"
-                    android:layout_width="wrap_content"
+                <androidx.appcompat.widget.SwitchCompat
+                    android:id="@+id/reminder_mode_switch"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="13:00"
-                    android:textColor="@color/secondaryTextColor" />
+                    android:checked="@{viewmodel.remindOnlyWordsToLearn}"
+                    android:padding="16dp"
+                    android:text="@string/remind_only_if_there_are_words_to_learn"
+                    android:textColor="@color/primaryTextColor"
+                    android:textSize="16sp" />
 
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/reminding_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
 
-            <Button
-                android:id="@+id/remove_all_words"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/horizontal_layout_margin"
-                android:layout_marginTop="@dimen/vertical_layout_margin"
-                android:layout_marginEnd="@dimen/horizontal_layout_margin"
-                android:layout_marginBottom="@dimen/vertical_layout_margin"
-                android:text="@string/remove_all_words"
-                android:visibility="gone" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/reminding_time"
+                        android:textColor="@color/primaryTextColor"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/reminding_time_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="13:00"
+                        android:textColor="@color/secondaryTextColor" />
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/remove_all_words"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/horizontal_layout_margin"
+                    android:layout_marginTop="@dimen/vertical_layout_margin"
+                    android:layout_marginEnd="@dimen/horizontal_layout_margin"
+                    android:layout_marginBottom="@dimen/vertical_layout_margin"
+                    android:text="@string/remove_all_words"
+                    android:visibility="gone" />
 
             </LinearLayout>
 

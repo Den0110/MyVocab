@@ -23,12 +23,19 @@
             android:name="firebase_crashlytics_collection_enabled"
             android:value="${enableCrashReporting}" />
 
-        <activity android:name=".ui.MainActivity">
+        <activity
+            android:name=".ui.IntroActivity"
+            android:screenOrientation="userPortrait"
+            android:theme="@style/AppTheme.TranslucentStatusTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:screenOrientation="userPortrait" />
 
         <service
             android:name=".common.fasttranslation.FastTranslationService"

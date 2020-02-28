@@ -8,6 +8,7 @@ import androidx.navigation.ui.NavigationUI
 import com.myvocab.myvocab.MyVocabApp
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.source.WordRepository
+import com.myvocab.myvocab.util.PreferencesManager
 import com.myvocab.myvocab.util.setupToolbar
 import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.disposables.Disposable
@@ -28,6 +29,9 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
     @Inject
     lateinit var wordRepository: WordRepository
 
+    @Inject
+    lateinit var preferencesManager: PreferencesManager
+
     private var wordCountDisposable: Disposable? = null
 
     private lateinit var navController: NavController
@@ -41,6 +45,14 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
         val graph = inflater.inflate(R.navigation.navigation_graph)
 
         navController = navHostFragment.navController
+
+        NavigationUI.setupWithNavController(bottom_navigation, navController)
+
+        if(!preferencesManager.fastTranslationGuideShowed) {
+            graph.startDestination = R.id.navigation_settings
+            navController.graph = graph
+            return
+        }
 
         if (!(application as MyVocabApp).started) {
             wordCountDisposable = wordRepository.getInLearningWordsCount().subscribe({
@@ -59,7 +71,6 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
             navController.graph = graph
         }
 
-        NavigationUI.setupWithNavController(bottom_navigation, navController)
 
     }
 

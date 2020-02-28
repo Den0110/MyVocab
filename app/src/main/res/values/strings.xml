@@ -82,5 +82,16 @@
     <string name="reset_the_progress">Reset the progress</string>
     <string name="add_to_my_vocab">Add to my vocab</string>
     <string name="delete_word">Delete</string>
+    <string name="splash_learn_only_what_you_need">Learn only the words,\n that you need</string>
+    <string name="intro_word_lists_label">Add and learn word lists that interest you. They are updated regularly.</string>
+    <string name="intro_fast_translation_text" translatable="false">Speculative fiction can include fantasy and science fiction, though as with many literary
+        genres, nobody agrees on exactly what belongs to which category. The way I see it, speculative fiction is any story that guides a reader into thinking
+        more deeply about something that doesn’t presently appear in their world. Typically this takes place through the lens of events that don’t happen
+        in the world today (either because they can’t, or simply because they haven’t come to pass yet) but could in the future. The stories in speculative </string>
+    <string name="select_and_copy_unfamiliar_word">Select and copy unfamiliar word</string>
+    <string name="intro_fast_translate_label">Translate unfamiliar words without distracting from reading, just select and copy them</string>
+    <string name="settings_fast_translate_guide_description">You will be able to translate without distracting from reading, just select and copy unfamiliar word</string>
+    <string name="progress_will_be_reset">Progress will be reset</string>
+    <string name="progress_will_be_increased">Progress will be increased</string>
 
 </resources>

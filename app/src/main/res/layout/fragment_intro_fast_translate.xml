@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/appIntro2BottomBarHeight"
+    android:background="@color/introBackgroundColor">
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/intro_fast_translation_text"
+        android:textIsSelectable="true"
+        android:textColor="@color/primaryTextColor"
+        android:layout_margin="16dp"
+        android:textSize="20sp"
+        android:lineSpacingExtra="3dp"/>
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="16dp"
+        android:layout_alignParentBottom="true"
+        android:text="Выделите и скопируйте любое слово из теста, чтобы попробовать Быстрый Перевод"
+        android:textColor="@color/primaryTextColor"
+        android:textSize="16sp" />
+
+</RelativeLayout>

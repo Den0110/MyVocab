@@ -23,6 +23,8 @@ import com.myvocab.myvocab.di.settings.SettingsViewModelsModule
 import com.myvocab.myvocab.di.word_set_details.WordSetDetailsModule
 import com.myvocab.myvocab.di.word_set_details.WordSetDetailsViewModelsModule
 import com.myvocab.myvocab.ui.MainActivity
+import com.myvocab.myvocab.ui.IntroActivity
+import com.myvocab.myvocab.ui.intro.IntroEnableFastTranslationFragment
 import com.myvocab.myvocab.ui.my_word_sets.MyWordSetsFragment
 import com.myvocab.myvocab.ui.my_word_sets.in_learning_words.InLearningWordSetsFragment
 import com.myvocab.myvocab.ui.my_words.MyWordsFragment
@@ -35,15 +37,19 @@ import dagger.android.ContributesAndroidInjector
 @Module
 abstract class ActivityBuilderModule {
 
-    /*
-    *   MainActivity
-    */
+    /**
+     *  Activities
+     */
+
     @ContributesAndroidInjector
     abstract fun contributeMainActivity(): MainActivity
 
-    /*
-    *   Fragments
-    */
+    @ContributesAndroidInjector
+    abstract fun contributeIntroActivity(): IntroActivity
+
+    /**
+     *  Fragments
+     */
 
     @ContributesAndroidInjector(modules = [FastTranslationModule::class, FastTranslationViewModelsModule::class])
     abstract fun contributeTranslationService(): FastTranslationService
@@ -78,10 +84,13 @@ abstract class ActivityBuilderModule {
     @ContributesAndroidInjector(modules = [SettingsViewModelsModule::class])
     abstract fun contributeSettingsFragment(): SettingsFragment
 
+    @ContributesAndroidInjector()
+    abstract fun contributeIntroEnableFastTranslationFragment(): IntroEnableFastTranslationFragment
 
-    /*
-    *   Broadcast receivers
-    */
+
+    /**
+     *  Broadcast receivers
+     */
 
     @ContributesAndroidInjector
     abstract fun contributeReminderReceiver(): ReminderReceiver

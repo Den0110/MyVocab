@@ -135,7 +135,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="Уровень выученности обнулится"
+                        android:text="@string/progress_will_be_reset"
+                        android:lines="2"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -177,7 +178,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:gravity="center"
-                        android:text="Уровень выученности увеличится"
+                        android:text="@string/progress_will_be_increased"
+                        android:lines="2"
                         android:textSize="12sp" />
 
                 </LinearLayout>
