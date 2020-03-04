@@ -83,4 +83,12 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="AppTheme.RecyclerMessage" parent="AppTheme">
+        <item name="android:layout_margin">@dimen/horizontal_layout_margin</item>
+        <item name="android:gravity">center</item>
+        <item name="android:text">@string/message_empty_vocab</item>
+        <item name="android:textColor">@color/secondaryTextColor</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
 </resources>

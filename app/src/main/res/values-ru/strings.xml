@@ -85,5 +85,6 @@
     <string name="settings_fast_translate_guide_description">Вы сможете переводить не отвлекаясь от чтения, просто выделите и скопируйте незнакомое слово</string>
     <string name="progress_will_be_increased">Прогресс будет повышен</string>
     <string name="progress_will_be_reset">Прогресс сбросится</string>
+    <string name="failed_to_load_word_lists">Не удалось загрузить списки слов.\nПроверьте подключение к сети.</string>
 
 </resources>

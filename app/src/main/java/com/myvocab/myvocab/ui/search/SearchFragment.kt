@@ -8,7 +8,6 @@ import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.databinding.FragmentSearchBinding
@@ -53,13 +52,18 @@ class SearchFragment : MainNavigationFragment() {
 
         viewModel.wordSets.observe(viewLifecycleOwner, Observer {
             when(it.status){
-                Resource.Status.LOADING -> swipe_refresh_layout.isRefreshing = true
+                Resource.Status.LOADING -> {
+                    swipe_refresh_layout.isRefreshing = true
+                    message_failed_to_load.visibility = View.GONE
+                }
                 Resource.Status.SUCCESS -> {
                     swipe_refresh_layout.isRefreshing = false
+                    message_failed_to_load.visibility = View.GONE
                     wordSetListAdapter.submitList(it.data)
                 }
                 Resource.Status.ERROR -> {
                     swipe_refresh_layout.isRefreshing = false
+                    message_failed_to_load.visibility = View.VISIBLE
                     Timber.e(it.error)
                 }
             }

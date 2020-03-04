@@ -9,7 +9,7 @@ import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.domain.WordSetUseCase
 import com.myvocab.myvocab.util.RepositoryData
 import com.myvocab.myvocab.util.Source
-import durdinapps.rxfirebase2.RxFirestore
+import com.myvocab.myvocab.util.getMaybe
 import io.reactivex.Single
 import javax.inject.Inject
 
@@ -21,10 +21,10 @@ constructor(
 ) {
 
     fun getWordSets(): Single<List<WordSetUseCaseResult>> =
-            RxFirestore
-                    .getCollection(FirebaseFirestore.getInstance()
-                            .collection("word_sets")
-                            .orderBy("timestamp", Query.Direction.DESCENDING))
+            FirebaseFirestore.getInstance()
+                    .collection("word_sets")
+                    .orderBy("timestamp", Query.Direction.DESCENDING)
+                    .getMaybe()
                     .map {
                         val wordSetResults = mutableListOf<WordSet>()
                         for (doc: DocumentSnapshot in it.documents) {

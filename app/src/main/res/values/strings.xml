@@ -93,5 +93,6 @@
     <string name="settings_fast_translate_guide_description">You will be able to translate without distracting from reading, just select and copy unfamiliar word</string>
     <string name="progress_will_be_reset">Progress will be reset</string>
     <string name="progress_will_be_increased">Progress will be increased</string>
+    <string name="failed_to_load_word_lists">Failed to load word lists.\nPlease check your internet connection.</string>
 
 </resources>

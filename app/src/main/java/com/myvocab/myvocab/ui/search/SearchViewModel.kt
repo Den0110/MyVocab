@@ -31,10 +31,10 @@ constructor(
                 .getWordSets()
                 .toObservable()
                 .publish {
-                    it
-                            .timeout(500, TimeUnit.MILLISECONDS, Observable.create<MutableList<WordSetUseCaseResult>> {
-                                wordSets.postValue(Resource.loading())
-                            })
+                    it.timeout(500, TimeUnit.MILLISECONDS, Observable.create<MutableList<WordSetUseCaseResult>> {
+                        wordSets.postValue(Resource.loading())
+                    })
+                            .onErrorResumeNext(Observable.empty())
                             .mergeWith(it)
                 }
                 .subscribe({

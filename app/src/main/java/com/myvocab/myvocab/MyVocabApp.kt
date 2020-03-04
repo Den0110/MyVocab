@@ -12,10 +12,10 @@ import com.myvocab.myvocab.util.createReminderNotificationChannel
 import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
+import io.reactivex.plugins.RxJavaPlugins
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import javax.inject.Inject
-
 
 class MyVocabApp : DaggerApplication() {
 
@@ -49,6 +49,10 @@ class MyVocabApp : DaggerApplication() {
 
         // just to create and pre-populate database
         wordsDb.wordSetsDao().getWordSets().subscribe({},{})
+
+        RxJavaPlugins.setErrorHandler {
+            Timber.e(it)
+        }
 
     }
 
