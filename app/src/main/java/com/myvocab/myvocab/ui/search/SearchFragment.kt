@@ -59,6 +59,10 @@ class SearchFragment : MainNavigationFragment() {
                 Resource.Status.SUCCESS -> {
                     swipe_refresh_layout.isRefreshing = false
                     message_failed_to_load.visibility = View.GONE
+                    if(wordSetListAdapter.itemCount == 0 && it.data?.size ?: 0 > 0) {
+                        word_sets_recycler_view.alpha = 0f
+                        word_sets_recycler_view.animate().alpha(1f).setDuration(400).start()
+                    }
                     wordSetListAdapter.submitList(it.data)
                 }
                 Resource.Status.ERROR -> {

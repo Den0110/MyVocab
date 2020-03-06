@@ -8,6 +8,7 @@ import com.myvocab.myvocab.domain.search.GetSearchWordSetsUseCase
 import com.myvocab.myvocab.util.Resource
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -37,11 +38,13 @@ constructor(
                             .onErrorResumeNext(Observable.empty())
                             .mergeWith(it)
                 }
+                .subscribeOn(Schedulers.io())
                 .subscribe({
                     wordSets.postValue(Resource.success(it))
                 }, {
                     wordSets.postValue(Resource.error(it))
                 })
+
         compositeDisposable.clear()
         compositeDisposable.add(wordSetsDisposable)
     }

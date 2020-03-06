@@ -35,6 +35,9 @@ class WordSetHolder(private val view: View) : RecyclerView.ViewHolder(view) {
                 in 75..100 -> ContextCompat.getDrawable(knowingLevel.context, R.drawable.ic_brain_green_18dp)
                 else -> null
             })
+        } else {
+            learningPercentage.visibility = View.GONE
+            knowingLevel.visibility = View.GONE
         }
 
         view.setOnClickListener { callbackClickListener?.onClick(wordSetResult.wordSet) }
