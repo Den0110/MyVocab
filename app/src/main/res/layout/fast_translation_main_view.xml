@@ -55,6 +55,7 @@
                         android:id="@+id/translatable_lang"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/colorAccent"
                         android:text="@string/english"/>
 
                     <TextView
@@ -62,7 +63,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
-                        android:textColor="#444"
+                        android:textColor="@color/primaryTextColor"
                         android:textSize="@dimen/translate_text_size"
                         android:ellipsize="end"
                         android:maxLines="10"
@@ -75,18 +76,28 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
+                        android:textColor="@color/colorAccent"
                         android:text="@string/russian"/>
 
                     <TextView
                         android:id="@+id/translated_text_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="#444"
+                        android:textColor="@color/primaryTextColor"
                         android:textSize="@dimen/translate_text_size"
                         android:ellipsize="end"
                         android:maxLines="10"
                         android:visibility="gone"
                         tools:text="Особенно"/>
+
+                    <TextView
+                        android:id="@+id/translation_message_cant_translate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/secondaryTextColor"
+                        android:text="@string/could_not_translate"
+                        android:textSize="@dimen/translate_text_size"
+                        android:visibility="gone"/>
 
                     <ProgressBar
                         android:id="@+id/translation_progress_bar"

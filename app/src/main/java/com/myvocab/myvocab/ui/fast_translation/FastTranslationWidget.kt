@@ -47,6 +47,7 @@ constructor(
     private var translatableTextView: TextView? = null
     private var translatedTextView: TextView? = null
     private var translationProgressBar: ProgressBar? = null
+    private var translationErrorMessage: TextView? = null
     private var addToDictionaryBtn: ImageView? = null
 
     private var translationBgShowAnim: Animation? = null
@@ -64,10 +65,9 @@ constructor(
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
         viewModel = ViewModelProvider(this, viewModelFactory).get(FastTranslationWidgetViewModel::class.java)
 
+        resetViewStates()
+
         translatableTextView!!.text = text
-        translatedTextView!!.text = ""
-        translatedTextView!!.visibility = View.GONE
-        translationProgressBar!!.visibility = View.VISIBLE
 
         val translatableText = TranslatableText(text, "en-ru")
         val translateDisposable = viewModel
@@ -90,7 +90,7 @@ constructor(
                     translationProgressBar!!.visibility = View.GONE
                 }, {
                     Timber.e(it)
-                    Toast.makeText(context, R.string.could_not_translate, Toast.LENGTH_SHORT).show()
+                    translationErrorMessage!!.visibility = View.VISIBLE
                     translationProgressBar!!.visibility = View.GONE
                 })
         disposables.add(translateDisposable)
@@ -114,7 +114,16 @@ constructor(
         translatableTextView = translationRootView!!.findViewById(R.id.translatable_text_view)
         translatedTextView = translationRootView!!.findViewById(R.id.translated_text_view)
         translationProgressBar = translationRootView!!.findViewById(R.id.translation_progress_bar)
+        translationErrorMessage = translationRootView!!.findViewById(R.id.translation_message_cant_translate)
         addToDictionaryBtn = translationRootView!!.findViewById(R.id.add_to_dictionary)
+    }
+
+    private fun resetViewStates(){
+        translatedTextView!!.text = ""
+        translatedTextView!!.visibility = View.GONE
+        translationProgressBar!!.visibility = View.VISIBLE
+        translationErrorMessage!!.visibility = View.GONE
+        addToDictionaryBtn!!.visibility = View.GONE
     }
 
     private fun cleanViews() {
