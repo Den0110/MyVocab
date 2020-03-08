@@ -109,37 +109,41 @@ class WordSetDetailsFragment : BaseWordListFragment() {
         })
 
         viewModel.addingWordSet.observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Resource.Status.LOADING -> {
-                    Timber.d("Adding \"${it.data?.title}\" word set")
-                    menu.findItem(R.id.add)?.isEnabled = false
-                }
-                Resource.Status.SUCCESS -> {
-                    Snackbar.make(container, "${it.data?.title} (${it.data?.words?.size} words) was added",
-                            Snackbar.LENGTH_SHORT).show()
-                    viewModel.loadWordSet()
-                }
-                Resource.Status.ERROR -> {
-                    Snackbar.make(container, "Error, words weren't added", Snackbar.LENGTH_SHORT).show()
-                    Timber.e(it.error)
+            it.getContentIfNotHandled()?.let {
+                when (it.status) {
+                    Resource.Status.LOADING -> {
+                        Timber.d("Adding \"${it.data?.title}\" word set")
+                        menu.findItem(R.id.add)?.isEnabled = false
+                    }
+                    Resource.Status.SUCCESS -> {
+                        Snackbar.make(container, "${it.data?.title} (${it.data?.words?.size} words) was added",
+                                Snackbar.LENGTH_SHORT).show()
+                        viewModel.loadWordSet()
+                    }
+                    Resource.Status.ERROR -> {
+                        Snackbar.make(container, "Error, words weren't added", Snackbar.LENGTH_SHORT).show()
+                        Timber.e(it.error)
+                    }
                 }
             }
         })
 
         viewModel.removingWordSet.observe(viewLifecycleOwner, Observer {
-            when (it.status) {
-                Resource.Status.LOADING -> {
-                    Timber.d("Removing \"${it.data?.title}\" word set")
-                    menu.findItem(R.id.remove)?.isEnabled = false
-                }
-                Resource.Status.SUCCESS -> {
-                    Snackbar.make(container, "${it.data?.title} (${it.data?.words?.size} words) was removed",
-                            Snackbar.LENGTH_SHORT).show()
-                    viewModel.loadWordSet()
-                }
-                Resource.Status.ERROR -> {
-                    Snackbar.make(container, "Error, words weren't removed", Snackbar.LENGTH_SHORT).show()
-                    Timber.e(it.error)
+            it.getContentIfNotHandled()?.let {
+                when (it.status) {
+                    Resource.Status.LOADING -> {
+                        Timber.d("Removing \"${it.data?.title}\" word set")
+                        menu.findItem(R.id.remove)?.isEnabled = false
+                    }
+                    Resource.Status.SUCCESS -> {
+                        Snackbar.make(container, "${it.data?.title} (${it.data?.words?.size} words) was removed",
+                                Snackbar.LENGTH_SHORT).show()
+                        viewModel.loadWordSet()
+                    }
+                    Resource.Status.ERROR -> {
+                        Snackbar.make(container, "Error, words weren't removed", Snackbar.LENGTH_SHORT).show()
+                        Timber.e(it.error)
+                    }
                 }
             }
         })
