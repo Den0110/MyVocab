@@ -5,20 +5,13 @@ import android.app.PendingIntent
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
 import android.os.IBinder
 import android.os.SystemClock
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import com.myvocab.myvocab.R
-import com.myvocab.myvocab.ui.MainActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import com.myvocab.myvocab.R
+import com.myvocab.myvocab.ui.MainActivity
 import com.myvocab.myvocab.ui.fast_translation.FastTranslationWidget
 import com.myvocab.myvocab.util.*
 import dagger.android.DaggerService
@@ -31,8 +24,6 @@ import javax.inject.Inject
 class FastTranslationService : DaggerService() {
 
     companion object {
-        private const val BUBBLE_VIEW_GRAVITY = Gravity.TOP or Gravity.END
-        private const val BUBBLE_SHOW_TIME = 3000L
         private const val REQUEST_CODE = 121
 
         fun start(context: Context) {
@@ -58,20 +49,6 @@ class FastTranslationService : DaggerService() {
     private var serviceStarterAlarmManager: AlarmManager? = null
     private lateinit var pendingIntent: PendingIntent
 
-    @Inject
-    lateinit var windowManager: WindowManager
-    @Inject
-    lateinit var inflater: LayoutInflater
-
-    private var bubbleRootView: View? = null
-    private var translateBtn: View? = null
-
-    private var bubbleShowAnim: Animation? = null
-    private var bubbleHideAnim: Animation? = null
-
-    private val bubbleHandler = Handler()
-    private val hideBubbleRunnable = Runnable { hideBubble() }
-
     override fun onCreate() {
         super.onCreate()
         Timber.d("Service created")
@@ -95,32 +72,13 @@ class FastTranslationService : DaggerService() {
                 .doOnNext { Timber.d("Copied: $it") }
                 .filter { it.isNotEmpty() && it[0].toInt() in 65..122 }
                 .subscribe ({
-                    showBubble(it!!)
+                    translate(it!!)
                 }, {
                     Timber.e(it)
                 })
 
         pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE,
                 Intent(this, FastTranslationServiceStarter::class.java), 0)
-
-        bubbleRootView = inflater.inflate(R.layout.fast_translation_bubble_view, null)
-
-        val bubbleParams = getDefaultWindowParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT)
-        bubbleParams.gravity = BUBBLE_VIEW_GRAVITY
-        bubbleParams.y = dpToPixels(64)
-        windowManager.addView(bubbleRootView, bubbleParams)
-
-        translateBtn = bubbleRootView!!.findViewById(R.id.translate_btn)
-
-        bubbleShowAnim = AnimationUtils.loadAnimation(applicationContext, R.anim.bubble_show)
-        bubbleHideAnim = AnimationUtils.loadAnimation(applicationContext, R.anim.bubble_hide)
-        bubbleHideAnim!!.setAnimationListener(object : AnimationListenerAdapter() {
-            override fun onAnimationEnd(animation: Animation) {
-                translateBtn!!.visibility = View.GONE
-            }
-        })
 
     }
 
@@ -136,11 +94,11 @@ class FastTranslationService : DaggerService() {
             val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
 
             val notification = NotificationCompat.Builder(this, FAST_TRANSLATION_CHANNEL_ID)
-                    .setContentTitle("Translator")
-                    .setTicker("Translator")
+                    .setContentTitle("Fast Translation")
+                    .setTicker("Fast Translation")
                     .setLargeIcon(ContextCompat.getDrawable(applicationContext, R.mipmap.ic_launcher)?.toBitmap())
                     .setSmallIcon(R.mipmap.ic_launcher)
-                    .setContentText("Fast translation enabled")
+                    .setContentText("Select and copy a word to translate")
                     .setContentIntent(pendingIntent)
                     .build()
 
@@ -157,20 +115,8 @@ class FastTranslationService : DaggerService() {
         return START_STICKY
     }
 
-    private fun showBubble(translatable: String) {
-        translateBtn!!.visibility = View.VISIBLE
-        translateBtn!!.startAnimation(bubbleShowAnim)
-        bubbleRootView!!.setOnClickListener {
-            hideBubble()
-            translationWidget.start(translatable)
-        }
-        bubbleHandler.postDelayed(hideBubbleRunnable, BUBBLE_SHOW_TIME)
-    }
-
-    private fun hideBubble() {
-        translateBtn!!.startAnimation(bubbleHideAnim)
-        bubbleRootView!!.setOnClickListener(null)
-        bubbleHandler.removeCallbacks(hideBubbleRunnable)
+    private fun translate(translatable: String){
+        translationWidget.start(translatable)
     }
 
     private fun startServiceStarter() {
@@ -190,10 +136,6 @@ class FastTranslationService : DaggerService() {
     override fun onDestroy() {
         super.onDestroy()
         Timber.d("Service destroyed")
-        if (bubbleRootView != null) {
-            windowManager.removeView(bubbleRootView)
-            bubbleRootView = null
-        }
         clipboardDisposable.dispose()
         translationWidget.finish()
     }

@@ -6,7 +6,6 @@ import com.myvocab.myvocab.data.model.TranslateUseCaseResult
 import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.domain.TranslateUseCase
-import io.reactivex.Single
 import javax.inject.Inject
 
 class FastTranslationWidgetViewModel
@@ -16,19 +15,16 @@ constructor(
         private val wordRepository: WordRepository
 ) : ViewModel() {
 
-    fun translate(translatable: TranslatableText): Single<TranslateUseCaseResult> {
-        return translateUseCase.execute(translatable)
-    }
+    fun translate(translatable: TranslatableText) =
+            translateUseCase.execute(translatable)
 
-    fun addToDictionary(translateResult: TranslateUseCaseResult) {
-        wordRepository
-                .addMyWord(
-                    Word(
-                        word = translateResult.text.text,
-                        translation = translateResult.translations[0]
+    fun addToDictionary(translateResult: TranslateUseCaseResult) =
+            wordRepository
+                    .addMyWord(
+                            Word(
+                                    word = translateResult.text.text,
+                                    translation = translateResult.translations[0]
+                            )
                     )
-                )
-                .subscribe()
-    }
 
 }

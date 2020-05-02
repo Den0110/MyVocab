@@ -1,23 +1,23 @@
 package com.myvocab.myvocab.ui.fast_translation
 
-import android.annotation.SuppressLint
 import android.app.Application
-import android.view.LayoutInflater
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.view.View
-import android.view.WindowManager
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
-import androidx.cardview.widget.CardView
+import android.widget.*
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.*
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.TranslatableText
+import com.myvocab.myvocab.data.model.TranslateUseCaseResult
 import com.myvocab.myvocab.data.model.TranslationSource
-import com.myvocab.myvocab.util.AnimationListenerAdapter
-import com.myvocab.myvocab.util.getDefaultWindowParams
+import com.myvocab.myvocab.util.*
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -27,10 +27,14 @@ import javax.inject.Inject
 class FastTranslationWidget
 @Inject
 constructor(
-        private val context: Application,
-        private val windowManager: WindowManager,
-        private val inflater: LayoutInflater
+        private val context: Application
 ) : LifecycleOwner, ViewModelStoreOwner {
+
+    companion object {
+        const val ADD_TO_VOCAB_ACTION = "com.myvocab.myvocab.ui.fast_translation.ADD_TO_VOCAB_ACTION"
+    }
+
+    private val addToDictReceiver = AddToDictionaryReceiver()
 
     private val lifecycle: LifecycleRegistry = LifecycleRegistry(this)
     private val viewModelStore: ViewModelStore = ViewModelStore()
@@ -40,34 +44,32 @@ constructor(
     private lateinit var viewModel: FastTranslationWidgetViewModel
     private var disposables: CompositeDisposable = CompositeDisposable()
 
-    private var translationRootView: View? = null
+    private var remoteViews: RemoteViews? = null
 
-    private var translationBgView: View? = null
-    private var translationCardView: CardView? = null
-    private var translatableTextView: TextView? = null
-    private var translatedTextView: TextView? = null
-    private var translationProgressBar: ProgressBar? = null
-    private var translationErrorMessage: TextView? = null
-    private var addToDictionaryBtn: ImageView? = null
-
-    private var translationBgShowAnim: Animation? = null
-    private var translationBgHideAnim: Animation? = null
-    private var translationCardShowAnim: Animation? = null
-    private var translationCardHideAnim: Animation? = null
+    private var word = ""
+    private var translation = ""
+    private var loading = true
+    private var error = false
+    private var canAddToDictionary = false
 
     init {
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
-        setupAnimations()
-        setupViews()
+        remoteViews = RemoteViews(context.packageName, R.layout.translation_notification)
     }
 
     fun start(text: String) {
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
         viewModel = ViewModelProvider(this, viewModelFactory).get(FastTranslationWidgetViewModel::class.java)
 
-        resetViewStates()
+        word = text
+        translation = ""
+        loading = true
+        error = false
+        canAddToDictionary = false
 
-        translatableTextView!!.text = text
+        updateTranslationNotification()
+
+        context.registerReceiver(addToDictReceiver, IntentFilter(ADD_TO_VOCAB_ACTION))
 
         val translatableText = TranslatableText(text, "en-ru")
         val translateDisposable = viewModel
@@ -76,102 +78,93 @@ constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ translateResult ->
                     if (translateResult.source == TranslationSource.DICTIONARY) {
-                        addToDictionaryBtn!!.visibility = View.VISIBLE
-                        addToDictionaryBtn!!.setOnClickListener {
-                            viewModel.addToDictionary(translateResult)
-                            destroy()
+                        val intent = Intent(ADD_TO_VOCAB_ACTION).apply {
+                            putExtra("translate_result", translateResult)
                         }
+                        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                        remoteViews?.setOnClickPendingIntent(R.id.add_to_dictionary_btn, pendingIntent)
+                        canAddToDictionary = true
                     } else {
-                        addToDictionaryBtn!!.visibility = View.GONE
-                        addToDictionaryBtn!!.setOnClickListener(null)
+                        canAddToDictionary = false
                     }
-                    translatedTextView!!.text = translateResult.translations.joinToString (separator = ", ", limit = 4)
-                    translatedTextView!!.visibility = View.VISIBLE
-                    translationProgressBar!!.visibility = View.GONE
+
+                    translation = translateResult.translations.joinToString(separator = ", ", limit = 2)
+                    loading = false
+                    error = false
+
+                    updateTranslationNotification()
+
                 }, {
                     Timber.e(it)
-                    translationErrorMessage!!.visibility = View.VISIBLE
-                    translationProgressBar!!.visibility = View.GONE
+                    translation = ""
+                    loading = false
+                    error = true
+                    updateTranslationNotification()
                 })
+
         disposables.add(translateDisposable)
-
-        showTranslationView()
     }
 
-    @SuppressLint("InflateParams")
-    private fun setupViews() {
-        translationRootView = inflater.inflate(R.layout.fast_translation_main_view, null)
+    inner class AddToDictionaryReceiver : BroadcastReceiver() {
 
-        val translationViewParams = getDefaultWindowParams(
-                WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT
-        )
+        private val compositeDisposable = CompositeDisposable()
 
-        windowManager.addView(translationRootView, translationViewParams)
+        override fun onReceive(context: Context, intent: Intent) {
+            compositeDisposable.clear()
+            if (intent.hasExtra("translate_result")) {
+                intent.getParcelableExtra<TranslateUseCaseResult>("translate_result")?.let {
+                    val addToDictionaryDisposable =
+                            viewModel
+                                    .addToDictionary(it)
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .subscribe({
+                                        canAddToDictionary = false
+                                        updateTranslationNotification()
+                                        Toast.makeText(context, "${it.text.text} added to your vocab", Toast.LENGTH_SHORT).show()
+                                    }, {
+                                        Toast.makeText(context, "Error, word is not added", Toast.LENGTH_SHORT).show()
+                                    })
 
-        translationBgView = translationRootView!!.findViewById(R.id.translation_view_bg)
-        translationCardView = translationRootView!!.findViewById(R.id.translation_view_card)
-        translatableTextView = translationRootView!!.findViewById(R.id.translatable_text_view)
-        translatedTextView = translationRootView!!.findViewById(R.id.translated_text_view)
-        translationProgressBar = translationRootView!!.findViewById(R.id.translation_progress_bar)
-        translationErrorMessage = translationRootView!!.findViewById(R.id.translation_message_cant_translate)
-        addToDictionaryBtn = translationRootView!!.findViewById(R.id.add_to_dictionary)
-    }
-
-    private fun resetViewStates(){
-        translatedTextView!!.text = ""
-        translatedTextView!!.visibility = View.GONE
-        translationProgressBar!!.visibility = View.VISIBLE
-        translationErrorMessage!!.visibility = View.GONE
-        addToDictionaryBtn!!.visibility = View.GONE
-    }
-
-    private fun cleanViews() {
-        if (translationRootView != null) {
-            windowManager.removeView(translationRootView)
-            translationRootView = null
+                    compositeDisposable.add(addToDictionaryDisposable)
+                }
+            }
         }
+
     }
 
-    private fun setupAnimations() {
-        translationBgShowAnim = AnimationUtils.loadAnimation(context, R.anim.translation_bg_show)
-        translationBgHideAnim = AnimationUtils.loadAnimation(context, R.anim.translation_bg_hide)
+    private fun updateTranslationNotification() {
+        remoteViews?.setTextViewText(R.id.word, word)
+        remoteViews?.setTextViewText(R.id.translation, translation)
+        remoteViews?.setTextViewText(R.id.translation_error, if (error) "Unable to translate" else "")
+        remoteViews?.setViewVisibility(R.id.translation_progress, if (loading) View.VISIBLE else View.GONE)
+        remoteViews?.setViewVisibility(R.id.add_to_dictionary_btn, if (canAddToDictionary) View.VISIBLE else View.GONE)
 
-        translationCardShowAnim = AnimationUtils.loadAnimation(context, R.anim.translation_card_show)
-        translationCardShowAnim!!.setAnimationListener(object : AnimationListenerAdapter() {
-            override fun onAnimationEnd(animation: Animation) {
-                translationBgView!!.setOnClickListener { destroy() }
-            }
-        })
-        translationCardHideAnim = AnimationUtils.loadAnimation(context, R.anim.translation_card_hide)
-        translationCardHideAnim!!.setAnimationListener(object : AnimationListenerAdapter() {
-            override fun onAnimationEnd(animation: Animation) {
-                translationRootView!!.visibility = View.GONE
-            }
-        })
-    }
+        val notification = NotificationCompat.Builder(context, TRANSLATION_CHANNEL_ID)
+                .setContentTitle(word)
+                .setTicker(word)
+                .setContentText(translation)
+                .setDefaults(0)
+                .setCustomContentView(remoteViews)
+//                .addAction(0, "Add to vocab", pendingIntent)
+                .setLargeIcon(ContextCompat.getDrawable(context, R.mipmap.ic_launcher)?.toBitmap())
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setAutoCancel(true)
+                .setOngoing(true)
+                .build()
 
-    private fun showTranslationView() {
-        translationRootView!!.visibility = View.VISIBLE
-        translationBgView!!.startAnimation(translationBgShowAnim)
-        translationCardView!!.startAnimation(translationCardShowAnim)
-    }
-
-    private fun hideTranslationView() {
-        translationBgView!!.startAnimation(translationBgHideAnim)
-        translationCardView!!.startAnimation(translationCardHideAnim)
+        NotificationManagerCompat.from(context).notify(Constants.NotificationId.FOREGROUND_SERVICE, notification)
     }
 
     private fun destroy() {
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        hideTranslationView()
         viewModelStore.clear()
+        context.unregisterReceiver(addToDictReceiver)
         disposables.clear()
     }
 
     fun finish() {
         destroy()
-        cleanViews()
     }
 
     override fun getLifecycle(): Lifecycle = lifecycle

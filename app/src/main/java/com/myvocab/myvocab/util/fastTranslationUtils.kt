@@ -5,12 +5,8 @@ import android.os.Build
 import android.os.PowerManager
 import android.provider.Settings
 
-
 const val REQUEST_CODE_DRAW_OVERLAYS = 1
 const val REQUEST_CODE_BATTERY = 2
-
-
-fun canStartFastTranslation(context: Context) = canDrawOverlays(context)
 
 fun canDrawOverlays(context: Context?) =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(context)

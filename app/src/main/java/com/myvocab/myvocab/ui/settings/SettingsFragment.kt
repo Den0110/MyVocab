@@ -2,7 +2,6 @@ package com.myvocab.myvocab.ui.settings
 
 import android.app.TimePickerDialog
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -133,27 +132,8 @@ class SettingsFragment : MainNavigationFragment() {
     }
 
     private fun startTranslationService() {
-        if (canDrawOverlays(context)) {
-            viewModel.startTranslationService()
-        } else {
-            AlertDialog.Builder(context!!)
-                    .setMessage(R.string.dialog_permission_draw_overlay)
-                    .setPositiveButton(R.string.dialog_permission_allow) { _, _ ->
-                        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                Uri.parse("package:" + context!!.packageName))
-                        if (PackageUtils.isIntentCallable(context!!, intent))
-                            startActivityForResult(intent, REQUEST_CODE_DRAW_OVERLAYS)
-                    }
-                    .setNegativeButton(R.string.dialog_permission_deny) { dialog, _ ->
-                        viewModel.stopTranslationService()
-                        dialog.dismiss()
-                    }
-                    .setOnDismissListener {
-                        viewModel.stopTranslationService()
-                    }
-                    .create()
-                    .show()
-        }
+        viewModel.startTranslationService()
+        openBatteryDialog()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

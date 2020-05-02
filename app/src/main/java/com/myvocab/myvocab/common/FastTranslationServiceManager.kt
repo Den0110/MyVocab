@@ -4,7 +4,6 @@ import android.app.ActivityManager
 import android.content.Context
 import com.myvocab.myvocab.common.fasttranslation.FastTranslationService
 import com.myvocab.myvocab.util.PreferencesManager
-import com.myvocab.myvocab.util.canStartFastTranslation
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -13,32 +12,28 @@ class FastTranslationServiceManager
 constructor(
         private val context: Context,
         private val prefManager: PreferencesManager
-){
+) {
 
     fun start() {
         prefManager.fastTranslationState = true
-        if(!isServiceRunning())
+        if (!isServiceRunning())
             FastTranslationService.start(context)
     }
 
     fun startIfEnabled() {
         val state = prefManager.fastTranslationState
-        if(state) {
-            if(canStartFastTranslation(context)) {
-                Timber.v("FastTranslationServiceStarter: checking service state...")
-                if (!isServiceRunning()) {
-                    Timber.d("Restarting service")
-                    start()
-                } else {
-                    Timber.v("Service running")
-                }
+        if (state) {
+            Timber.v("FastTranslationServiceStarter: checking service state...")
+            if (!isServiceRunning()) {
+                Timber.d("Restarting service")
+                start()
             } else {
-                cancel()
+                Timber.v("Service running")
             }
         }
     }
 
-    fun isServiceRunning(): Boolean {
+    private fun isServiceRunning(): Boolean {
         val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         @Suppress("DEPRECATION")
         for (service in manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -49,9 +44,11 @@ constructor(
         return false
     }
 
+    fun isTranslationEnabled() = prefManager.fastTranslationState
+
     fun cancel() {
         prefManager.fastTranslationState = false
-        if(isServiceRunning())
+        if (isServiceRunning())
             FastTranslationService.stop(context)
     }
 

@@ -67,7 +67,7 @@ constructor(
     }
 
     init {
-        translationEnabled.value = translationServiceManager.isServiceRunning()
+        translationEnabled.value = translationServiceManager.isTranslationEnabled()
         reminderEnabled.value = reminderScheduler.isReminderEnabled()
         remindOnlyWordsToLearn.value = reminderScheduler.isRemindOnlyWordsToLearn()
         remindingTime.value = Calendar.getInstance().apply { time = Date(reminderScheduler.getRemindingTime()) }
