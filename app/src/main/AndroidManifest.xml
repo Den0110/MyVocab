@@ -37,6 +37,19 @@
             android:name=".ui.MainActivity"
             android:screenOrientation="userPortrait" />
 
+        <receiver
+            android:name=".ui.widgetlearning.WidgetLearning"
+            android:icon="@android:drawable/star_big_on"
+            android:label="Learning Widget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_metadata" />
+        </receiver>
+
         <service
             android:name=".common.fasttranslation.FastTranslationService"
             android:enabled="true"
