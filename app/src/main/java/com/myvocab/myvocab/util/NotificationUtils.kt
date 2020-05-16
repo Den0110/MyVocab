@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import com.myvocab.myvocab.R
 
 const val FAST_TRANSLATION_CHANNEL_ID = "fastTranslationServiceChannel"
 const val TRANSLATION_CHANNEL_ID = "translationChannel"
@@ -47,3 +48,10 @@ fun createReminderNotificationChannel(context: Context) {
         manager?.createNotificationChannel(serviceChannel)
     }
 }
+
+fun getNotificationIconId() =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        R.drawable.ic_notification
+    } else {
+        R.mipmap.ic_launcher
+    }

@@ -97,7 +97,7 @@ class FastTranslationService : DaggerService() {
                     .setContentTitle("Fast Translation")
                     .setTicker("Fast Translation")
                     .setLargeIcon(ContextCompat.getDrawable(applicationContext, R.mipmap.ic_launcher)?.toBitmap())
-                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setSmallIcon(getNotificationIconId())
                     .setContentText("Select and copy a word to translate")
                     .setContentIntent(pendingIntent)
                     .build()
