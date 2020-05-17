@@ -57,6 +57,7 @@ constructor(
     private var loading = true
     private var error = false
     private var canAddToDictionary = false
+    private var alreadyAddedToDictionary = false
 
     private val destroyHandler = Handler()
     private val destroyer = Runnable {
@@ -89,15 +90,25 @@ constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ translateResult ->
-                    if (translateResult.source == TranslationSource.DICTIONARY) {
-                        val intent = Intent(ADD_TO_VOCAB_ACTION).apply {
-                            putExtra("translate_result", translateResult)
+                    when (translateResult.source) {
+                        TranslationSource.DICTIONARY -> {
+                            val intent = Intent(ADD_TO_VOCAB_ACTION).apply {
+                                putExtra("translate_result", translateResult)
+                            }
+                            val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                            remoteViews?.setOnClickPendingIntent(R.id.add_to_dictionary_btn, pendingIntent)
+                            alreadyAddedToDictionary = false
+                            canAddToDictionary = true
                         }
-                        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-                        remoteViews?.setOnClickPendingIntent(R.id.add_to_dictionary_btn, pendingIntent)
-                        canAddToDictionary = true
-                    } else {
-                        canAddToDictionary = false
+                        TranslationSource.VOCAB -> {
+                            remoteViews?.setOnClickPendingIntent(R.id.add_to_dictionary_btn, null)
+                            alreadyAddedToDictionary = true
+                            canAddToDictionary = false
+                        }
+                        else -> {
+                            alreadyAddedToDictionary = false
+                            canAddToDictionary = false
+                        }
                     }
 
                     translation = translateResult.translations.joinToString(separator = ", ")
@@ -154,7 +165,14 @@ constructor(
         remoteViews?.setTextViewText(R.id.translation, translation)
         remoteViews?.setTextViewText(R.id.translation_error, if (error) "Unable to translate" else "")
         remoteViews?.setViewVisibility(R.id.translation_progress, if (loading) View.VISIBLE else View.GONE)
-        remoteViews?.setViewVisibility(R.id.add_to_dictionary_btn, if (canAddToDictionary) View.VISIBLE else View.GONE)
+        remoteViews?.setViewVisibility(R.id.add_to_dictionary_btn,
+                if (canAddToDictionary || alreadyAddedToDictionary) View.VISIBLE else View.GONE)
+
+        if(canAddToDictionary) {
+            remoteViews?.setImageViewResource(R.id.add_to_dictionary_btn, R.drawable.ic_add_to_dictionary_36dp)
+        } else if(alreadyAddedToDictionary){
+            remoteViews?.setImageViewResource(R.id.add_to_dictionary_btn, R.drawable.ic_already_added_to_dictionary_36dp)
+        }
 
         val notification = NotificationCompat.Builder(context, TRANSLATION_CHANNEL_ID)
                 .setContentTitle(word)

@@ -10,4 +10,4 @@ data class TranslateUseCaseResult(
         var source: TranslationSource
 ) : Parcelable
 
-enum class TranslationSource { TRANSLATOR, DICTIONARY }
+enum class TranslationSource { TRANSLATOR, DICTIONARY, VOCAB }
