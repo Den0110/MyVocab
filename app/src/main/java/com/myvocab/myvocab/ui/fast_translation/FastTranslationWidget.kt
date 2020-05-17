@@ -6,8 +6,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Handler
 import android.view.View
-import android.widget.*
+import android.widget.RemoteViews
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -17,7 +19,9 @@ import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.TranslatableText
 import com.myvocab.myvocab.data.model.TranslateUseCaseResult
 import com.myvocab.myvocab.data.model.TranslationSource
-import com.myvocab.myvocab.util.*
+import com.myvocab.myvocab.util.Constants
+import com.myvocab.myvocab.util.TRANSLATION_CHANNEL_ID
+import com.myvocab.myvocab.util.getNotificationIconId
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -32,6 +36,8 @@ constructor(
 
     companion object {
         const val ADD_TO_VOCAB_ACTION = "com.myvocab.myvocab.ui.fast_translation.ADD_TO_VOCAB_ACTION"
+
+        const val LIVE_TIME = 30_000L
     }
 
     private val addToDictReceiver = AddToDictionaryReceiver()
@@ -51,6 +57,12 @@ constructor(
     private var loading = true
     private var error = false
     private var canAddToDictionary = false
+
+    private val destroyHandler = Handler()
+    private val destroyer = Runnable {
+        Timber.d("Destroy widget by time")
+        finish()
+    }
 
     init {
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
@@ -88,7 +100,7 @@ constructor(
                         canAddToDictionary = false
                     }
 
-                    translation = translateResult.translations.joinToString(separator = ", ", limit = 2)
+                    translation = translateResult.translations.joinToString(separator = ", ")
                     loading = false
                     error = false
 
@@ -103,6 +115,10 @@ constructor(
                 })
 
         disposables.add(translateDisposable)
+
+
+        destroyHandler.removeCallbacks(destroyer)
+        destroyHandler.postDelayed(destroyer, LIVE_TIME)
     }
 
     inner class AddToDictionaryReceiver : BroadcastReceiver() {
@@ -119,9 +135,9 @@ constructor(
                                     .subscribeOn(Schedulers.io())
                                     .observeOn(AndroidSchedulers.mainThread())
                                     .subscribe({
-                                        canAddToDictionary = false
-                                        updateTranslationNotification()
                                         Toast.makeText(context, "${it.text.text} added to your vocab", Toast.LENGTH_SHORT).show()
+                                        Timber.d("Destroy widget after adding word to vocab")
+                                        finish()
                                     }, {
                                         Toast.makeText(context, "Error, word is not added", Toast.LENGTH_SHORT).show()
                                     })
@@ -150,6 +166,7 @@ constructor(
                 .setSmallIcon(getNotificationIconId())
                 .setAutoCancel(true)
                 .setOngoing(true)
+                .setOnlyAlertOnce(translation.isBlank())
                 .build()
 
         NotificationManagerCompat.from(context).notify(Constants.NotificationId.FOREGROUND_SERVICE, notification)
@@ -158,8 +175,11 @@ constructor(
     private fun destroy() {
         lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         viewModelStore.clear()
-        context.unregisterReceiver(addToDictReceiver)
         disposables.clear()
+        try {
+            context.unregisterReceiver(addToDictReceiver)
+        } catch (e: Exception) { }
+        destroyHandler.removeCallbacks(destroyer)
     }
 
     fun finish() {

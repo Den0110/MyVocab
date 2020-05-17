@@ -1,15 +1,20 @@
 package com.myvocab.myvocab.common.fasttranslation
 
 import android.app.AlarmManager
+import android.app.Notification
 import android.app.PendingIntent
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.os.SystemClock
+import android.webkit.URLUtil
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.ui.MainActivity
 import com.myvocab.myvocab.ui.fast_translation.FastTranslationWidget
@@ -70,7 +75,8 @@ class FastTranslationService : DaggerService() {
         clipboardDisposable = clipboard
                 .throttleFirst(300, TimeUnit.MILLISECONDS)
                 .doOnNext { Timber.d("Copied: $it") }
-                .filter { it.isNotEmpty() && it[0].toInt() in 65..122 }
+                // filter empty, non-English or url strings
+                .filter { it.isNotEmpty() && it[0].toInt() in 65..122 && !URLUtil.isValidUrl(it) }
                 .subscribe ({
                     translate(it!!)
                 }, {
@@ -80,6 +86,13 @@ class FastTranslationService : DaggerService() {
         pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE,
                 Intent(this, FastTranslationServiceStarter::class.java), 0)
 
+        translationWidget.lifecycle.addObserver(LifecycleEventObserver { owner, event ->
+            if(event == Lifecycle.Event.ON_DESTROY){
+                NotificationManagerCompat.from(this)
+                        .notify(Constants.NotificationId.FOREGROUND_SERVICE, getDefaultNotification())
+            }
+        })
+
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -88,24 +101,9 @@ class FastTranslationService : DaggerService() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         if (Constants.START_FOREGROUND_ACTION == intent.action) {
-            val notificationIntent = Intent(this, MainActivity::class.java)
-            notificationIntent.action = Constants.MAIN_ACTION
-            notificationIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
-
-            val notification = NotificationCompat.Builder(this, FAST_TRANSLATION_CHANNEL_ID)
-                    .setContentTitle("Fast Translation")
-                    .setTicker("Fast Translation")
-                    .setLargeIcon(ContextCompat.getDrawable(applicationContext, R.mipmap.ic_launcher)?.toBitmap())
-                    .setSmallIcon(getNotificationIconId())
-                    .setContentText("Select and copy a word to translate")
-                    .setContentIntent(pendingIntent)
-                    .build()
-
             Timber.d("Starting foreground service")
-            startForeground(Constants.NotificationId.FOREGROUND_SERVICE, notification)
+            startForeground(Constants.NotificationId.FOREGROUND_SERVICE, getDefaultNotification())
             startServiceStarter()
-
         } else if (Constants.STOP_FOREGROUND_ACTION == intent.action) {
             Timber.d("Stopping foreground service")
             stopServiceStarter()
@@ -117,6 +115,23 @@ class FastTranslationService : DaggerService() {
 
     private fun translate(translatable: String){
         translationWidget.start(translatable)
+    }
+
+    private fun getDefaultNotification(): Notification {
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        notificationIntent.action = Constants.MAIN_ACTION
+        notificationIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
+
+        return NotificationCompat.Builder(this, FAST_TRANSLATION_CHANNEL_ID)
+                .setContentTitle("Fast Translation")
+                .setTicker("Fast Translation")
+                .setLargeIcon(ContextCompat.getDrawable(applicationContext, R.mipmap.ic_launcher)?.toBitmap())
+                .setSmallIcon(getNotificationIconId())
+                .setContentText("Select and copy a word to translate")
+                .setContentIntent(pendingIntent)
+                .setOnlyAlertOnce(true)
+                .build()
     }
 
     private fun startServiceStarter() {
