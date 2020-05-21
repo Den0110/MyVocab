@@ -38,7 +38,7 @@ class PreferencesManager(context: Context) {
                 .edit()
                 .putBoolean("fast_translation_state", value)
                 .apply()
-        get() = preferences.getBoolean("fast_translation_state", false)
+        get() = preferences.getBoolean("fast_translation_state", true)
 
     /**
      *  Reminder

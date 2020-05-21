@@ -15,6 +15,7 @@ import com.myvocab.myvocab.ui.MainActivity
 import com.myvocab.myvocab.util.Constants
 import com.myvocab.myvocab.util.PreferencesManager
 import com.myvocab.myvocab.util.REMINDER_CHANNEL_ID
+import com.myvocab.myvocab.util.getNotificationIconId
 import dagger.android.DaggerBroadcastReceiver
 import timber.log.Timber
 import javax.inject.Inject
@@ -60,7 +61,7 @@ class ReminderReceiver : DaggerBroadcastReceiver() {
                 .setTicker(ticker)
                 .setContentText(text)
                 .setLargeIcon(ContextCompat.getDrawable(context, R.mipmap.ic_launcher)?.toBitmap())
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(getNotificationIconId())
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build()

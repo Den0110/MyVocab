@@ -1,9 +1,7 @@
 package com.myvocab.myvocab.data.source
 
 import com.myvocab.myvocab.BuildConfig
-import com.myvocab.myvocab.data.model.TranslatableText
-import com.myvocab.myvocab.data.model.TranslateUseCaseResult
-import com.myvocab.myvocab.data.model.TranslationSource
+import com.myvocab.myvocab.data.model.*
 import com.myvocab.myvocab.data.source.remote.translation.DictionaryApi
 import com.myvocab.myvocab.data.source.remote.translation.TranslatorApi
 import io.reactivex.Single
@@ -16,28 +14,14 @@ constructor(
         private val dictionaryApi: DictionaryApi
 ){
 
-    fun translateInTranslator(text: TranslatableText): Single<TranslateUseCaseResult> {
+    fun translateInTranslator(text: TranslatableText): Single<TranslatorModel> {
         return translatorApi
                 .translate(BuildConfig.YANDEX_TRANSLATE_API_KEY, text.text, text.lang)
-                .map {
-                    TranslateUseCaseResult(text, it.text?.toList()
-                            ?: arrayListOf(), TranslationSource.TRANSLATOR)
-                }
     }
 
-    fun translateInDictionary(text: TranslatableText): Single<TranslateUseCaseResult> {
+    fun translateInDictionary(text: TranslatableText): Single<DictionaryModel> {
         return dictionaryApi
                 .translate(BuildConfig.YANDEX_DICTIONARY_API_KEY, text.text, text.lang)
-                .map {
-                    val translations = mutableListOf<String>()
-
-                    translations.add(it.def?.get(0)?.tr?.get(0)?.text!!)
-                    it.def?.get(0)?.tr?.get(0)?.syn?.forEach { syn ->
-                        translations.add(syn.text)
-                    }
-
-                    TranslateUseCaseResult(text, translations, TranslationSource.DICTIONARY)
-                }
     }
 
 }

@@ -9,6 +9,7 @@ import com.myvocab.myvocab.data.source.local.Database
 import com.myvocab.myvocab.di.DaggerAppComponent
 import com.myvocab.myvocab.util.createFastTranslationNotificationChannel
 import com.myvocab.myvocab.util.createReminderNotificationChannel
+import com.myvocab.myvocab.util.createTranslationNotificationChannel
 import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
@@ -43,6 +44,7 @@ class MyVocabApp : DaggerApplication() {
 
         createFastTranslationNotificationChannel(this)
         createReminderNotificationChannel(this)
+        createTranslationNotificationChannel(this)
 
         translationServiceManager.startIfEnabled()
         reminderScheduler.scheduleIfEnabled()
