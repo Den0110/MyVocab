@@ -7,6 +7,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.databinding.FragmentWordSetDetailsBinding
@@ -54,6 +55,13 @@ class WordSetDetailsFragment : BaseWordListFragment() {
                             .setMessage(R.string.dialog_sure_want_learn_this_word_list)
                             .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
                                 viewModel.addWordSet()
+
+                                // log saving word set
+                                FirebaseAnalytics.getInstance(context!!).logEvent("save_word_set", Bundle().apply {
+                                    putString("title", viewModel.title.value)
+                                    putInt("size", viewModel.words.value?.data?.size ?: 0)
+                                })
+
                                 dialog.dismiss()
                             }
                             .setNegativeButton(R.string.dialog_action_no) { dialog, _ -> dialog.dismiss() }
@@ -64,6 +72,13 @@ class WordSetDetailsFragment : BaseWordListFragment() {
                             .setMessage(R.string.dialog_sure_want_remove_this_word_list)
                             .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
                                 viewModel.removeWordSet()
+
+                                // log removing word set
+                                FirebaseAnalytics.getInstance(context!!).logEvent("remove_word_set", Bundle().apply {
+                                    putString("title", viewModel.title.value)
+                                    putInt("size", viewModel.words.value?.data?.size ?: 0)
+                                })
+
                                 dialog.dismiss()
                             }
                             .setNegativeButton(R.string.dialog_action_no) { dialog, _ -> dialog.dismiss() }

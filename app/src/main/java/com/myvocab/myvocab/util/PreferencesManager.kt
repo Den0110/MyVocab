@@ -1,9 +1,12 @@
 package com.myvocab.myvocab.util
 
 import android.content.Context
+import android.os.Bundle
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.common.ReminderScheduler
+import java.util.*
 
-class PreferencesManager(context: Context) {
+class PreferencesManager(val context: Context) {
 
     companion object {
         const val APP_PREFERENCES = "APP_PREFERENCES"
@@ -27,17 +30,28 @@ class PreferencesManager(context: Context) {
                 .edit()
                 .putBoolean("fast_translation_guide_showed", value)
                 .apply()
-        get() = preferences.getBoolean("fast_translation_guide_showed", false)
+        get() = preferences.getBoolean("fast_translation_guide_showed", true) // temporary disabled
 
     /**
      *  Fast Translation
      */
 
     var fastTranslationState: Boolean
-        set(value) = preferences
-                .edit()
-                .putBoolean("fast_translation_state", value)
-                .apply()
+        set(value) {
+            if(value != fastTranslationState) {
+                if (value) {
+                    // log enabling fast translation
+                    FirebaseAnalytics.getInstance(context).logEvent("fast_translation_enabled", Bundle())
+                } else {
+                    // log disabling fast translation
+                    FirebaseAnalytics.getInstance(context).logEvent("fast_translation_disabled", Bundle())
+                }
+                preferences
+                        .edit()
+                        .putBoolean("fast_translation_state", value)
+                        .apply()
+            }
+        }
         get() = preferences.getBoolean("fast_translation_state", true)
 
     /**
@@ -45,26 +59,62 @@ class PreferencesManager(context: Context) {
      */
 
     var remindingState: Boolean
-        set(value) = preferences
-                .edit()
-                .putBoolean("reminding_state", value)
-                .apply()
+        set(value) {
+            if (value != remindingState) {
+                if (value) {
+                    // log enabling reminder
+                    FirebaseAnalytics.getInstance(context).logEvent("reminder_enabled", Bundle().apply {
+                        putString("time", Date(remindingTime).toString())
+                    })
+                } else {
+                    // log disabling reminder
+                    FirebaseAnalytics.getInstance(context).logEvent("reminder_disabled", Bundle().apply {
+                        putString("time", Date(remindingTime).toString())
+                    })
+                }
+                preferences
+                        .edit()
+                        .putBoolean("reminding_state", value)
+                        .apply()
+            }
+        }
         get() = preferences.getBoolean("reminding_state", true)
 
     var remindOnlyWordsToLearn: Boolean
-        set(value) =
-            preferences
-                    .edit()
-                    .putBoolean("remind_only_words_to_learn", value)
-                    .apply()
+        set(value) {
+            if (value != remindOnlyWordsToLearn) {
+                if (value) {
+                    // log enabling remind only words to learn
+                    FirebaseAnalytics.getInstance(context).logEvent("reminder_learn_words_enabled", Bundle().apply {
+                        putString("time", Date(remindingTime).toString())
+                    })
+                } else {
+                    // log disabling remind only words to learn
+                    FirebaseAnalytics.getInstance(context).logEvent("reminder_learn_words_disabled", Bundle().apply {
+                        putString("time", Date(remindingTime).toString())
+                    })
+                }
+                preferences
+                        .edit()
+                        .putBoolean("remind_only_words_to_learn", value)
+                        .apply()
+            }
+        }
         get() = preferences.getBoolean("remind_only_words_to_learn", false)
 
     var remindingTime: Long
-        set(value) =
-            preferences
-                    .edit()
-                    .putLong("reminding_time", value)
-                    .apply()
+        set(value) {
+            if (value != remindingTime) {
+                // log changing reminder time
+                FirebaseAnalytics.getInstance(context).logEvent("reminder_time_changed", Bundle().apply {
+                    putString("new_time", Date(value).toString())
+                })
+                preferences
+                        .edit()
+                        .putLong("reminding_time", value)
+                        .apply()
+            }
+        }
         get() = preferences.getLong("reminding_time", ReminderScheduler.REMINDER_DEFAULT_TIME)
 
     /**

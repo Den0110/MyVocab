@@ -4,7 +4,9 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
+import android.text.Layout.BREAK_STRATEGY_HIGH_QUALITY
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
@@ -21,6 +23,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.*
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.databinding.FragmentLearningBinding
@@ -103,6 +106,13 @@ class LearningFragment : MainNavigationFragment() {
                                                             }.subscribe {
                                                                 viewModel.nextWord()
                                                             }
+
+                                                            // log rightness
+                                                            FirebaseAnalytics.getInstance(context!!).logEvent("rightness", Bundle().apply {
+                                                                putString("text", word.word)
+                                                                putInt("length", word.word.length)
+                                                                putBoolean("was_right", wasRight)
+                                                            })
                                                         }
                                                     } else {
                                                         // else leave them to learn the new word
@@ -116,11 +126,31 @@ class LearningFragment : MainNavigationFragment() {
                                                                 }
                                                     }
                                                 })
+
+                                        // log knowing word
+                                        FirebaseAnalytics.getInstance(context!!).logEvent("knowing_word", Bundle().apply {
+                                            putString("text", word.word)
+                                            putInt("length", word.word.length)
+                                            putBoolean("know", isKnown)
+                                        })
+
                                     }
                             compositeDisposable.clear()
                             compositeDisposable.add(askIfWordKnownDisposable)
                         }
                     })
+
+            word?.let {
+                // log showing next word
+                FirebaseAnalytics.getInstance(context!!).logEvent("show_next_word", Bundle().apply {
+                    putString("text", it.word)
+                    putInt("length", it.word.length)
+                    viewModel.wordSetTitle.value?.let {
+                        putString("word_set_title", it)
+                    }
+                })
+            }
+
         })
     }
 

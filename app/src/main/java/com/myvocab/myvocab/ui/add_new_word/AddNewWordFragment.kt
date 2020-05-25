@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.databinding.FragmentAddNewWordBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
@@ -74,6 +75,12 @@ class AddNewWordFragment : MainNavigationFragment() {
                 compositeDisposable.add(
                         viewModel.addWord().subscribe({
                             findNavController().navigateUp()
+
+                            // log adding new word
+                            FirebaseAnalytics.getInstance(context!!).logEvent("add_new_word", Bundle().apply {
+                                putString("text", viewModel.newWord.value)
+                                putInt("length", viewModel.newWord.value?.length ?: 0)
+                            })
                         }, { e ->
                             Timber.e(e)
                             Snackbar.make(it, "Error, word wasn't added", Snackbar.LENGTH_SHORT).show()

@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import android.widget.RemoteViews
@@ -15,6 +16,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.lifecycle.*
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.TranslatableText
 import com.myvocab.myvocab.data.model.TranslateUseCaseResult
@@ -119,6 +121,16 @@ constructor(
 
                     updateTranslationNotification()
 
+                    // log translating
+                    FirebaseAnalytics.getInstance(context).logEvent("translate", Bundle().apply {
+                        putString("text", translateResult.word.word)
+                        putInt("length", translateResult.word.word.length)
+                        putString("source", translateResult.source.name)
+                        putInt("meanings_size", translateResult.word.meanings.size)
+                        putInt("synonyms_size", translateResult.word.synonyms.size)
+                        putInt("examples_size", translateResult.word.examples.size)
+                    })
+
                 }, {
                     Timber.e(it)
                     translation = ""
@@ -156,6 +168,14 @@ constructor(
                                     })
 
                     compositeDisposable.add(addToDictionaryDisposable)
+
+                    // log adding to dictionary
+                    FirebaseAnalytics.getInstance(context).logEvent("add_to_dictionary", Bundle().apply {
+                        putString("text", it.word.word)
+                        putInt("length", it.word.word.length)
+                        putString("source", it.source.name)
+                    })
+
                 }
             }
         }
