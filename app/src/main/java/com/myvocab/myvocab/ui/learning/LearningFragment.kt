@@ -345,7 +345,7 @@ class LearningFragment : MainNavigationFragment() {
 
     private fun setMeanings(word: Word?){
         if(!word?.meanings.isNullOrEmpty()){
-            meanings.text = word!!.meanings.joinToString(", ", postfix = "…")
+            meanings.text = word!!.meanings.joinToString(", ", postfix = ", …")
             meanings.visibility = View.VISIBLE
         } else {
             meanings.visibility = View.GONE
@@ -354,7 +354,7 @@ class LearningFragment : MainNavigationFragment() {
 
     private fun setSynonyms(word: Word?){
         if(!word?.synonyms.isNullOrEmpty()) {
-            synonyms.text = word!!.synonyms.joinToString(", ", postfix = "…")
+            synonyms.text = word!!.synonyms.joinToString(", ", postfix = ", …")
             synonyms.visibility = View.VISIBLE
         } else {
             synonyms.visibility = View.GONE
