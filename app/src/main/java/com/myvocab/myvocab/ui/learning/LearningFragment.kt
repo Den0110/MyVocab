@@ -324,8 +324,8 @@ class LearningFragment : MainNavigationFragment() {
         word?.word?.let { w ->
             val wordTitle = SpannableStringBuilder(w.toLowerCase())
 
-            word.transcription.let {
-                val ts = " [$it]"
+            if(word.transcription.isNotEmpty()){
+                val ts = " [${word.transcription}]".replace("ˈ", "'")
                 wordTitle.append(ts)
 
                 val tsStart = wordTitle.indexOf(ts)
@@ -337,6 +337,9 @@ class LearningFragment : MainNavigationFragment() {
             }
 
             word_title.text = wordTitle
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                word_title.breakStrategy = BREAK_STRATEGY_HIGH_QUALITY
+            }
         }
     }
 
