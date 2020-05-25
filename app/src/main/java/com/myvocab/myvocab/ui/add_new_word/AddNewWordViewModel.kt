@@ -25,7 +25,7 @@ constructor(
 
     fun addWord() =
         wordRepository
-                .addMyWord(Word(word = newWord.value, translation = translation.value))
+                .addMyWord(Word(word = newWord.value ?: "", translation = translation.value ?: ""))
                 .observeOn(AndroidSchedulers.mainThread())
 
     fun addWordsFromFile(uri: Uri) =
@@ -46,7 +46,7 @@ constructor(
                     .build()
             var nextLine: Array<String?>?
             while (reader.readNext().also { nextLine = it } != null) { // nextLine[] is an array of values from the line
-                nextLine?.let { wordBunch.add(Word(word = it[0], translation = it[1])) }
+                nextLine?.let { wordBunch.add(Word(word = it[0] ?: "", translation = it[1] ?: "")) }
             }
             emitter.onSuccess(wordBunch.apply { reverse() })
         } catch (e: Exception) {

@@ -5,6 +5,7 @@ import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.util.PreferencesManager
 import io.reactivex.Observable
 import io.reactivex.Single
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -43,7 +44,10 @@ constructor(
                 loadNextWord()
             }
                     .doOnSuccess { prefManager.lastWordToLearnId = it.id!! }
-                    .doOnError { prefManager.lastWordToLearnId = -1 }
+                    .doOnError {
+                        Timber.e(it)
+                        prefManager.lastWordToLearnId = -1
+                    }
 
 
     private fun loadNextWord(): Single<Word> {

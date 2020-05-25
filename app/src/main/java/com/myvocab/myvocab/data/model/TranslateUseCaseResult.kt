@@ -6,7 +6,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class TranslateUseCaseResult(
         val text: TranslatableText,
-        val translations: List<String>,
+        val word: Word,
         var source: TranslationSource
 ) : Parcelable
 

@@ -5,6 +5,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.MyVocabApp
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.source.WordRepository
@@ -71,6 +72,10 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
             navController.graph = graph
         }
 
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            // log screen
+            FirebaseAnalytics.getInstance(this).setCurrentScreen(this, destination.label.toString(), null)
+        }
 
     }
 

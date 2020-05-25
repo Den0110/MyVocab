@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 3,
-    "identityHash": "fc0709a26ca22d83ecb52efc8f32d64f",
+    "version": 4,
+    "identityHash": "cf980db6c573eff98abc1c455f36f924",
     "entities": [
       {
         "tableName": "words",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `word` TEXT, `translation` TEXT, `knowingLevel` INTEGER NOT NULL, `lastShowTime` INTEGER NOT NULL, `wordSetId` TEXT NOT NULL, `needToLearn` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `word` TEXT, `transcription` TEXT, `meanings` TEXT, `translation` TEXT, `synonyms` TEXT, `examples` TEXT, `knowingLevel` INTEGER NOT NULL, `lastShowTime` INTEGER NOT NULL, `wordSetId` TEXT, `needToLearn` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -21,8 +21,32 @@
             "notNull": false
           },
           {
+            "fieldPath": "transcription",
+            "columnName": "transcription",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "meanings",
+            "columnName": "meanings",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
             "fieldPath": "translation",
             "columnName": "translation",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "synonyms",
+            "columnName": "synonyms",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "examples",
+            "columnName": "examples",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -42,7 +66,7 @@
             "fieldPath": "wordSetId",
             "columnName": "wordSetId",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "needToLearn",
@@ -96,7 +120,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fc0709a26ca22d83ecb52efc8f32d64f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cf980db6c573eff98abc1c455f36f924')"
     ]
   }
 }

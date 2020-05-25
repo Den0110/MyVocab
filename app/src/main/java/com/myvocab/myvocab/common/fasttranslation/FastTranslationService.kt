@@ -30,6 +30,7 @@ class FastTranslationService : DaggerService() {
 
     companion object {
         private const val REQUEST_CODE = 121
+        private const val SERVICE_STARTER_PERIOD = 5*60*1000L
 
         fun start(context: Context) {
             val startIntent = Intent(context.applicationContext, FastTranslationService::class.java)
@@ -139,7 +140,7 @@ class FastTranslationService : DaggerService() {
             serviceStarterAlarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
             serviceStarterAlarmManager?.setRepeating(AlarmManager.ELAPSED_REALTIME,
                     SystemClock.elapsedRealtime() + 5000,
-                    60000, pendingIntent)
+                    SERVICE_STARTER_PERIOD, pendingIntent)
         }
     }
 

@@ -3,13 +3,20 @@ package com.myvocab.myvocab.ui.learning
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -24,6 +31,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_learning.*
+import kotlinx.android.synthetic.main.learning_word_example.view.*
 import javax.inject.Inject
 
 class LearningFragment : MainNavigationFragment() {
@@ -31,8 +39,6 @@ class LearningFragment : MainNavigationFragment() {
     companion object {
         const val TRANSLATION_SHOW_FADE_ANIM_TIME = 200L
         const val TRANSLATION_SHOW_BOUNDS_ANIM_TIME = 300L
-        const val TRANSLATION_HIDE_FADE_ANIM_TIME = 100L
-        const val TRANSLATION_HIDE_BOUNDS_ANIM_TIME = 200L
 
         const val FAST_FADE_ANIM_TIME = 150L
         const val SLOW_FADE_ANIM_TIME = 250L
@@ -71,11 +77,16 @@ class LearningFragment : MainNavigationFragment() {
         viewModel.currentWord.observe(viewLifecycleOwner, Observer { word ->
 
             // show a new word (other fields bind in xml)
-            showKnowingLevel(word)
+            setKnowingLevel(word)
+            setTitle(word)
+            setMeanings(word)
+            setSynonyms(word)
+            setExamples(word)
 
             compositeDisposable.add(
                     animateNewWord(word).subscribe {
                         if (word != null) {
+
                             // ask user if them know the word
                             val askIfWordKnownDisposable =
                                     getAskObservable().subscribe { isKnown ->
@@ -84,8 +95,8 @@ class LearningFragment : MainNavigationFragment() {
                                                 animateShowTranslation(word, isKnown).subscribe {
                                                     if (isKnown) {
                                                         // if answered that them know, ask is them was right
-                                                        getAskObservable().subscribe { isRight ->
-                                                            if (isRight) {
+                                                        getAskObservable().subscribe { wasRight ->
+                                                            if (wasRight) {
                                                                 viewModel.increaseKnowingLevel()
                                                             } else {
                                                                 viewModel.zeroizeKnowingLevel()
@@ -127,22 +138,7 @@ class LearningFragment : MainNavigationFragment() {
         var completable = Completable.complete()
 
         hideNextViews()
-
-        completable = completable.mergeWith(Completable.create { emitter ->
-            val hideTranslationAnim = TransitionSet().apply {
-                addTransition(Fade(Fade.OUT).setDuration(TRANSLATION_HIDE_FADE_ANIM_TIME))
-                addTransition(ChangeBounds().setDuration(TRANSLATION_HIDE_BOUNDS_ANIM_TIME))
-                ordering = TransitionSet.ORDERING_SEQUENTIAL
-                addTarget(translation_container)
-                addTarget(examples_container)
-                addTarget(word_container)
-
-                addListener(rxTransitionCallback(emitter))
-            }
-
-            TransitionManager.beginDelayedTransition(word_scroll, hideTranslationAnim)
-            hideTranslation()
-        })
+        hideTranslation()
 
         completable = if (word != null) {
             completable
@@ -189,7 +185,8 @@ class LearningFragment : MainNavigationFragment() {
             }
 
             TransitionManager.beginDelayedTransition(word_scroll, showTranslationAnim)
-            showTranslation(word.translation?.toLowerCase())
+            showTranslation(word.translation.toLowerCase())
+            showExampleTranslations(word)
         })
 
         completable = if (isKnown) {
@@ -313,7 +310,7 @@ class LearningFragment : MainNavigationFragment() {
         word_scroll.visibility = View.GONE
     }
 
-    private fun showKnowingLevel(word: Word?) {
+    private fun setKnowingLevel(word: Word?) {
         knowing_level.setImageDrawable(when (word?.knowingLevel) {
             0 -> ContextCompat.getDrawable(context!!, R.drawable.ic_brain_empty_24dp)
             1 -> ContextCompat.getDrawable(context!!, R.drawable.ic_brain_red_24dp)
@@ -323,6 +320,81 @@ class LearningFragment : MainNavigationFragment() {
         })
     }
 
+    private fun setTitle(word: Word?){
+        word?.word?.let { w ->
+            val wordTitle = SpannableStringBuilder(w.toLowerCase())
+
+            word.transcription.let {
+                val ts = " [$it]"
+                wordTitle.append(ts)
+
+                val tsStart = wordTitle.indexOf(ts)
+                val tsEnd = tsStart + ts.length
+
+                wordTitle.setSpan(AbsoluteSizeSpan(spToPixels(16)), tsStart, tsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                wordTitle.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.secondaryTextColor)),
+                        tsStart, tsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+
+            word_title.text = wordTitle
+        }
+    }
+
+    private fun setMeanings(word: Word?){
+        if(!word?.meanings.isNullOrEmpty()){
+            meanings.text = word!!.meanings.joinToString(", ", postfix = "…")
+            meanings.visibility = View.VISIBLE
+        } else {
+            meanings.visibility = View.GONE
+        }
+    }
+
+    private fun setSynonyms(word: Word?){
+        if(!word?.synonyms.isNullOrEmpty()) {
+            synonyms.text = word!!.synonyms.joinToString(", ", postfix = "…")
+            synonyms.visibility = View.VISIBLE
+        } else {
+            synonyms.visibility = View.GONE
+        }
+    }
+
+    private fun setExamples(word: Word?){
+        examples_container.removeAllViews()
+        if(!word?.examples.isNullOrEmpty()) {
+            word?.examples!!.forEach {
+                val exampleView = layoutInflater.inflate(R.layout.learning_word_example, examples_container, false)
+
+                val text = SpannableStringBuilder(it.text)
+
+                val textMaskStart = it.textHighlight.first
+                val textMaskEnd = it.textHighlight.last + 1
+
+                text.setSpan(StyleSpan(Typeface.BOLD), textMaskStart, textMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                text.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTextColor)),
+                        textMaskStart, textMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                exampleView.text.text = text
+
+                val starMask = "*****"
+                val translation = SpannableStringBuilder(it.translation.replaceRange(it.translationHighlight, starMask))
+
+                val translationMaskStart = it.translationHighlight.first
+                val translationMaskEnd = it.translationHighlight.first + starMask.length
+
+                translation.setSpan(StyleSpan(Typeface.BOLD), translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                translation.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTranslationColor)),
+                        translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                exampleView.translation.text = translation
+
+                examples_container.addView(exampleView)
+            }
+            examples_container.visibility = View.VISIBLE
+        } else {
+            examples_container.visibility = View.GONE
+        }
+    }
+
     private fun showTranslation(text: String?) {
         translation.text = text
         translation_container.visibility = View.VISIBLE
@@ -330,6 +402,25 @@ class LearningFragment : MainNavigationFragment() {
 
     private fun hideTranslation() {
         translation_container.visibility = View.GONE
+    }
+
+    private fun showExampleTranslations(word: Word?){
+        word?.let {
+            examples_container.children.forEachIndexed { index, view ->
+
+                val example = word.examples[index]
+                val translation = SpannableStringBuilder(example.translation)
+
+                val translationMaskStart = example.translationHighlight.first
+                val translationMaskEnd = example.translationHighlight.last + 1
+
+                translation.setSpan(StyleSpan(Typeface.BOLD), translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                translation.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTranslationColor)),
+                        translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+                view.translation.text = translation
+            }
+        }
     }
 
     private fun showDoesUserKnowViews(){

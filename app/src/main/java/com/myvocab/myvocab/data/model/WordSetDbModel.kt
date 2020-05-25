@@ -18,4 +18,9 @@ data class WordSetDbModel(
         @Json(name = "title")
         val title: String = ""
 
-) : Serializable
+) : Serializable {
+
+        companion object {
+                const val MY_WORDS = "my_words"
+        }
+}

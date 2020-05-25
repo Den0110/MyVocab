@@ -81,21 +81,20 @@
                             android:layout_marginStart="@dimen/learning_screen_padding"
                             android:layout_marginEnd="8dp"
                             android:baselineAlignBottom="true"
-                            app:layout_constraintBaseline_toBaselineOf="@+id/word"
-                            app:layout_constraintEnd_toStartOf="@+id/word"
+                            app:layout_constraintBaseline_toBaselineOf="@+id/word_title"
+                            app:layout_constraintEnd_toStartOf="@+id/word_title"
                             app:layout_constraintHorizontal_chainStyle="packed"
                             app:layout_constraintStart_toStartOf="parent"
                             tools:src="@drawable/ic_brain_red_24dp" />
 
                         <TextView
-                            android:id="@+id/word"
+                            android:id="@+id/word_title"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="8dp"
                             android:layout_marginTop="6dp"
                             android:layout_marginEnd="@dimen/learning_screen_padding"
                             android:background="@color/learningCardColor"
-                            android:text="@{viewModel.currentWord.word.toLowerCase()}"
                             android:textAppearance="@style/LabelTextAppearance"
                             android:textColor="@color/colorAccent"
                             android:textSize="36sp"
@@ -105,16 +104,16 @@
                             tools:text="Especially" />
 
                         <TextView
-                            android:id="@+id/word_synonyms"
+                            android:id="@+id/meanings"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginEnd="@dimen/learning_screen_padding"
                             android:paddingStart="2dp"
-                            android:text="(purely, mainly)"
                             android:textColor="@color/secondaryTextColor"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="@+id/word"
-                            app:layout_constraintTop_toBottomOf="@+id/word" />
+                            app:layout_constraintStart_toStartOf="@+id/word_title"
+                            app:layout_constraintTop_toBottomOf="@+id/word_title"
+                            tools:text="purely, mainly" />
 
                         <View
                             android:id="@+id/divider"
@@ -124,8 +123,8 @@
                             android:layout_marginEnd="@dimen/learning_screen_padding"
                             android:background="@color/dividerColor"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="@+id/word"
-                            app:layout_constraintTop_toBottomOf="@+id/word_synonyms" />
+                            app:layout_constraintStart_toStartOf="@+id/word_title"
+                            app:layout_constraintTop_toBottomOf="@+id/meanings" />
 
                         <LinearLayout
                             android:id="@+id/translation_container"
@@ -134,7 +133,7 @@
                             android:layout_marginEnd="@dimen/learning_screen_padding"
                             android:orientation="vertical"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="@+id/word"
+                            app:layout_constraintStart_toStartOf="@+id/word_title"
                             app:layout_constraintTop_toBottomOf="@+id/divider">
 
                             <TextView
@@ -148,15 +147,15 @@
                                 tools:text="Особенно" />
 
                             <TextView
-                                android:id="@+id/translation_synonyms"
+                                android:id="@+id/synonyms"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:paddingStart="2dp"
-                                android:text="(в особенности, особо, тем более)"
                                 android:textColor="@color/secondaryTextColor"
                                 app:layout_constraintEnd_toEndOf="parent"
-                                app:layout_constraintStart_toStartOf="@+id/word"
-                                app:layout_constraintTop_toBottomOf="@+id/word" />
+                                app:layout_constraintStart_toStartOf="@+id/word_title"
+                                app:layout_constraintTop_toBottomOf="@+id/word_title"
+                                tools:text="в особенности, особо, тем более" />
 
                         </LinearLayout>
 
@@ -168,33 +167,10 @@
                             android:layout_marginEnd="@dimen/learning_screen_padding"
                             android:orientation="vertical"
                             app:layout_constraintEnd_toEndOf="parent"
-                            app:layout_constraintStart_toStartOf="@+id/word"
+                            app:layout_constraintStart_toStartOf="@+id/word_title"
                             app:layout_constraintTop_toBottomOf="@+id/translation_container">
 
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical">
 
-                                <TextView
-                                    android:id="@+id/example_text"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text="especially noticeable"
-                                    android:textColor="#E34280"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold" />
-
-                                <TextView
-                                    android:id="@+id/example_translation"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:text="especially noticeable"
-                                    android:textColor="#33A025"
-                                    android:textSize="16sp"
-                                    android:textStyle="bold" />
-
-                            </LinearLayout>
 
                         </LinearLayout>
 

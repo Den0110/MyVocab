@@ -2,13 +2,8 @@ package com.myvocab.myvocab.ui.word
 
 import android.view.View
 import android.widget.CheckBox
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.myvocab.myvocab.R
-import com.myvocab.myvocab.data.model.Word
-import java.util.*
 
 class LearnAllHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 

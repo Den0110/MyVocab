@@ -6,6 +6,7 @@ import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.data.model.WordSetDbModel
 import com.myvocab.myvocab.data.source.local.WordSetDao
+import com.myvocab.myvocab.util.ListMapperImpl
 import com.myvocab.myvocab.util.RepositoryData
 import com.myvocab.myvocab.util.Source
 import durdinapps.rxfirebase2.RxFirestore
@@ -133,10 +134,12 @@ constructor(
 
     fun getWordByContent(content: String): Single<Word> {
         return wordDao.getWordByContent(content).subscribeOn(Schedulers.io())
+                .map { Word.fromDBWord().map(it) }
     }
 
     fun getWordsByWordSetId(wordSetId: String): Single<List<Word>> {
         return wordDao.getWordsByWordSetId(wordSetId).subscribeOn(Schedulers.io())
+                .map { ListMapperImpl(Word.fromDBWord()).map(it) }
     }
 
     fun getInLearningWordsByKnowingLevel(knowingLevel: Int): Single<List<Word>> {
@@ -148,7 +151,7 @@ constructor(
     }
 
     fun addMyWord(word: Word): Completable {
-        return addWord(word.apply { wordSetId = "my_words" })
+        return addWord(word.apply { wordSetId = WordSetDbModel.MY_WORDS })
     }
 
     fun addWord(word: Word): Completable {
@@ -176,21 +179,22 @@ constructor(
 
     private fun getWordsInLearningByKnowingLevelFromDb(knowingLevel: Int): Single<List<Word>> =
             wordDao.getWordsInLearningByKnowingLevel(knowingLevel)
+                    .map { ListMapperImpl(Word.fromDBWord()).map(it) }
 
     private fun getWordByIdFromDb(id: Int): Single<Word> =
-            wordDao.getWordById(id)
+            wordDao.getWordById(id).map { Word.fromDBWord().map(it) }
 
     private fun addWordToDb(word: Word) =
-            wordDao.addWord(word)
+            wordDao.addWord(Word.toDBWord().map(word))
 
     private fun addWordsToDb(words: List<Word>) =
-            wordDao.addWords(words)
+            wordDao.addWords(ListMapperImpl(Word.toDBWord()).map(words))
 
     private fun updateWordInDb(word: Word) =
-            wordDao.updateWord(word)
+            wordDao.updateWord(Word.toDBWord().map(word))
 
     private fun deleteWordFromDb(word: Word) =
-            wordDao.deleteWord(word)
+            wordDao.deleteWord(Word.toDBWord().map(word))
 
     private fun deleteAllWordsFromDb() =
             wordDao.deleteAllWords()

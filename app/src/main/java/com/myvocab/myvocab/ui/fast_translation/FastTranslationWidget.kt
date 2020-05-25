@@ -111,7 +111,9 @@ constructor(
                         }
                     }
 
-                    translation = translateResult.translations.joinToString(separator = ", ")
+                    translation = mutableListOf(translateResult.word.translation)
+                            .apply { addAll(translateResult.word.synonyms) }
+                            .joinToString(separator = ", ")
                     loading = false
                     error = false
 

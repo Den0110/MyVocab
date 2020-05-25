@@ -11,7 +11,10 @@
     <color name="captionTextColor">#AAAAAA</color>
 
     <color name="dividerColor">#BDBDBD</color>
+
     <color name="learningCardColor">#FFF4CE</color>  <!-- #FFF4CE (light primary) #FFFFCC (from sample) #FFFABF -->
+    <color name="exampleTextColor">#E34280</color>
+    <color name="exampleTranslationColor">#33A025</color>
 
     <color name="guideBgColor">#E6FFDD6A</color>
     <color name="introBackgroundColor">#FFFFFF</color>

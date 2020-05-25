@@ -37,10 +37,10 @@ class ReminderReceiver : DaggerBroadcastReceiver() {
         var text: Spanned
 
         @Suppress("DEPRECATION")
-        var getWordDisposable = getNextWordUseCase.execute(false).subscribe({
-            text = Html.fromHtml("Do you know, what does <strong>${it.word?.toLowerCase()}</strong> mean?")
+        getNextWordUseCase.execute(false).subscribe({
+            text = Html.fromHtml("Do you know, what does <strong>${it.word.toLowerCase()}</strong> mean?")
             showNotification(context, title, ticker, text)
-        },{
+        }, {
             if(!preferencesManager.remindOnlyWordsToLearn) {
                 text = Html.fromHtml("Add new words to your vocab and start learning")
                 showNotification(context, title, ticker, text)

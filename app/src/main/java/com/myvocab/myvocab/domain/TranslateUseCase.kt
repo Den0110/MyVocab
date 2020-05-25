@@ -20,36 +20,27 @@ constructor(
             translationRepository
                     .translateInDictionary(translatableText)
                     .map {
-                        val translations = mutableListOf<String>()
-
-                        translations.add(it.def?.get(0)?.tr?.get(0)?.text!!)
-                        it.def?.get(0)?.tr?.get(0)?.syn?.forEach { syn ->
-                            translations.add(syn.text)
-                        }
-
-                        TranslateUseCaseResult(translatableText, translations, TranslationSource.DICTIONARY)
+                        TranslateUseCaseResult(translatableText, it, TranslationSource.DICTIONARY)
                     }
                     .onErrorResumeNext {
                         translationRepository
                                 .translateInTranslator(translatableText)
                                 .map {
-                                    TranslateUseCaseResult(translatableText, it.text?.toList()
-                                            ?: arrayListOf(), TranslationSource.TRANSLATOR)
+                                    TranslateUseCaseResult(translatableText, it, TranslationSource.TRANSLATOR)
                                 }
                     }
         } else {
             translationRepository
                     .translateInTranslator(translatableText)
                     .map {
-                        TranslateUseCaseResult(translatableText, it.text?.toList()
-                                ?: arrayListOf(), TranslationSource.TRANSLATOR)
+                        TranslateUseCaseResult(translatableText, it, TranslationSource.TRANSLATOR)
                     }
         }
 
         return wordRepository
                 .getWordByContent(translatableText.text)
                 .map {
-                    TranslateUseCaseResult(translatableText, listOf(it.translation!!), TranslationSource.VOCAB)
+                    TranslateUseCaseResult(translatableText, it, TranslationSource.VOCAB)
                 }
                 .onErrorResumeNext { translate }
     }

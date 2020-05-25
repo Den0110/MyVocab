@@ -74,10 +74,11 @@ class AppModule {
                         super.onCreate(db)
                         Executors.newSingleThreadScheduledExecutor().execute {
                             Timber.d("Database created")
-                            wordsDb.wordSetsDao().addWordSet(WordSetDbModel(globalId = "my_words", title = "My words")).subscribe()
+                            wordsDb.wordSetsDao().addWordSet(WordSetDbModel(globalId = WordSetDbModel.MY_WORDS, title = "My words")).subscribe()
                         }
                     }
                 })
+                .addMigrations(Database.MIGRATION_3_4)
                 .build()
         return wordsDb
     }

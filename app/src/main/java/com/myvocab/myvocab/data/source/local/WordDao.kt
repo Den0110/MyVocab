@@ -1,7 +1,7 @@
 package com.myvocab.myvocab.data.source.local
 
 import androidx.room.*
-import com.myvocab.myvocab.data.model.Word
+import com.myvocab.myvocab.data.model.DBWord
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
@@ -10,10 +10,10 @@ import io.reactivex.Single
 interface WordDao {
 
     @Query("SELECT * FROM words ORDER BY id DESC")
-    fun getWords(): Flowable<List<Word>>
+    fun getWords(): Flowable<List<DBWord>>
 
     @Query("SELECT * FROM words WHERE wordSetId = :globalId")
-    fun getWordsByWordSetId(globalId: String): Single<List<Word>>
+    fun getWordsByWordSetId(globalId: String): Single<List<DBWord>>
 
     @Query("SELECT COUNT(*) FROM words WHERE wordSetId = :globalId")
     fun getWordsCountInWordSet(globalId: String): Single<Int>
@@ -22,34 +22,34 @@ interface WordDao {
     fun getLearningPercentageByWordSetId(globalId: String): Single<Int>
 
     @Query("SELECT * FROM words WHERE knowingLevel < 3 ORDER BY id DESC")
-    fun getInLearningWords(): Flowable<List<Word>>
+    fun getInLearningWords(): Flowable<List<DBWord>>
 
     @Query("SELECT COUNT(id) FROM words WHERE knowingLevel < 3 and needToLearn = 1")
     fun getInLearningWordsCount(): Single<Int>
 
     @Query("SELECT * FROM words WHERE knowingLevel = :knowingLevel and needToLearn = 1 ORDER BY lastShowTime ASC")
-    fun getWordsInLearningByKnowingLevel(knowingLevel: Int): Single<List<Word>>
+    fun getWordsInLearningByKnowingLevel(knowingLevel: Int): Single<List<DBWord>>
 
     @Query("SELECT * FROM words WHERE knowingLevel >= 3 ORDER BY id DESC")
-    fun getLearnedWords(): Flowable<List<Word>>
+    fun getLearnedWords(): Flowable<List<DBWord>>
 
     @Query("SELECT * FROM words WHERE id = :id LIMIT 1")
-    fun getWordById(id: Int): Single<Word>
+    fun getWordById(id: Int): Single<DBWord>
 
     @Query("SELECT * FROM words WHERE word = :content LIMIT 1")
-    fun getWordByContent(content: String): Single<Word>
+    fun getWordByContent(content: String): Single<DBWord>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addWord(word: Word): Completable
+    fun addWord(word: DBWord): Completable
 
     @Update
-    fun updateWord(word: Word): Completable
+    fun updateWord(word: DBWord): Completable
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addWords(words: List<Word>): Completable
+    fun addWords(words: List<DBWord>): Completable
 
     @Delete
-    fun deleteWord(word: Word): Completable
+    fun deleteWord(word: DBWord): Completable
 
     @Query("DELETE FROM words")
     fun deleteAllWords(): Single<Int>

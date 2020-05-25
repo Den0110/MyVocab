@@ -1,6 +1,6 @@
 package com.myvocab.myvocab.data.source.remote.translation
 
-import com.myvocab.myvocab.data.model.DictionaryModel
+import com.myvocab.myvocab.data.model.NetworkDictionaryModel
 import io.reactivex.Single
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
@@ -12,6 +12,6 @@ interface DictionaryApi {
     @POST("/api/v1/dicservice.json/lookup")
     fun translate(@Field("key") key: String?,
                   @Field("text") source_text: String?,
-                  @Field("lang") target_lang: String?): Single<DictionaryModel>
+                  @Field("lang") target_lang: String?): Single<NetworkDictionaryModel>
 
 }

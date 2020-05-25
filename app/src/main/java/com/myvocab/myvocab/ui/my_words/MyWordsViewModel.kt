@@ -1,5 +1,6 @@
 package com.myvocab.myvocab.ui.my_words
 
+import com.myvocab.myvocab.data.model.WordSetDbModel
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.ui.word.BaseWordListViewModel
 import com.myvocab.myvocab.util.Resource
@@ -17,7 +18,7 @@ constructor(
 
     fun loadMyWords() {
         compositeDisposable.add(wordRepository
-                .getWordsByWordSetId("my_words")
+                .getWordsByWordSetId(WordSetDbModel.MY_WORDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
                     words.value = Resource.success(it.reversed().toMutableList())

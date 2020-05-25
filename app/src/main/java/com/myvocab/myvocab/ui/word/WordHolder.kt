@@ -22,8 +22,8 @@ class WordHolder(private val view: View) : RecyclerView.ViewHolder(view) {
     private val needToLearnCheckBox: CheckBox = view.findViewById(R.id.need_to_learn_checkbox)
 
     fun bind(word: Word, callback: WordCallback? = null, savedLocally: Boolean? = false) {
-        wordView.text = word.word?.toLowerCase(Locale.getDefault())
-        translateView.text = word.translation?.toLowerCase(Locale.getDefault())
+        wordView.text = word.word.toLowerCase(Locale.getDefault())
+        translateView.text = word.translation.toLowerCase(Locale.getDefault())
 
         if(savedLocally == true) {
             needToLearnCheckBox.visibility = View.VISIBLE
