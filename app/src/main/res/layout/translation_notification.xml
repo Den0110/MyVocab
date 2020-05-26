@@ -22,7 +22,6 @@
             android:textSize="18sp"
             android:textColor="@color/colorAccent"
             android:maxLines="1"
-            android:ellipsize="end"
             tools:text="Word" />
 
         <FrameLayout
@@ -44,7 +43,6 @@
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:maxLines="1"
-                android:ellipsize="end"
                 android:textColor="@color/colorError"
                 tools:text="Error" />
 
