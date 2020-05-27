@@ -4,6 +4,8 @@
     <!-- Fast Translation -->
     <string name="english">ENGLISH</string>
     <string name="russian">RUSSIAN</string>
+    <string name="fast_translation">Fast Translation</string>
+    <string name="fast_translation_notification_content">Select and copy a word to translate</string>
     <string name="could_not_translate">Could not translate</string>
 
     <!-- Learning -->

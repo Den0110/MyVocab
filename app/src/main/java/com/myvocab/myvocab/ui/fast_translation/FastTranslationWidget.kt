@@ -185,7 +185,7 @@ constructor(
     private fun updateTranslationNotification() {
         remoteViews?.setTextViewText(R.id.word, word)
         remoteViews?.setTextViewText(R.id.translation, translation)
-        remoteViews?.setTextViewText(R.id.translation_error, if (error) "Unable to translate" else "")
+        remoteViews?.setTextViewText(R.id.translation_error, if (error) context.getString(R.string.could_not_translate) else "")
         remoteViews?.setViewVisibility(R.id.translation_progress, if (loading) View.VISIBLE else View.GONE)
         remoteViews?.setViewVisibility(R.id.add_to_dictionary_btn,
                 if (canAddToDictionary || alreadyAddedToDictionary) View.VISIBLE else View.GONE)

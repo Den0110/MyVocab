@@ -86,5 +86,7 @@
     <string name="progress_will_be_increased">Прогресс будет повышен</string>
     <string name="progress_will_be_reset">Прогресс сбросится</string>
     <string name="failed_to_load_word_lists">Не удалось загрузить списки слов.\nПроверьте подключение к сети.</string>
+    <string name="fast_translation">Быстрый перевод</string>
+    <string name="fast_translation_notification_content">Выделите и скопируйте слово, чтобы перевести</string>
 
 </resources>
