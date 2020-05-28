@@ -79,11 +79,8 @@
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:layout_marginStart="@dimen/learning_screen_padding"
-                            android:layout_marginEnd="8dp"
                             android:baselineAlignBottom="true"
                             app:layout_constraintBaseline_toBaselineOf="@+id/word_title"
-                            app:layout_constraintEnd_toStartOf="@+id/word_title"
-                            app:layout_constraintHorizontal_chainStyle="packed"
                             app:layout_constraintStart_toStartOf="parent"
                             tools:src="@drawable/ic_brain_red_24dp" />
 
@@ -91,7 +88,7 @@
                             android:id="@+id/word_title"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
+                            android:layout_marginStart="@dimen/horizontal_layout_margin"
                             android:layout_marginTop="6dp"
                             android:layout_marginEnd="@dimen/learning_screen_padding"
                             android:background="@color/learningCardColor"
