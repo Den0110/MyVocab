@@ -19,15 +19,16 @@ constructor(
         val translate = if (translatableText.text.length < 50) {
             translationRepository
                     .translateInDictionary(translatableText)
-                    .map {
-                        TranslateUseCaseResult(translatableText, it, TranslationSource.DICTIONARY)
-                    }
-                    .onErrorResumeNext {
-                        translationRepository
-                                .translateInTranslator(translatableText)
-                                .map {
-                                    TranslateUseCaseResult(translatableText, it, TranslationSource.TRANSLATOR)
-                                }
+                    .flatMap {
+                        if(it.isEmpty()) {
+                            translationRepository
+                                    .translateInTranslator(translatableText)
+                                    .map {
+                                        TranslateUseCaseResult(translatableText, it, TranslationSource.TRANSLATOR)
+                                    }
+                        } else {
+                            Single.just(TranslateUseCaseResult(translatableText, it, TranslationSource.DICTIONARY))
+                        }
                     }
         } else {
             translationRepository

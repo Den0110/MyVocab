@@ -25,12 +25,17 @@ data class Word(
 
     companion object {
 
+        val EMPTY = Word()
+
         const val MAX_MEANING_NUMBER = 4
         const val MAX_SYNONYMS_NUMBER = 4
         const val MAX_EXAMPLES_NUMBER = 5
 
         fun fromNetworkDictionaryModel() = object : Mapper<NetworkDictionaryModel, Word> {
             override fun map(input: NetworkDictionaryModel): Word {
+
+                if(input.def.isNullOrEmpty() || input.def!![0].tr.isNullOrEmpty())
+                    return EMPTY
 
                 val entries = input.def!!
                 val mainEntry = entries[0]
@@ -135,9 +140,10 @@ data class Word(
 
         fun fromNetworkTranslatorModel() = object : Mapper<NetworkTranslatorModel, Word> {
             override fun map(input: NetworkTranslatorModel): Word {
+                if(input.text.isNullOrEmpty())
+                    return EMPTY
                 return Word(
-                        null,
-                        input.text?.get(0) ?: "",
+                        translation = input.text!![0],
                         synonyms = input.text?.subList(1, input.text?.size ?: 1) ?: listOf()
                 )
             }
@@ -201,6 +207,8 @@ data class Word(
             parcel.writeInt(last)
         }
     }
+
+    fun isEmpty() = this == EMPTY
 
 }
 
