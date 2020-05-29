@@ -3,10 +3,9 @@ package com.myvocab.myvocab.data.model
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.recyclerview.widget.DiffUtil
+import com.myvocab.myvocab.data.model.Word.Example.Companion.setHighlight
 import com.myvocab.myvocab.util.Mapper
-import kotlinx.android.parcel.Parceler
 import kotlinx.android.parcel.Parcelize
-import kotlinx.android.parcel.TypeParceler
 
 @Parcelize
 data class Word(
@@ -112,10 +111,8 @@ data class Word(
 
                                                 if(textHighlightStart > -1 && textHighlightEnd > -1 && translationHighlightStart > -1 && translationHighlightEnd > -1) {
                                                     Example(
-                                                            text,
-                                                            translation,
-                                                            IntRange(textHighlightStart, textHighlightEnd),
-                                                            IntRange(translationHighlightStart, translationHighlightEnd)
+                                                            setHighlight(text, textHighlightStart, textHighlightEnd),
+                                                            setHighlight(translation, translationHighlightStart, translationHighlightEnd)
                                                     )
                                                 } else null
                                             }
@@ -160,7 +157,7 @@ data class Word(
                         input.meanings,
                         input.translation,
                         input.synonyms,
-                        input.examples.map { DBWord.Example(it.text, it.translation, it.textHighlight, it.translationHighlight) },
+                        input.examples.map { DBWord.Example(it.text, it.translation) },
                         input.knowingLevel,
                         input.lastShowTime,
                         input.wordSetId!!,
@@ -178,7 +175,7 @@ data class Word(
                         meanings = input.meanings ?: listOf(),
                         translation = input.translation ?: "",
                         synonyms = input.synonyms ?: listOf(),
-                        examples = input.examples?.map { Example(it.text, it.translation, it.textHighlight, it.translationHighlight) } ?: listOf(),
+                        examples = input.examples?.map { Example(it.text, it.translation) } ?: listOf(),
                         knowingLevel = input.knowingLevel,
                         lastShowTime = input.lastShowTime,
                         wordSetId = input.wordSetId,
@@ -190,21 +187,27 @@ data class Word(
     }
 
     @Parcelize
-    @TypeParceler<IntRange, IntRangeParceler>
     data class Example(
             val text: String = "",
-            val translation: String = "",
-            val textHighlight: IntRange,
-            val translationHighlight: IntRange
-    ) : Parcelable
+            val translation: String = ""
+    ) : Parcelable {
+        companion object {
+            private const val SEPARATOR = "*"
 
-    object IntRangeParceler : Parceler<IntRange> {
-        override fun create(parcel: Parcel) =
-            IntRange(parcel.readInt(), parcel.readInt())
+            fun getRawText(s: String) = s.replace(SEPARATOR, "")
 
-        override fun IntRange.write(parcel: Parcel, flags: Int) {
-            parcel.writeInt(start)
-            parcel.writeInt(last)
+            fun getHighlight(s: String): IntRange? {
+                val start = s.indexOf(SEPARATOR)
+                val end = s.indexOf(SEPARATOR, start+1) - SEPARATOR.length*2
+                if(start <= -1 || end <= -1) {
+                    return null
+                }
+                return IntRange(start, end)
+            }
+
+            fun setHighlight(s: String, start: Int, end: Int): String {
+                return s.substring(0, start) + SEPARATOR + s.substring(start, end+1) + SEPARATOR + s.substring(end+1)
+            }
         }
     }
 

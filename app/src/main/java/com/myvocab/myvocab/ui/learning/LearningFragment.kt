@@ -26,6 +26,8 @@ import androidx.transition.*
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
+import com.myvocab.myvocab.data.model.Word.Example.Companion.getHighlight
+import com.myvocab.myvocab.data.model.Word.Example.Companion.getRawText
 import com.myvocab.myvocab.databinding.FragmentLearningBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.util.*
@@ -397,26 +399,34 @@ class LearningFragment : MainNavigationFragment() {
             word?.examples!!.forEach {
                 val exampleView = layoutInflater.inflate(R.layout.learning_word_example, examples_container, false)
 
-                val text = SpannableStringBuilder(it.text)
+                val text = SpannableStringBuilder(getRawText(it.text))
+                val textHighlight = getHighlight(it.text)
 
-                val textMaskStart = it.textHighlight.first
-                val textMaskEnd = it.textHighlight.last + 1
+                textHighlight?.let {
+                    val textMaskStart = it.first
+                    val textMaskEnd = it.last + 1
 
-                text.setSpan(StyleSpan(Typeface.BOLD), textMaskStart, textMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                text.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTextColor)),
-                        textMaskStart, textMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    text.setSpan(StyleSpan(Typeface.BOLD), textMaskStart, textMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    text.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTextColor)),
+                            textMaskStart, textMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
 
                 exampleView.text.text = text
 
                 val starMask = "*****"
-                val translation = SpannableStringBuilder(it.translation.replaceRange(it.translationHighlight, starMask))
+                var translation = SpannableStringBuilder(getRawText(it.translation))
+                val starHighlight = getHighlight(it.translation)
 
-                val translationMaskStart = it.translationHighlight.first
-                val translationMaskEnd = it.translationHighlight.first + starMask.length
+                starHighlight?.let {
+                    translation = SpannableStringBuilder(translation.replaceRange(starHighlight, starMask))
 
-                translation.setSpan(StyleSpan(Typeface.BOLD), translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                translation.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTranslationColor)),
-                        translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    val translationMaskStart = starHighlight.first
+                    val translationMaskEnd = starHighlight.first + starMask.length
+
+                    translation.setSpan(StyleSpan(Typeface.BOLD), translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    translation.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTranslationColor)),
+                            translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
 
                 exampleView.translation.text = translation
 
@@ -442,14 +452,17 @@ class LearningFragment : MainNavigationFragment() {
             examples_container.children.forEachIndexed { index, view ->
 
                 val example = word.examples[index]
-                val translation = SpannableStringBuilder(example.translation)
+                val translation = SpannableStringBuilder(getRawText(example.translation))
+                val translationHighlight = getHighlight(example.translation)
 
-                val translationMaskStart = example.translationHighlight.first
-                val translationMaskEnd = example.translationHighlight.last + 1
+                translationHighlight?.let {
+                    val translationMaskStart = it.first
+                    val translationMaskEnd = it.last + 1
 
-                translation.setSpan(StyleSpan(Typeface.BOLD), translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                translation.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTranslationColor)),
-                        translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    translation.setSpan(StyleSpan(Typeface.BOLD), translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    translation.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTranslationColor)),
+                            translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                }
 
                 view.translation.text = translation
             }

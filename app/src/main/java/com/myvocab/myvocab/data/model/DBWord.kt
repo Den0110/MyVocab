@@ -46,9 +46,7 @@ data class DBWord(
 
     data class Example(
             val text: String,
-            val translation: String,
-            val textHighlight: IntRange,
-            val translationHighlight: IntRange
+            val translation: String
     ) : Serializable
 
 }
@@ -71,8 +69,7 @@ class ExampleListConverter {
     @TypeConverter
     fun fromExampleList(list: List<DBWord.Example>): String {
         return list.joinToString(";") {
-            "${it.text},${it.translation},${it.textHighlight.first},${it.textHighlight.last}," +
-                    "${it.translationHighlight.first},${it.translationHighlight.last}"
+            "${it.text},${it.translation}"
         }
     }
 
@@ -82,7 +79,7 @@ class ExampleListConverter {
         return data.split(";").toTypedArray().toList().mapNotNull {
             try {
                 val values = it.split(",")
-                DBWord.Example(values[0], values[1], IntRange(values[2].toInt(), values[3].toInt()), IntRange(values[4].toInt(), values[5].toInt()))
+                DBWord.Example(values[0], values[1])
             } catch (e: Exception) {
                 null
             }
