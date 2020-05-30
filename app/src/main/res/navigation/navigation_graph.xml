@@ -97,6 +97,14 @@
         android:id="@+id/navigation_add_new_word"
         android:name="com.myvocab.myvocab.ui.add_new_word.AddNewWordFragment"
         android:label="@string/label_add_new_word"
-        tools:layout="@layout/fragment_add_new_word"/>
+        tools:layout="@layout/fragment_add_new_word">
+
+        <argument
+            android:name="wordToEdit"
+            app:argType="com.myvocab.myvocab.data.model.Word"
+            android:defaultValue="@null"
+            app:nullable="true" />
+
+    </fragment>
 
 </navigation>

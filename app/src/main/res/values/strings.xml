@@ -96,5 +96,13 @@
     <string name="progress_will_be_reset">Progress will be reset</string>
     <string name="progress_will_be_increased">Progress will be increased</string>
     <string name="failed_to_load_word_lists">Failed to load word lists.\nPlease check your internet connection.</string>
+    <string name="transcription">Transcription (optional)</string>
+    <string name="meanings">Word synonyms by \",\" (optional)</string>
+    <string name="synonyms">Translation synonyms by \",\" (optional)</string>
+    <string name="example">Example %d</string>
+    <string name="example_translation">Translation %d</string>
+    <string name="add_example">Add example</string>
+    <string name="max_examples_number">Max number of examples is %d</string>
+    <string name="edit_word">Edit</string>
 
 </resources>

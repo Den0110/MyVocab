@@ -1,22 +1,30 @@
 package com.myvocab.myvocab.ui.add_new_word
 
-import android.Manifest
+import android.animation.LayoutTransition
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.*
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.R
+import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.databinding.FragmentAddNewWordBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
+import com.myvocab.myvocab.util.Resource
+import com.myvocab.myvocab.util.enableSelectItemBg
 import com.myvocab.myvocab.util.findNavController
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.android.synthetic.main.add_word_example.view.*
 import kotlinx.android.synthetic.main.fragment_add_new_word.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import timber.log.Timber
@@ -37,6 +45,8 @@ class AddNewWordFragment : MainNavigationFragment() {
 
     private val compositeDisposable = CompositeDisposable()
 
+    private lateinit var examplesAdapter: ExamplesAdapter
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_new_word, container, false)
@@ -51,41 +61,83 @@ class AddNewWordFragment : MainNavigationFragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
 
-//        TODO: Fix import, temporarily disabled
-//        toolbar.inflateMenu(R.menu.add_new_word)
+        arguments?.let {
+            viewModel.initWith(AddNewWordFragmentArgs.fromBundle(it).wordToEdit)
+        }
+
+        viewModel.suggestedWord.observe(viewLifecycleOwner, Observer {
+            when (it.status) {
+                Resource.Status.LOADING -> word_suggestion_container.visibility = View.GONE
+                Resource.Status.SUCCESS -> {
+                    val w = it.data!!
+                    var wordText = "${w.word} [${w.transcription}] - ${w.translation}"
+                    if (!w.synonyms.isNullOrEmpty())
+                        wordText += w.synonyms.joinToString(", ", prefix = ", ", limit = 2)
+                    word_suggestion.text = wordText
+
+                    enableSelectItemBg(word_suggestion_container)
+                    word_suggestion_container.visibility = View.VISIBLE
+
+                    word_suggestion_container.setOnClickListener {
+                        viewModel.fillFieldsWithSuggestedWord()
+                        word_suggestion_container.visibility = View.GONE
+                    }
+                }
+                Resource.Status.ERROR -> word_suggestion_container.visibility = View.GONE
+            }
+        })
+
+        viewModel.examples.observe(viewLifecycleOwner, Observer {
+            examplesAdapter.examples = it
+            examplesAdapter.notifyDataSetChanged()
+        })
+
+        examplesAdapter = ExamplesAdapter(object : ExampleItemCallback {
+            override fun onDelete(pos: Int) {
+                examplesAdapter.examples.removeAt(pos)
+                examplesAdapter.notifyItemRemoved(pos)
+                examplesAdapter.notifyItemRangeChanged(pos, examplesAdapter.itemCount - pos)
+            }
+        })
+
+        examples_recycler.adapter = examplesAdapter
+        examples_recycler.isNestedScrollingEnabled = false
+        examples_recycler.layoutManager = LinearLayoutManager(context)
+
+        container.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+
+        toolbar.inflateMenu(R.menu.add_new_word)
         toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.import_csv -> {
-                    if (ContextCompat.checkSelfPermission(context!!, Manifest.permission.READ_EXTERNAL_STORAGE)
-                            == PackageManager.PERMISSION_GRANTED) {
-                        chooseFile()
-                    } else {
-                        ActivityCompat.requestPermissions(activity!!, arrayOf(
-                                Manifest.permission.READ_EXTERNAL_STORAGE
-                        ), PERMISSION_REQUEST_CODE)
+                R.id.add -> {
+                    if (allDataCompleted()) {
+                        compositeDisposable.clear()
+                        compositeDisposable.add(
+                                viewModel.addWord().subscribe({
+                                    findNavController().navigateUp()
+
+                                    // log adding new word
+                                    FirebaseAnalytics.getInstance(context!!).logEvent("add_new_word", Bundle().apply {
+                                        putString("text", viewModel.newWord.value)
+                                        putInt("length", viewModel.newWord.value?.length ?: 0)
+                                    })
+                                }, { e ->
+                                    Timber.e(e)
+                                    Snackbar.make(view, "Error, word wasn't added", Snackbar.LENGTH_SHORT).show()
+                                })
+                        )
                     }
                 }
             }
             true
         }
 
-        add_btn.setOnClickListener {
-            if (allDataCompleted()) {
-                compositeDisposable.clear()
-                compositeDisposable.add(
-                        viewModel.addWord().subscribe({
-                            findNavController().navigateUp()
-
-                            // log adding new word
-                            FirebaseAnalytics.getInstance(context!!).logEvent("add_new_word", Bundle().apply {
-                                putString("text", viewModel.newWord.value)
-                                putInt("length", viewModel.newWord.value?.length ?: 0)
-                            })
-                        }, { e ->
-                            Timber.e(e)
-                            Snackbar.make(it, "Error, word wasn't added", Snackbar.LENGTH_SHORT).show()
-                        })
-                )
+        add_example.setOnClickListener {
+            if (examplesAdapter.itemCount < 5) {
+                examplesAdapter.examples.add(examplesAdapter.itemCount, Word.Example())
+                examplesAdapter.notifyItemInserted(examplesAdapter.itemCount - 1)
+            } else {
+                Toast.makeText(context, getString(R.string.max_examples_number, Word.MAX_EXAMPLES_NUMBER), Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -145,6 +197,69 @@ class AddNewWordFragment : MainNavigationFragment() {
     override fun onDestroy() {
         super.onDestroy()
         compositeDisposable.clear()
+    }
+
+    class ExamplesAdapter(val callback: ExampleItemCallback) : RecyclerView.Adapter<ExamplesAdapter.ExampleVH>() {
+
+        var examples = mutableListOf<Word.Example>()
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+                ExampleVH(LayoutInflater.from(parent.context)
+                        .inflate(
+                                R.layout.add_word_example, parent, false),
+                        ExampleEditTextListener { example, s -> example.copy(text = s) },
+                        ExampleEditTextListener { example, s -> example.copy(translation = s) }
+                )
+
+        override fun onBindViewHolder(holder: ExampleVH, position: Int) {
+            holder.bind(examples[position], callback)
+        }
+
+        override fun getItemCount() = examples.size
+
+        inner class ExampleVH(
+                itemView: View,
+                private val textListener: ExampleEditTextListener,
+                private val translationListener: ExampleEditTextListener
+        ) : RecyclerView.ViewHolder(itemView) {
+
+            init {
+                itemView.example_edt.addTextChangedListener(textListener)
+                itemView.example_translation_edt.addTextChangedListener(translationListener)
+            }
+
+            fun bind(example: Word.Example, callback: ExampleItemCallback) {
+                textListener.position = adapterPosition
+                translationListener.position = adapterPosition
+
+                itemView.example_edt.setText(example.text)
+                itemView.example_translation_edt.setText(example.translation)
+
+                itemView.example_til.hint = itemView.context.getString(R.string.example, adapterPosition + 1)
+                itemView.example_translation_til.hint = itemView.context.getString(R.string.example_translation, adapterPosition + 1)
+
+                itemView.delete_btn.setOnClickListener {
+                    callback.onDelete(adapterPosition)
+                }
+            }
+        }
+
+        inner class ExampleEditTextListener(val transform: (e: Word.Example, s: String) -> Word.Example) : TextWatcher {
+            var position = 0
+
+            override fun afterTextChanged(s: Editable?) {}
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                examples[position] = transform(examples[position], s.toString())
+            }
+        }
+    }
+
+    interface ExampleItemCallback {
+        fun onDelete(pos: Int)
     }
 
 }

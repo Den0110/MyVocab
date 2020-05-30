@@ -88,5 +88,13 @@
     <string name="failed_to_load_word_lists">Не удалось загрузить списки слов.\nПроверьте подключение к сети.</string>
     <string name="fast_translation">Быстрый перевод</string>
     <string name="fast_translation_notification_content">Выделите и скопируйте слово, чтобы перевести</string>
+    <string name="transcription">Транскрипция (не обязательно)</string>
+    <string name="meanings">Синонимы слова через запятую (не обязательно)</string>
+    <string name="synonyms">Синонимы перевода через запятую (не обязательно)</string>
+    <string name="example">Пример %d</string>
+    <string name="add_example">Добавить пример</string>
+    <string name="example_translation">Перевод %d</string>
+    <string name="max_examples_number">Максимальное количество примеров %d</string>
+    <string name="edit_word">Редактировать</string>
 
 </resources>
