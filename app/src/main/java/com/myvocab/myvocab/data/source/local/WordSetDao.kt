@@ -1,10 +1,9 @@
 package com.myvocab.myvocab.data.source.local
 
 import androidx.room.*
-import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.data.model.WordSetDbModel
+import com.myvocab.myvocab.data.model.WordSetDbModel.Companion.MY_WORDS
 import io.reactivex.Completable
-import io.reactivex.Flowable
 import io.reactivex.Single
 
 @Dao
@@ -18,7 +17,7 @@ interface WordSetDao {
 //        FROM word_sets ws
 //        LEFT OUTER JOIN words w
 //        ON (ws.globalId = w.wordSetId)
-//        WHERE ws.globalId != "my_words"
+//        WHERE ws.globalId != "$MY_WORDS"
 //        GROUP BY ws.globalId
 //        HAVING COUNT(w.knowingLevel >= 3 OR NULL) < COUNT(w.needToLearn = 1 OR NULL)"""
 //    )
@@ -40,7 +39,7 @@ interface WordSetDao {
                 FROM words w 
                 WHERE w.wordSetId = ws.globalId AND w.needToLearn = 1 AND w.knowingLevel >= 3
             ) = 0
-        ) AND ws.globalId != "my_words"
+        ) AND ws.globalId != "$MY_WORDS"
     """)
     fun getInLearningWordSets(): Single<List<WordSetDbModel>>
 
@@ -49,7 +48,7 @@ interface WordSetDao {
 //        FROM word_sets ws
 //        LEFT OUTER JOIN words w
 //        ON (ws.globalId = w.wordSetId)
-//        WHERE ws.globalId != "my_words"
+//        WHERE ws.globalId != "$MY_WORDS"
 //        GROUP BY ws.globalId
 //        HAVING COUNT(w.knowingLevel >= 3 OR NULL) >= COUNT(w.needToLearn = 1 OR NULL)"""
 //    )
@@ -71,7 +70,7 @@ interface WordSetDao {
                 FROM words w 
                 WHERE w.wordSetId = ws.globalId AND w.needToLearn = 1 AND w.knowingLevel >= 3
             ) > 0
-        ) AND ws.globalId != "my_words"
+        ) AND ws.globalId != "$MY_WORDS"
     """)
     fun getLearnedWordSets(): Single<List<WordSetDbModel>>
 
