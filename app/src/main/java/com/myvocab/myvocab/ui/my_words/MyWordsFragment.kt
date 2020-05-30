@@ -12,9 +12,11 @@ import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.myvocab.myvocab.R
+import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.databinding.FragmentMyWordsBinding
 import com.myvocab.myvocab.ui.word.BaseWordListFragment
 import com.myvocab.myvocab.util.Resource
+import com.myvocab.myvocab.util.findNavController
 import kotlinx.android.synthetic.main.fragment_in_learning_words.recycler_view
 import kotlinx.android.synthetic.main.fragment_in_learning_words.swipe_refresh_layout
 import kotlinx.android.synthetic.main.fragment_my_words.*
@@ -82,6 +84,37 @@ class MyWordsFragment : BaseWordListFragment() {
     override fun onResume() {
         super.onResume()
         viewModel.loadMyWords()
+    }
+
+    override fun getContextMenuItems(word: Word, isSavedLocally: Boolean): Array<String> {
+        val items = arrayListOf<String>()
+        if (!isSavedLocally) {
+            items.add(WORD_MENU_ITEMS[2]) // add to my words
+        } else {
+            if (word.knowingLevel < 3)
+                items.add(WORD_MENU_ITEMS[0]) // mark as learned
+
+            if (word.knowingLevel > 0)
+                items.add(WORD_MENU_ITEMS[1]) // reset the progress
+
+            items.add(WORD_MENU_ITEMS[3]) // edit
+            items.add(WORD_MENU_ITEMS[4]) // delete
+        }
+        return items.toTypedArray()
+    }
+
+    override fun onContextMenuItemClicked(item: String, word: Word) {
+        when (item) {
+            WORD_MENU_ITEMS[0] -> viewModel.markAsLearned(word)
+            WORD_MENU_ITEMS[1] -> viewModel.resetProgress(word)
+            WORD_MENU_ITEMS[2] -> viewModel.addToMyWords(word)
+            WORD_MENU_ITEMS[3] -> {
+                val action = MyWordsFragmentDirections
+                        .toAddNewWord().setWordToEdit(word)
+                findNavController().navigate(action)
+            }
+            WORD_MENU_ITEMS[4] -> viewModel.delete(word)
+        }
     }
 
 }

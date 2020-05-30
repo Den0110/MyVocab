@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.R
+import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.databinding.FragmentWordSetDetailsBinding
 import com.myvocab.myvocab.domain.word_set_details.GetWordSetUseCase
@@ -162,6 +163,28 @@ class WordSetDetailsFragment : BaseWordListFragment() {
                 }
             }
         })
+    }
+
+    override fun getContextMenuItems(word: Word, isSavedLocally: Boolean): Array<String> {
+        val items = arrayListOf<String>()
+        if (!isSavedLocally) {
+            items.add(WORD_MENU_ITEMS[2]) // add to my words
+        } else {
+            if (word.knowingLevel < 3)
+                items.add(WORD_MENU_ITEMS[0]) // mark as learned
+
+            if (word.knowingLevel > 0)
+                items.add(WORD_MENU_ITEMS[1]) // reset the progress
+        }
+        return items.toTypedArray()
+    }
+
+    override fun onContextMenuItemClicked(item: String, word: Word) {
+        when (item) {
+            WORD_MENU_ITEMS[0] -> viewModel.markAsLearned(word)
+            WORD_MENU_ITEMS[1] -> viewModel.resetProgress(word)
+            WORD_MENU_ITEMS[2] -> viewModel.addToMyWords(word)
+        }
     }
 
     private fun showAddBtn() {
