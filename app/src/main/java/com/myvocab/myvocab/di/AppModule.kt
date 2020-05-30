@@ -78,7 +78,7 @@ class AppModule {
                         }
                     }
                 })
-                .addMigrations(Database.MIGRATION_3_4)
+                .addMigrations(Database.MIGRATION_3_4, Database.MIGRATION_4_5)
                 .build()
         return wordsDb
     }

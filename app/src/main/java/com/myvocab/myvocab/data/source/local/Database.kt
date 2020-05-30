@@ -7,7 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.myvocab.myvocab.data.model.DBWord
 import com.myvocab.myvocab.data.model.WordSetDbModel
 
-@Database(entities = [DBWord::class, WordSetDbModel::class], version = 4)
+@Database(entities = [DBWord::class, WordSetDbModel::class], version = 5)
 abstract class Database : RoomDatabase() {
 
     companion object {
@@ -18,6 +18,11 @@ abstract class Database : RoomDatabase() {
                 database.execSQL("ALTER TABLE words ADD COLUMN meanings TEXT")
                 database.execSQL("ALTER TABLE words ADD COLUMN synonyms TEXT")
                 database.execSQL("ALTER TABLE words ADD COLUMN examples TEXT")
+            }
+        }
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL("CREATE UNIQUE INDEX index_unique_word ON words(word, translation)")
             }
         }
     }

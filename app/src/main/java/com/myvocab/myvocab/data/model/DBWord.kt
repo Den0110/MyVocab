@@ -4,7 +4,7 @@ import androidx.room.*
 import com.squareup.moshi.Json
 import java.io.Serializable
 
-@Entity(tableName = "words")
+@Entity(tableName = "words", indices = [Index(name = "index_unique_word", value = ["word", "translation"], unique = true)])
 @TypeConverters(StringListConverter::class, ExampleListConverter::class)
 data class DBWord(
 
