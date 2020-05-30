@@ -1,5 +1,9 @@
 package com.myvocab.myvocab.ui.word
 
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.CheckBox
 import android.widget.ImageView
@@ -8,6 +12,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
+import com.myvocab.myvocab.util.convertSpToPixels
+import com.myvocab.myvocab.util.spToPixels
 import java.util.*
 
 class WordHolder(private val view: View) : RecyclerView.ViewHolder(view) {
@@ -22,8 +28,25 @@ class WordHolder(private val view: View) : RecyclerView.ViewHolder(view) {
     private val needToLearnCheckBox: CheckBox = view.findViewById(R.id.need_to_learn_checkbox)
 
     fun bind(word: Word, callback: WordCallback? = null, savedLocally: Boolean? = false) {
-        wordView.text = word.word.toLowerCase(Locale.getDefault())
-        translateView.text = word.translation.toLowerCase(Locale.getDefault())
+
+        val wordTitle = SpannableStringBuilder(word.word.toLowerCase(Locale.getDefault()))
+        if(word.transcription.isNotEmpty()){
+            val ts = " [${word.transcription}]".replace("ˈ", "'")
+            wordTitle.append(ts)
+
+            val tsStart = wordTitle.indexOf(ts)
+            val tsEnd = tsStart + ts.length
+
+            wordTitle.setSpan(AbsoluteSizeSpan(convertSpToPixels(itemView.context, 13)), tsStart, tsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            wordTitle.setSpan(ForegroundColorSpan(ContextCompat.getColor(itemView.context, R.color.secondaryTextColor)),
+                    tsStart, tsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        wordView.text = wordTitle
+
+        var translationTitle = word.translation.toLowerCase(Locale.getDefault())
+        if (!word.synonyms.isNullOrEmpty())
+            translationTitle += word.synonyms.joinToString(", ", prefix = ", ", limit = 2)
+        translateView.text = translationTitle
 
         if(savedLocally == true) {
             needToLearnCheckBox.visibility = View.VISIBLE
