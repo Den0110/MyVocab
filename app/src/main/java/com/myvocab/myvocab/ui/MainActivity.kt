@@ -72,7 +72,7 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
             navController.graph = graph
         }
 
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             // log screen
             FirebaseAnalytics.getInstance(this).setCurrentScreen(this, destination.label.toString(), null)
         }

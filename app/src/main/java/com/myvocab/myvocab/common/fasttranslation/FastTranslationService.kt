@@ -87,7 +87,7 @@ class FastTranslationService : DaggerService() {
         pendingIntent = PendingIntent.getBroadcast(this, REQUEST_CODE,
                 Intent(this, FastTranslationServiceStarter::class.java), 0)
 
-        translationWidget.lifecycle.addObserver(LifecycleEventObserver { owner, event ->
+        translationWidget.lifecycle.addObserver(LifecycleEventObserver { _, event ->
             if(event == Lifecycle.Event.ON_DESTROY){
                 NotificationManagerCompat.from(this)
                         .notify(Constants.NotificationId.FOREGROUND_SERVICE, getDefaultNotification())

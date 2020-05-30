@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -61,9 +62,9 @@ class SettingsFragment : MainNavigationFragment() {
                     .setTarget(service_switch)
                     .setPrimaryText(getString(R.string.enable_fast_translation))
                     .setSecondaryText(getString(R.string.settings_fast_translate_guide_description))
-                    .setBackgroundColour(resources.getColor(R.color.guideBgColor))
-                    .setPrimaryTextColour(resources.getColor(R.color.primaryTextColor))
-                    .setSecondaryTextColour(resources.getColor(R.color.secondaryTextColor))
+                    .setBackgroundColour(ContextCompat.getColor(context!!, R.color.guideBgColor))
+                    .setPrimaryTextColour(ContextCompat.getColor(context!!, R.color.primaryTextColor))
+                    .setSecondaryTextColour(ContextCompat.getColor(context!!, R.color.secondaryTextColor))
                     .setPromptStateChangeListener { prompt, state ->
                         if (state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED) {
                             prompt.finish()
