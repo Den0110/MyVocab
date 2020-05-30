@@ -12,6 +12,7 @@ import com.myvocab.myvocab.util.Resource
 import com.opencsv.CSVParserBuilder
 import io.reactivex.android.schedulers.AndroidSchedulers
 import com.opencsv.CSVReaderBuilder
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
@@ -37,6 +38,8 @@ constructor(
     val examples: MutableLiveData<MutableList<Word.Example>> = MutableLiveData()
 
     val suggestedWord: MediatorLiveData<Resource<Word>> = MediatorLiveData()
+
+    var initialWord: Word? = null
 
     val compositeDisposable = CompositeDisposable()
 
@@ -67,6 +70,7 @@ constructor(
 
     fun initWith(word: Word?){
         word?.let {
+            initialWord = it
             newWord.value = it.word
             transcription.value = it.transcription
             translation.value = it.translation
@@ -86,18 +90,32 @@ constructor(
         }
     }
 
-    fun addWord() =
-        wordRepository
-                .addMyWord(Word(
-                        word = newWord.value ?: "",
-                        translation = translation.value ?: "",
-                        transcription = transcription.value ?: "",
-                        meanings = (meanings.value ?: "").split(",").map { it.trim() },
-                        synonyms = (synonyms.value ?: "").split(",").map { it.trim() },
-                        examples = examples.value?.mapNotNull {
-                            if(it.text.isEmpty() || it.translation.isEmpty()) null else it } ?: listOf()
-                ))
-                .observeOn(AndroidSchedulers.mainThread())
+    fun commitWord(): Completable {
+
+        val word = Word(
+                word = newWord.value ?: "",
+                translation = translation.value ?: "",
+                transcription = transcription.value ?: "",
+                meanings = (meanings.value ?: "").split(",").map { it.trim() },
+                synonyms = (synonyms.value ?: "").split(",").map { it.trim() },
+                examples = examples.value?.mapNotNull {
+                    if (it.text.isEmpty() || it.translation.isEmpty()) null else it
+                } ?: listOf()
+        )
+
+        initialWord?.let{
+            return wordRepository.updateWord(it.copy(
+                    word = word.word,
+                    translation = word.translation,
+                    transcription = word.transcription,
+                    meanings = word.meanings,
+                    synonyms = word.synonyms,
+                    examples = word.examples
+            )).observeOn(AndroidSchedulers.mainThread())
+        }
+
+        return wordRepository.addMyWord(word).observeOn(AndroidSchedulers.mainThread())
+    }
 
     fun addWordsFromFile(uri: Uri) =
             readWordsFromFile(uri)

@@ -113,7 +113,7 @@ class AddNewWordFragment : MainNavigationFragment() {
                     if (allDataCompleted()) {
                         compositeDisposable.clear()
                         compositeDisposable.add(
-                                viewModel.addWord().subscribe({
+                                viewModel.commitWord().subscribe({
                                     findNavController().navigateUp()
 
                                     // log adding new word
@@ -229,17 +229,17 @@ class AddNewWordFragment : MainNavigationFragment() {
             }
 
             fun bind(example: Word.Example, callback: ExampleItemCallback) {
-                textListener.position = adapterPosition
-                translationListener.position = adapterPosition
+                textListener.position = bindingAdapterPosition
+                translationListener.position = bindingAdapterPosition
 
                 itemView.example_edt.setText(example.text)
                 itemView.example_translation_edt.setText(example.translation)
 
-                itemView.example_til.hint = itemView.context.getString(R.string.example, adapterPosition + 1)
-                itemView.example_translation_til.hint = itemView.context.getString(R.string.example_translation, adapterPosition + 1)
+                itemView.example_til.hint = itemView.context.getString(R.string.example, bindingAdapterPosition + 1)
+                itemView.example_translation_til.hint = itemView.context.getString(R.string.example_translation, bindingAdapterPosition + 1)
 
                 itemView.delete_btn.setOnClickListener {
-                    callback.onDelete(adapterPosition)
+                    callback.onDelete(bindingAdapterPosition)
                 }
             }
         }
