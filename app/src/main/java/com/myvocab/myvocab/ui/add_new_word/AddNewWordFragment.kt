@@ -4,6 +4,7 @@ import android.animation.LayoutTransition
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -122,8 +123,12 @@ class AddNewWordFragment : MainNavigationFragment() {
                                         putInt("length", viewModel.newWord.value?.length ?: 0)
                                     })
                                 }, { e ->
-                                    Timber.e(e)
-                                    Snackbar.make(view, "Error, word wasn't added", Snackbar.LENGTH_SHORT).show()
+                                    if (e is SQLiteConstraintException){
+                                        Snackbar.make(view, "This word have already added to your vocab", Snackbar.LENGTH_SHORT).show()
+                                    } else {
+                                        Timber.e(e)
+                                        Snackbar.make(view, "Error, word wasn't added", Snackbar.LENGTH_SHORT).show()
+                                    }
                                 })
                         )
                     }

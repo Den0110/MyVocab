@@ -151,11 +151,11 @@ constructor(
     }
 
     fun addMyWord(word: Word): Completable {
-        return addWord(word.apply { wordSetId = WordSetDbModel.MY_WORDS })
+        return addNewWord(word.apply { wordSetId = WordSetDbModel.MY_WORDS })
     }
 
-    fun addWord(word: Word): Completable {
-        return addWordToDb(word).subscribeOn(Schedulers.io())
+    fun addNewWord(word: Word): Completable {
+        return addNewWordToDb(word).subscribeOn(Schedulers.io())
     }
 
     fun addWords(words: List<Word>): Completable {
@@ -184,8 +184,8 @@ constructor(
     private fun getWordByIdFromDb(id: Int): Single<Word> =
             wordDao.getWordById(id).map { Word.fromDBWord().map(it) }
 
-    private fun addWordToDb(word: Word) =
-            wordDao.addWord(Word.toDBWord().map(word))
+    private fun addNewWordToDb(word: Word) =
+            wordDao.addNewWord(Word.toDBWord().map(word))
 
     private fun addWordsToDb(words: List<Word>) =
             wordDao.addWords(ListMapperImpl(Word.toDBWord()).map(words))
