@@ -85,6 +85,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta6'
     implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.recyclerview:recyclerview:1.2.0-alpha03'
     implementation 'com.jakewharton.rxbinding3:rxbinding:3.1.0'
 
     // Firebase

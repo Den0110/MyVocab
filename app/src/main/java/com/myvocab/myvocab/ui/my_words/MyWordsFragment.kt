@@ -10,6 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.MergeAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
@@ -50,7 +51,7 @@ class MyWordsFragment : BaseWordListFragment() {
             }
         })
 
-        recycler_view.adapter = wordListAdapter
+        recycler_view.adapter = adapter
 
         viewModel.words.observe(viewLifecycleOwner, Observer {
             when (it.status) {
@@ -61,11 +62,13 @@ class MyWordsFragment : BaseWordListFragment() {
                     swipe_refresh_layout.isRefreshing = false
                     if (it.data.isNullOrEmpty()) {
                         message_empty_vocab.visibility = View.VISIBLE
+                        adapter.removeAdapter(learnAllWordsAdapter)
                     } else {
                         message_empty_vocab.visibility = View.GONE
+                        adapter.addAdapter(0, learnAllWordsAdapter)
                     }
-                    recycler_view.post { wordListAdapter.checkIfAllNeedToLearn(it.data) }
                     wordListAdapter.submitList(it.data)
+                    learnAllWordsAdapter.checkIfAllNeedToLearn(it.data)
                 }
                 Resource.Status.ERROR -> {
                     swipe_refresh_layout.isRefreshing = false

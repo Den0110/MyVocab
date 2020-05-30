@@ -91,7 +91,7 @@ class WordSetDetailsFragment : BaseWordListFragment() {
 
         swipe_refresh_layout.setOnRefreshListener { viewModel.loadWordSet() }
 
-        recycler_view.adapter = wordListAdapter
+        recycler_view.adapter = adapter
 
         viewModel.isSavedLocally.observe(viewLifecycleOwner, Observer {
             if (it) {
@@ -112,8 +112,13 @@ class WordSetDetailsFragment : BaseWordListFragment() {
                 Resource.Status.SUCCESS -> {
                     swipe_refresh_layout.isRefreshing = false
                     wordListAdapter.isSavedLocally = viewModel.isSavedLocally.value
-                    if (wordListAdapter.isSavedLocally == true)
-                        recycler_view.post { wordListAdapter.checkIfAllNeedToLearn(it.data) }
+                    if (wordListAdapter.isSavedLocally == true) {
+                        learnAllWordsAdapter.checkIfAllNeedToLearn(it.data)
+                        adapter.addAdapter(0, learnAllWordsAdapter)
+                        recycler_view.smoothScrollToPosition(0)
+                    } else {
+                        adapter.removeAdapter(learnAllWordsAdapter)
+                    }
                     wordListAdapter.submitList(it.data)
                 }
                 Resource.Status.ERROR -> {

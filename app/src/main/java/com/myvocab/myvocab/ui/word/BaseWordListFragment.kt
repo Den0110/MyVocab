@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.MergeAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
@@ -26,6 +27,11 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
     @Inject
     lateinit var wordListAdapter: WordListAdapter
 
+    @Inject
+    lateinit var learnAllWordsAdapter: LearnAllWordsAdapter
+
+    lateinit var adapter: MergeAdapter
+
     private val learnAllCallback = object : LearnAllCallback() {
         override fun onNeedToLearnAll(state: Boolean) {
             val title =
@@ -40,7 +46,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
                             it.needToLearn = state
                             viewModel.update(it)
                         }
-                        wordListAdapter.needToLearnAll = state
+                        learnAllWordsAdapter.needToLearnAll = state
                         dialog.dismiss()
                     }
                     .setNegativeButton(R.string.dialog_action_no) { dialog, _ ->
@@ -56,8 +62,10 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        adapter = MergeAdapter(wordListAdapter)
+
         wordListAdapter.callback = viewModel.wordCallback
-        wordListAdapter.learnAllCallback = learnAllCallback
+        learnAllWordsAdapter.learnAllCallback = learnAllCallback
 
         viewModel.showWordDialogEvent.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let { wordData ->
@@ -80,7 +88,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
 
         viewModel.notifyWordChangedEvent.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let { index ->
-                wordListAdapter.notifyItemChanged(index + 1)
+                wordListAdapter.notifyItemChanged(index)
             }
         })
 
@@ -105,7 +113,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
                 if (index == -1) {
                     Snackbar.make(view, "Error, word wasn't deleted", Snackbar.LENGTH_SHORT).show()
                 } else {
-                    wordListAdapter.notifyItemRemoved(index + 1)
+                    wordListAdapter.notifyItemRemoved(index)
                 }
             }
         })
