@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name" translatable="false">MyVocab</string>
 
+    <string name="admob_app_id" translatable="false">ca-app-pub-4460190431045399~9214225719</string>
+    <string name="admob_learning_interstitial_ad_id" translatable="false">ca-app-pub-4460190431045399/1894973040</string>
+<!--    <string name="admob_learning_interstitial_ad_id" translatable="false">ca-app-pub-3940256099942544/1033173712</string>  test ad id-->
+
     <!-- Fast Translation -->
     <string name="english">ENGLISH</string>
     <string name="russian">RUSSIAN</string>

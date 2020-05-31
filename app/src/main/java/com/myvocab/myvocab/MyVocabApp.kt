@@ -2,6 +2,7 @@ package com.myvocab.myvocab
 
 import android.content.Context
 import androidx.multidex.MultiDex
+import com.google.android.gms.ads.MobileAds
 import com.myvocab.myvocab.common.FastTranslationServiceManager
 import com.myvocab.myvocab.common.ReminderScheduler
 import com.myvocab.myvocab.data.source.WordRepository
@@ -55,6 +56,8 @@ class MyVocabApp : DaggerApplication() {
         RxJavaPlugins.setErrorHandler {
             Timber.e(it)
         }
+
+        MobileAds.initialize(this)
 
     }
 

@@ -137,4 +137,15 @@ class PreferencesManager(val context: Context) {
                 .apply()
         get() = preferences.getInt("last_word_to_learn_id", -1)
 
+    /**
+     *  Ads
+     */
+
+    var lastSessionShowedWordNumber: Int
+        set(value) = preferences
+                .edit()
+                .putInt("last_session_showed word_number", value)
+                .apply()
+        get() = preferences.getInt("last_session_showed word_number", 0)
+
 }

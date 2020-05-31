@@ -22,7 +22,12 @@ import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.transition.*
+import androidx.transition.ChangeBounds
+import androidx.transition.Fade
+import androidx.transition.TransitionManager
+import androidx.transition.TransitionSet
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.InterstitialAd
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
@@ -56,6 +61,9 @@ class LearningFragment : MainNavigationFragment() {
     private lateinit var viewModel: LearningViewModel
 
     private val compositeDisposable = CompositeDisposable()
+
+    private lateinit var interstitialAd: InterstitialAd
+    private var thisSessionShowedWordNumber = 0
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -154,6 +162,29 @@ class LearningFragment : MainNavigationFragment() {
             }
 
         })
+
+        viewModel.showedWordNumber.observe(viewLifecycleOwner, Observer {
+            when {
+                it >= 10 -> {
+                    if(interstitialAd.isLoaded && thisSessionShowedWordNumber >= 3) {
+                        interstitialAd.show()
+                        viewModel.showedWordNumber.value = 0
+                    } else if(!interstitialAd.isLoading) {
+                        interstitialAd.loadAd(AdRequest.Builder().build())
+                    }
+                }
+                it == 8 -> interstitialAd.loadAd(AdRequest.Builder().build())
+            }
+            thisSessionShowedWordNumber++
+        })
+
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        interstitialAd = InterstitialAd(context)
+        interstitialAd.adUnitId = getString(R.string.admob_learning_interstitial_ad_id)
     }
 
     private fun getAskObservable(): Single<Boolean> = Single.create { emitter ->
