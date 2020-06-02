@@ -29,6 +29,8 @@ import androidx.transition.TransitionSet
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.model.Word.Example.Companion.getHighlight
@@ -164,16 +166,21 @@ class LearningFragment : MainNavigationFragment() {
         })
 
         viewModel.showedWordNumber.observe(viewLifecycleOwner, Observer {
+
+            val showAd = Firebase.remoteConfig.getLong("learning_ad_show_time").toInt()
+            val loadAd = Firebase.remoteConfig.getLong("learning_ad_load_time").toInt()
+            val minCurrentSessionWordNumber = Firebase.remoteConfig.getLong("learning_ad_min_session_show_time").toInt()
+
             when {
-                it >= 10 -> {
-                    if(interstitialAd.isLoaded && thisSessionShowedWordNumber >= 3) {
+                it >= showAd -> {
+                    if(interstitialAd.isLoaded && thisSessionShowedWordNumber >= minCurrentSessionWordNumber) {
                         interstitialAd.show()
                         viewModel.showedWordNumber.value = 0
                     } else if(!interstitialAd.isLoading) {
                         interstitialAd.loadAd(AdRequest.Builder().build())
                     }
                 }
-                it == 8 -> interstitialAd.loadAd(AdRequest.Builder().build())
+                it == loadAd -> interstitialAd.loadAd(AdRequest.Builder().build())
             }
             thisSessionShowedWordNumber++
         })
