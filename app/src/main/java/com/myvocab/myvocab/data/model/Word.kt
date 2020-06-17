@@ -1,11 +1,11 @@
 package com.myvocab.myvocab.data.model
 
-import android.os.Parcel
 import android.os.Parcelable
 import androidx.recyclerview.widget.DiffUtil
 import com.myvocab.myvocab.data.model.Word.Example.Companion.setHighlight
 import com.myvocab.myvocab.util.Mapper
 import kotlinx.android.parcel.Parcelize
+import java.io.Serializable
 
 @Parcelize
 data class Word(
@@ -20,7 +20,7 @@ data class Word(
         var lastShowTime: Long = 0,
         var wordSetId: String? = null,
         var needToLearn: Boolean = true
-) : Parcelable {
+) : Parcelable, Serializable {
 
     companion object {
 

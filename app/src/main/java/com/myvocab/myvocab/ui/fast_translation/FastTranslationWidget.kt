@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
+import android.os.Parcelable
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.Toast
@@ -95,7 +96,7 @@ constructor(
                     when (translateResult.source) {
                         TranslationSource.DICTIONARY -> {
                             val intent = Intent(ADD_TO_VOCAB_ACTION).apply {
-                                putExtra("translate_result", translateResult)
+                                putExtra("translate_result", translateResult as Parcelable)
                             }
                             val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
                             remoteViews?.setOnClickPendingIntent(R.id.add_to_dictionary_btn, pendingIntent)
@@ -139,6 +140,7 @@ constructor(
                     updateTranslationNotification()
                 })
 
+        disposables.clear()
         disposables.add(translateDisposable)
 
 
