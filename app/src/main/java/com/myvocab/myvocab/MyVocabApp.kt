@@ -11,7 +11,6 @@ import com.myvocab.myvocab.di.DaggerAppComponent
 import com.myvocab.myvocab.util.createFastTranslationNotificationChannel
 import com.myvocab.myvocab.util.createReminderNotificationChannel
 import com.myvocab.myvocab.util.createTranslationNotificationChannel
-import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
 import io.reactivex.plugins.RxJavaPlugins
@@ -31,13 +30,6 @@ class MyVocabApp : DaggerApplication() {
     override fun onCreate() {
         super.onCreate()
         setTheme(R.style.AppTheme)
-
-        if (BuildConfig.USE_LEAK_CANARY) {
-            if (LeakCanary.isInAnalyzerProcess(this)) {
-                return
-            }
-            LeakCanary.install(this)
-        }
 
         if (BuildConfig.DEBUG) {
             Timber.plant(DebugTree())
