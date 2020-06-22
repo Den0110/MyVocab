@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -34,8 +33,6 @@ class SettingsFragment : MainNavigationFragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: SettingsViewModel
 
-    private var prompt: MaterialTapTargetPrompt? = null
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
         return binding.root
@@ -56,19 +53,7 @@ class SettingsFragment : MainNavigationFragment() {
         reminder_switch.setOnCheckedChangeListener(viewModel.reminderListener)
 
         if(!preferencesManager.fastTranslationGuideShowed) {
-            prompt = MaterialTapTargetPrompt.Builder(this)
-                    .setTarget(service_switch)
-                    .setPrimaryText(getString(R.string.enable_fast_translation))
-                    .setSecondaryText(getString(R.string.settings_fast_translate_guide_description))
-                    .setBackgroundColour(ContextCompat.getColor(context!!, R.color.guideBgColor))
-                    .setPrimaryTextColour(ContextCompat.getColor(context!!, R.color.primaryTextColor))
-                    .setSecondaryTextColour(ContextCompat.getColor(context!!, R.color.secondaryTextColor))
-                    .setPromptStateChangeListener { prompt, state ->
-                        if (state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED) {
-                            prompt.finish()
-                        }
-                    }
-                    .show()
+            allow_work_in_background_container.setBackgroundResource(R.drawable.word_suggestion_bg)
             preferencesManager.fastTranslationGuideShowed = true
         }
 
@@ -101,16 +86,12 @@ class SettingsFragment : MainNavigationFragment() {
         if (!ignoresPowerOptimization(context)) {
             allow_work_in_background_container.visibility = View.VISIBLE
             allow_work_in_bg_btn.setOnClickListener {
+                allow_work_in_background_container.background = null
                 openBatterySettings()
             }
         } else {
             allow_work_in_background_container.visibility = View.GONE
         }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        prompt?.finish()
     }
 
     private fun enableReminderTimeSwitch(){
