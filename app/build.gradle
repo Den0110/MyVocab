@@ -11,8 +11,8 @@ android {
         applicationId "com.myvocab.myvocab"
         minSdkVersion 17
         targetSdkVersion 29
-        versionCode 8
-        versionName "1.0.8"
+        versionCode 9
+        versionName "1.0.8.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         testOptions.unitTests.includeAndroidResources = true

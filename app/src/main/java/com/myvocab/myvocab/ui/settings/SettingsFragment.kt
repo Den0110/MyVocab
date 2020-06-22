@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -23,7 +22,6 @@ import kotlinx.android.synthetic.main.fragment_settings.*
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import java.util.*
 import javax.inject.Inject
-
 
 class SettingsFragment : MainNavigationFragment() {
 
@@ -97,6 +95,19 @@ class SettingsFragment : MainNavigationFragment() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        
+        if (!ignoresPowerOptimization(context)) {
+            allow_work_in_background_container.visibility = View.VISIBLE
+            allow_work_in_bg_btn.setOnClickListener {
+                openBatterySettings()
+            }
+        } else {
+            allow_work_in_background_container.visibility = View.GONE
+        }
+    }
+
     override fun onStop() {
         super.onStop()
         prompt?.finish()
@@ -134,34 +145,6 @@ class SettingsFragment : MainNavigationFragment() {
 
     private fun startTranslationService() {
         viewModel.startTranslationService()
-        openBatteryDialog()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_CODE_DRAW_OVERLAYS) {
-            if(canDrawOverlays(context)) {
-                viewModel.startTranslationService()
-                openBatteryDialog()
-            } else {
-                viewModel.stopTranslationService()
-            }
-        }
-    }
-
-    private fun openBatteryDialog(){
-        if (!ignoresPowerOptimization(context)) {
-            AlertDialog.Builder(context!!)
-                    .setMessage(R.string.dialog_permission_battery_settings)
-                    .setPositiveButton(R.string.dialog_permission_allow) { _, _ ->
-                        openBatterySettings()
-                    }
-                    .setNegativeButton(R.string.dialog_permission_deny) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .create()
-                    .show()
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)

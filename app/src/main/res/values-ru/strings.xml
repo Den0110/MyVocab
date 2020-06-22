@@ -42,9 +42,9 @@
     <string name="label_settings">Настройки</string>
     <string name="enable_fast_translation">Включить Быстрый Перевод</string>
     <string name="dialog_permission_draw_overlay">Разрешите MyVocab показывать всплывающий пузырёк Быстрого Перевода</string>
-    <string name="dialog_permission_battery_settings">"Разрешите MyVocab работать в фоновом режиме:\nНа следующем экране выберите \"Все приложения\", найдите MyVocab и выберите \"Нет ограничений\""</string>
-    <string name="dialog_permission_allow">Разрешить</string>
-    <string name="dialog_permission_deny">Запретить</string>
+    <string name="disable_optimization">Для стабильной работы Быстрого Перевода, пожалуйста, разрешите MyVocab работать в фоне:\n\nНа экране настроек выберите \"Все приложения\", найдите MyVocab и выберите \"Не экономить\""</string>
+    <string name="allow_work_in_background">Разрешите MyVocab работать в фоне</string>
+    <string name="allow">Разрешить</string>
     <string name="remove_all_words">Удалить все слова</string>
     <string name="learning_percentage">%d%% выучено</string>
     <string name="message_no_word_lists">Нет добавленных списков слов.\nДобавьте их из Поиска</string>

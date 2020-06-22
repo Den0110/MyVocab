@@ -61,9 +61,9 @@
     <string name="label_settings">Settings</string>
     <string name="enable_fast_translation">Enable Fast Translation</string>
     <string name="dialog_permission_draw_overlay">Allow MyVocab draw translation bubble</string>
-    <string name="dialog_permission_battery_settings">"Allow MyVocab work in background:\nOn the next screen choose \"All applications\", find MyVocab and choose \"Don't optimize\""</string>
-    <string name="dialog_permission_allow">Allow</string>
-    <string name="dialog_permission_deny">Deny</string>
+    <string name="disable_optimization">"For stable working of Fast Translate, please allow MyVocab work in background:\n\nOn the settings screen choose \"All applications\", find MyVocab and choose \"Don't optimize\""</string>
+    <string name="allow_work_in_background">Allow MyVocab work in background</string>
+    <string name="allow">Allow</string>
 
     <string name="dialog_action_yes">Yes</string>
     <string name="dialog_action_no">No</string>

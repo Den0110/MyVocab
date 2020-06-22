@@ -30,7 +30,7 @@ class PreferencesManager(val context: Context) {
                 .edit()
                 .putBoolean("fast_translation_guide_showed", value)
                 .apply()
-        get() = preferences.getBoolean("fast_translation_guide_showed", true) // temporary disabled
+        get() = preferences.getBoolean("fast_translation_guide_showed", false)
 
     /**
      *  Fast Translation
