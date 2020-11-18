@@ -110,5 +110,7 @@
     <string name="add_example">Add example</string>
     <string name="max_examples_number">Max number of examples is %d</string>
     <string name="edit_word">Edit</string>
+    <string name="developer">Developer</string>
+    <string name="developer_details">Ковалев Денис\ndenkov0110@yandex.ru</string>
 
 </resources>
