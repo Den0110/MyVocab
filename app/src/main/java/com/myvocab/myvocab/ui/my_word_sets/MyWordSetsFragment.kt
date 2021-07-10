@@ -17,7 +17,7 @@ class MyWordSetsFragment: MainNavigationFragment() {
     private lateinit var binding: FragmentMyWordSetsBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_word_sets, container, false)
         return binding.root
     }
@@ -26,7 +26,7 @@ class MyWordSetsFragment: MainNavigationFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         tab_layout.setupWithViewPager(view_pager)
-        view_pager.adapter = MyWordSetsPagerAdapter(context!!, childFragmentManager)
+        view_pager.adapter = MyWordSetsPagerAdapter(requireContext(), childFragmentManager)
         view_pager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
             override fun onPageScrollStateChanged(state: Int) {}
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }

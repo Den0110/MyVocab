@@ -11,14 +11,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.databinding.FragmentSettingsBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.util.*
 import kotlinx.android.synthetic.main.fragment_settings.*
-import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import java.util.*
 import javax.inject.Inject
 
@@ -33,7 +31,7 @@ class SettingsFragment : MainNavigationFragment() {
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private lateinit var viewModel: SettingsViewModel
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_settings, container, false)
         return binding.root
     }
@@ -57,7 +55,7 @@ class SettingsFragment : MainNavigationFragment() {
             preferencesManager.fastTranslationGuideShowed = true
         }
 
-        viewModel.reminderEnabled.observe(viewLifecycleOwner, Observer {
+        viewModel.reminderEnabled.observe(viewLifecycleOwner, {
             if (it) {
                 enableReminderTimeSwitch()
                 enableReminderModeSwitch()
@@ -67,12 +65,12 @@ class SettingsFragment : MainNavigationFragment() {
             }
         })
 
-        viewModel.remindingTime.observe(viewLifecycleOwner, Observer {
+        viewModel.remindingTime.observe(viewLifecycleOwner, {
             reminding_time_value.text = DateUtils.formatDateTime(context,
                     viewModel.remindingTime.value?.timeInMillis!!, DateUtils.FORMAT_SHOW_TIME)
         })
 
-        viewModel.startTranslationServiceMessage.observe(viewLifecycleOwner, Observer {
+        viewModel.startTranslationServiceMessage.observe(viewLifecycleOwner, {
             it.getContentIfNotHandled()?.let {
                 startTranslationService()
             }
@@ -131,7 +129,7 @@ class SettingsFragment : MainNavigationFragment() {
     @RequiresApi(Build.VERSION_CODES.M)
     private fun openBatterySettings() {
         val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-        if (PackageUtils.isIntentCallable(context!!, intent)) {
+        if (PackageUtils.isIntentCallable(requireContext(), intent)) {
             startActivityForResult(intent, REQUEST_CODE_BATTERY)
         }
     }

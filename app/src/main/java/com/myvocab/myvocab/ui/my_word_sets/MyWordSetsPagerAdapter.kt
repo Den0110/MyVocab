@@ -4,9 +4,9 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
-import com.myvocab.myvocab.ui.my_word_sets.learned_words.LearnedWordSetsFragment
-import com.myvocab.myvocab.ui.my_word_sets.in_learning_words.InLearningWordSetsFragment
 import com.myvocab.myvocab.R
+import com.myvocab.myvocab.ui.my_word_sets.in_learning_words.InLearningWordSetsFragment
+import com.myvocab.myvocab.ui.my_word_sets.learned_words.LearnedWordSetsFragment
 
 class MyWordSetsPagerAdapter(val context: Context, fm: FragmentManager) : FragmentPagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
@@ -20,7 +20,7 @@ class MyWordSetsPagerAdapter(val context: Context, fm: FragmentManager) : Fragme
                 else -> LearnedWordSetsFragment()
             }
 
-    override fun getPageTitle(position: Int): CharSequence? =
+    override fun getPageTitle(position: Int): CharSequence =
             when (position) {
                 0 -> context.getString(R.string.in_learning)
                 else -> context.getString(R.string.learned)

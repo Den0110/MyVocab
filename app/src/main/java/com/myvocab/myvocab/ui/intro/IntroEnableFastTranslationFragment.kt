@@ -1,22 +1,12 @@
 package com.myvocab.myvocab.ui.intro
 
-import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AlertDialog
 import com.github.paolorotolo.appintro.ISlidePolicy
 import com.myvocab.myvocab.R
-import com.myvocab.myvocab.common.FastTranslationServiceManager
-import com.myvocab.myvocab.ui.IntroActivity
-import com.myvocab.myvocab.util.*
 import dagger.android.support.DaggerFragment
-import javax.inject.Inject
 
 class IntroEnableFastTranslationFragment : DaggerFragment(), ISlidePolicy {
 

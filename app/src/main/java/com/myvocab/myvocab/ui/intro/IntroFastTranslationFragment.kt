@@ -1,14 +1,11 @@
 package com.myvocab.myvocab.ui.intro
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.myvocab.myvocab.R
-import kotlinx.android.synthetic.main.fragment_intro_fast_translate.*
-import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 
 class IntroFastTranslationFragment : Fragment() {
 

@@ -4,9 +4,9 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.graphics.Typeface
+import android.graphics.text.LineBreaker
 import android.os.Build
 import android.os.Bundle
-import android.text.Layout.BREAK_STRATEGY_HIGH_QUALITY
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.AbsoluteSizeSpan
@@ -20,14 +20,17 @@ import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.transition.ChangeBounds
 import androidx.transition.Fade
 import androidx.transition.TransitionManager
 import androidx.transition.TransitionSet
+import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
-import com.google.android.gms.ads.InterstitialAd
+import com.google.android.gms.ads.FullScreenContentCallback
+import com.google.android.gms.ads.LoadAdError
+import com.google.android.gms.ads.interstitial.InterstitialAd
+import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
@@ -44,6 +47,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.fragment_learning.*
 import kotlinx.android.synthetic.main.learning_word_example.view.*
+import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
 
 class LearningFragment : MainNavigationFragment() {
@@ -64,11 +69,13 @@ class LearningFragment : MainNavigationFragment() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    private lateinit var interstitialAd: InterstitialAd
+    private var interstitialAd: InterstitialAd? = null
     private var thisSessionShowedWordNumber = 0
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_learning, container, false)
         return binding.root
     }
@@ -89,7 +96,7 @@ class LearningFragment : MainNavigationFragment() {
 
         search_words_btn.setOnClickListener { findNavController().navigate(R.id.navigation_search) }
 
-        viewModel.currentWord.observe(viewLifecycleOwner, Observer { word ->
+        viewModel.currentWord.observe(viewLifecycleOwner, { word ->
 
             // show a new word (other fields bind in xml)
             setKnowingLevel(word)
@@ -99,99 +106,139 @@ class LearningFragment : MainNavigationFragment() {
             setExamples(word)
 
             compositeDisposable.add(
-                    animateNewWord(word).subscribe {
-                        if (word != null) {
+                animateNewWord(word).subscribe {
+                    if (word != null) {
 
-                            // ask user if them know the word
-                            val askIfWordKnownDisposable =
-                                    getAskObservable().subscribe { isKnown ->
-                                        // show translation to check
-                                        compositeDisposable.add(
-                                                animateShowTranslation(word, isKnown).subscribe {
-                                                    if (isKnown) {
-                                                        // if answered that them know, ask is them was right
-                                                        getAskObservable().subscribe { wasRight ->
-                                                            if (wasRight) {
-                                                                viewModel.increaseKnowingLevel()
-                                                            } else {
-                                                                viewModel.zeroizeKnowingLevel()
-                                                            }.subscribe {
-                                                                viewModel.nextWord()
-                                                            }
+                        // ask user if them know the word
+                        val askIfWordKnownDisposable =
+                            getAskObservable().subscribe { isKnown ->
+                                // show translation to check
+                                compositeDisposable.add(
+                                    animateShowTranslation(word, isKnown).subscribe {
+                                        if (isKnown) {
+                                            // if answered that them know, ask is them was right
+                                            getAskObservable().subscribe { wasRight ->
+                                                if (wasRight) {
+                                                    viewModel.increaseKnowingLevel()
+                                                } else {
+                                                    viewModel.zeroizeKnowingLevel()
+                                                }.subscribe {
+                                                    viewModel.nextWord()
+                                                }
 
-                                                            // log rightness
-                                                            FirebaseAnalytics.getInstance(context!!).logEvent("rightness", Bundle().apply {
-                                                                putString("text", word.word)
-                                                                putInt("length", word.word.length)
-                                                                putBoolean("was_right", wasRight)
-                                                            })
-                                                        }
-                                                    } else {
-                                                        // else leave them to learn the new word
-                                                        viewModel.zeroizeKnowingLevel()
-                                                                .observeOn(AndroidSchedulers.mainThread())
-                                                                .subscribe {
-                                                                    next_container.setOnClickListener {
-                                                                        // when them finished memorizing, show next word
-                                                                        viewModel.nextWord()
-                                                                    }
-                                                                }
+                                                // log rightness
+                                                FirebaseAnalytics.getInstance(requireContext())
+                                                    .logEvent("rightness", Bundle().apply {
+                                                        putString("text", word.word)
+                                                        putInt("length", word.word.length)
+                                                        putBoolean("was_right", wasRight)
+                                                    })
+                                            }
+                                        } else {
+                                            // else leave them to learn the new word
+                                            viewModel.zeroizeKnowingLevel()
+                                                .observeOn(AndroidSchedulers.mainThread())
+                                                .subscribe {
+                                                    next_container.setOnClickListener {
+                                                        // when them finished memorizing, show next word
+                                                        viewModel.nextWord()
                                                     }
-                                                })
+                                                }
+                                        }
+                                    })
 
-                                        // log knowing word
-                                        FirebaseAnalytics.getInstance(context!!).logEvent("knowing_word", Bundle().apply {
-                                            putString("text", word.word)
-                                            putInt("length", word.word.length)
-                                            putBoolean("know", isKnown)
-                                        })
+                                // log knowing word
+                                FirebaseAnalytics.getInstance(requireContext())
+                                    .logEvent("knowing_word", Bundle().apply {
+                                        putString("text", word.word)
+                                        putInt("length", word.word.length)
+                                        putBoolean("know", isKnown)
+                                    })
 
-                                    }
-                            compositeDisposable.clear()
-                            compositeDisposable.add(askIfWordKnownDisposable)
-                        }
-                    })
+                            }
+                        compositeDisposable.clear()
+                        compositeDisposable.add(askIfWordKnownDisposable)
+                    }
+                })
 
             word?.let {
                 // log showing next word
-                FirebaseAnalytics.getInstance(context!!).logEvent("show_next_word", Bundle().apply {
-                    putString("text", it.word)
-                    putInt("length", it.word.length)
-                    viewModel.wordSetTitle.value?.let {
-                        putString("word_set_title", it)
-                    }
-                })
+                FirebaseAnalytics.getInstance(requireContext())
+                    .logEvent("show_next_word", Bundle().apply {
+                        putString("text", it.word)
+                        putInt("length", it.word.length)
+                        viewModel.wordSetTitle.value?.let {
+                            putString("word_set_title", it)
+                        }
+                    })
             }
 
         })
 
-        viewModel.showedWordNumber.observe(viewLifecycleOwner, Observer {
+        viewModel.showedWordNumber.observe(viewLifecycleOwner, {
 
             val showAd = Firebase.remoteConfig.getLong("learning_ad_show_time").toInt()
             val loadAd = Firebase.remoteConfig.getLong("learning_ad_load_time").toInt()
-            val minCurrentSessionWordNumber = Firebase.remoteConfig.getLong("learning_ad_min_session_show_time").toInt()
+            val minCurrentSessionWordNumber =
+                Firebase.remoteConfig.getLong("learning_ad_min_session_show_time").toInt()
 
             when {
                 it >= showAd -> {
-                    if(interstitialAd.isLoaded && thisSessionShowedWordNumber >= minCurrentSessionWordNumber) {
-                        interstitialAd.show()
-                        viewModel.showedWordNumber.value = 0
-                    } else if(!interstitialAd.isLoading) {
-                        interstitialAd.loadAd(AdRequest.Builder().build())
+                    if (thisSessionShowedWordNumber >= minCurrentSessionWordNumber) {
+                        showInterstitialAd {
+                            viewModel.showedWordNumber.value = 0
+                        }
                     }
                 }
-                it == loadAd -> interstitialAd.loadAd(AdRequest.Builder().build())
+                it == loadAd -> loadInterstitialAd()
             }
             thisSessionShowedWordNumber++
         })
 
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    private fun loadInterstitialAd() {
+        val adRequest = AdRequest.Builder().build()
 
-        interstitialAd = InterstitialAd(context)
-        interstitialAd.adUnitId = getString(R.string.admob_learning_interstitial_ad_id)
+        InterstitialAd.load(requireContext(),
+            getString(R.string.admob_learning_interstitial_ad_id),
+            adRequest,
+            object : InterstitialAdLoadCallback() {
+                override fun onAdFailedToLoad(adError: LoadAdError) {
+                    Timber.d(adError.message)
+                    interstitialAd = null
+                }
+
+                override fun onAdLoaded(ad: InterstitialAd) {
+                    Timber.d("Ad was loaded.")
+                    interstitialAd = ad
+                }
+            })
+    }
+
+    private fun showInterstitialAd(onShowed: () -> Unit) {
+        interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+            override fun onAdDismissedFullScreenContent() {
+                Timber.d("The ad was dismissed")
+                interstitialAd = null
+                loadInterstitialAd()
+            }
+
+            override fun onAdFailedToShowFullScreenContent(adError: AdError?) {
+                interstitialAd = null
+            }
+
+            override fun onAdShowedFullScreenContent() {
+                Timber.d("Ad showed fullscreen content.")
+            }
+        }
+
+        if (interstitialAd != null) {
+            interstitialAd?.show(requireActivity())
+            onShowed()
+        } else {
+            loadInterstitialAd()
+        }
     }
 
     private fun getAskObservable(): Single<Boolean> = Single.create { emitter ->
@@ -212,14 +259,14 @@ class LearningFragment : MainNavigationFragment() {
 
         completable = if (word != null) {
             completable
-                    .mergeWith(animateShowWord())
-                    .mergeWith(animateHideNoWordsView())
-                    .mergeWith(animateShowDoesUserKnowViews())
+                .mergeWith(animateShowWord())
+                .mergeWith(animateHideNoWordsView())
+                .mergeWith(animateShowDoesUserKnowViews())
         } else {
             completable
-                    .mergeWith(animateHideWord())
-                    .mergeWith(animateShowNoWordsView())
-                    .mergeWith(animateHideChooseViews(FAST_FADE_ANIM_TIME))
+                .mergeWith(animateHideWord())
+                .mergeWith(animateShowNoWordsView())
+                .mergeWith(animateHideChooseViews(FAST_FADE_ANIM_TIME))
         }
 
         return completable
@@ -255,7 +302,7 @@ class LearningFragment : MainNavigationFragment() {
             }
 
             TransitionManager.beginDelayedTransition(word_scroll, showTranslationAnim)
-            showTranslation(word.translation.toLowerCase())
+            showTranslation(word.translation.lowercase(Locale.getDefault()))
             showExampleTranslations(word)
         })
 
@@ -263,8 +310,8 @@ class LearningFragment : MainNavigationFragment() {
             completable.mergeWith(animateShowWasUserRightViews())
         } else {
             completable.mergeWith(
-                    animateHideChooseViews(SLOW_FADE_ANIM_TIME)
-                            .andThen(animateShowNextViews())
+                animateHideChooseViews(SLOW_FADE_ANIM_TIME)
+                    .andThen(animateShowNextViews())
             )
         }
 
@@ -313,7 +360,7 @@ class LearningFragment : MainNavigationFragment() {
 
     private fun animateHideChooseViews(dur: Long): Completable {
         return Completable.create { emitter ->
-            if(choose_views.visibility != View.GONE) {
+            if (choose_views.visibility != View.GONE) {
                 ValueAnimator.ofFloat(1f, 0f).apply {
                     addUpdateListener {
                         val value = it.animatedValue as Float
@@ -334,7 +381,7 @@ class LearningFragment : MainNavigationFragment() {
 
     private fun animateShowNextViews(): Completable {
         return Completable.create { emitter ->
-            if(next_container.visibility != View.VISIBLE) {
+            if (next_container.visibility != View.VISIBLE) {
                 showNextViews()
 
                 ValueAnimator.ofFloat(0f, 1f).apply {
@@ -354,11 +401,11 @@ class LearningFragment : MainNavigationFragment() {
 
     private fun animateShowNoWordsView(): Completable {
         return Completable.create {
-            if(no_words_container.visibility != View.VISIBLE) {
+            if (no_words_container.visibility != View.VISIBLE) {
                 showNoWordsView()
                 ObjectAnimator
-                        .ofFloat(no_words_container, View.ALPHA, 0f, 1f)
-                        .addListener(rxAnimatorCallback(it))
+                    .ofFloat(no_words_container, View.ALPHA, 0f, 1f)
+                    .addListener(rxAnimatorCallback(it))
             } else {
                 it.onComplete()
             }
@@ -372,49 +419,63 @@ class LearningFragment : MainNavigationFragment() {
         }
     }
 
-    private fun showWord(){
+    private fun showWord() {
         word_scroll.visibility = View.VISIBLE
     }
 
-    private fun hideWord(){
+    private fun hideWord() {
         word_scroll.visibility = View.GONE
     }
 
     private fun setKnowingLevel(word: Word?) {
-        knowing_level.setImageDrawable(when (word?.knowingLevel) {
-            0 -> ContextCompat.getDrawable(context!!, R.drawable.ic_brain_empty_24dp)
-            1 -> ContextCompat.getDrawable(context!!, R.drawable.ic_brain_red_24dp)
-            2 -> ContextCompat.getDrawable(context!!, R.drawable.ic_brain_yellow_24dp)
-            3 -> ContextCompat.getDrawable(context!!, R.drawable.ic_brain_green_24dp)
-            else -> null
-        })
+        knowing_level.setImageDrawable(
+            when (word?.knowingLevel) {
+                0 -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_brain_empty_24dp)
+                1 -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_brain_red_24dp)
+                2 -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_brain_yellow_24dp)
+                3 -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_brain_green_24dp)
+                else -> null
+            }
+        )
     }
 
-    private fun setTitle(word: Word?){
+    private fun setTitle(word: Word?) {
         word?.word?.let { w ->
-            val wordTitle = SpannableStringBuilder(w.toLowerCase())
+            val wordTitle = SpannableStringBuilder(w.lowercase(Locale.getDefault()))
 
-            if(word.transcription.isNotEmpty()){
+            if (word.transcription.isNotEmpty()) {
                 val ts = " [${word.transcription}]".replace("ˈ", "'")
                 wordTitle.append(ts)
 
                 val tsStart = wordTitle.indexOf(ts)
                 val tsEnd = tsStart + ts.length
 
-                wordTitle.setSpan(AbsoluteSizeSpan(spToPixels(16)), tsStart, tsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                wordTitle.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.secondaryTextColor)),
-                        tsStart, tsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                wordTitle.setSpan(
+                    AbsoluteSizeSpan(spToPixels(16)),
+                    tsStart,
+                    tsEnd,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+                wordTitle.setSpan(
+                    ForegroundColorSpan(
+                        ContextCompat.getColor(
+                            requireContext(),
+                            R.color.secondaryTextColor
+                        )
+                    ),
+                    tsStart, tsEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
             }
 
             word_title.text = wordTitle
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                word_title.breakStrategy = BREAK_STRATEGY_HIGH_QUALITY
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                word_title.breakStrategy = LineBreaker.BREAK_STRATEGY_HIGH_QUALITY
             }
         }
     }
 
-    private fun setMeanings(word: Word?){
-        if(!word?.meanings.isNullOrEmpty()){
+    private fun setMeanings(word: Word?) {
+        if (!word?.meanings.isNullOrEmpty()) {
             meanings.text = word!!.meanings.joinToString(", ", postfix = ", …")
             meanings.visibility = View.VISIBLE
         } else {
@@ -422,8 +483,8 @@ class LearningFragment : MainNavigationFragment() {
         }
     }
 
-    private fun setSynonyms(word: Word?){
-        if(!word?.synonyms.isNullOrEmpty()) {
+    private fun setSynonyms(word: Word?) {
+        if (!word?.synonyms.isNullOrEmpty()) {
             synonyms.text = word!!.synonyms.joinToString(", ", postfix = ", …")
             synonyms.visibility = View.VISIBLE
         } else {
@@ -431,22 +492,38 @@ class LearningFragment : MainNavigationFragment() {
         }
     }
 
-    private fun setExamples(word: Word?){
+    private fun setExamples(word: Word?) {
         examples_container.removeAllViews()
-        if(!word?.examples.isNullOrEmpty()) {
+        if (!word?.examples.isNullOrEmpty()) {
             word?.examples!!.forEach {
-                val exampleView = layoutInflater.inflate(R.layout.learning_word_example, examples_container, false)
+                val exampleView = layoutInflater.inflate(
+                    R.layout.learning_word_example,
+                    examples_container,
+                    false
+                )
 
                 val text = SpannableStringBuilder(getRawText(it.text))
                 val textHighlight = getHighlight(it.text)
 
                 textHighlight?.let {
-                    val textMaskStart = it.first
-                    val textMaskEnd = it.last + 1
+                    val textMaskStart = textHighlight.first
+                    val textMaskEnd = textHighlight.last + 1
 
-                    text.setSpan(StyleSpan(Typeface.BOLD), textMaskStart, textMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    text.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTextColor)),
-                            textMaskStart, textMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    text.setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        textMaskStart,
+                        textMaskEnd,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    text.setSpan(
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.exampleTextColor
+                            )
+                        ),
+                        textMaskStart, textMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
                 }
 
                 exampleView.text.text = text
@@ -456,14 +533,27 @@ class LearningFragment : MainNavigationFragment() {
                 val starHighlight = getHighlight(it.translation)
 
                 starHighlight?.let {
-                    translation = SpannableStringBuilder(translation.replaceRange(starHighlight, starMask))
+                    translation =
+                        SpannableStringBuilder(translation.replaceRange(starHighlight, starMask))
 
                     val translationMaskStart = starHighlight.first
                     val translationMaskEnd = starHighlight.first + starMask.length
 
-                    translation.setSpan(StyleSpan(Typeface.BOLD), translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    translation.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTranslationColor)),
-                            translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    translation.setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        translationMaskStart,
+                        translationMaskEnd,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    translation.setSpan(
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.exampleTranslationColor
+                            )
+                        ),
+                        translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
                 }
 
                 exampleView.translation.text = translation
@@ -485,7 +575,7 @@ class LearningFragment : MainNavigationFragment() {
         translation_container.visibility = View.GONE
     }
 
-    private fun showExampleTranslations(word: Word?){
+    private fun showExampleTranslations(word: Word?) {
         word?.let {
             examples_container.children.forEachIndexed { index, view ->
 
@@ -497,9 +587,21 @@ class LearningFragment : MainNavigationFragment() {
                     val translationMaskStart = it.first
                     val translationMaskEnd = it.last + 1
 
-                    translation.setSpan(StyleSpan(Typeface.BOLD), translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-                    translation.setSpan(ForegroundColorSpan(ContextCompat.getColor(context!!, R.color.exampleTranslationColor)),
-                            translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    translation.setSpan(
+                        StyleSpan(Typeface.BOLD),
+                        translationMaskStart,
+                        translationMaskEnd,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    translation.setSpan(
+                        ForegroundColorSpan(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.exampleTranslationColor
+                            )
+                        ),
+                        translationMaskStart, translationMaskEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
                 }
 
                 view.translation.text = translation
@@ -507,34 +609,51 @@ class LearningFragment : MainNavigationFragment() {
         }
     }
 
-    private fun showDoesUserKnowViews(){
+    private fun showDoesUserKnowViews() {
         question.visibility = View.VISIBLE
         question.text = getString(R.string.do_you_know)
         choose_views.visibility = View.VISIBLE
         choose_views.isEnabled = true
-        know_icon.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_done_48dp))
-        dont_know_icon.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_close_48dp))
+        know_icon.setImageDrawable(
+            ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_done_48dp
+            )
+        )
+        dont_know_icon.setImageDrawable(
+            ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_close_48dp
+            )
+        )
         know_label.text = getString(R.string.i_know)
         dont_know_label.text = getString(R.string.i_dont_know)
     }
 
-    private fun showWasUserRight(){
+    private fun showWasUserRight() {
         question.visibility = View.VISIBLE
         question.text = getString(R.string.was_you_right)
         choose_views.visibility = View.VISIBLE
         choose_views.isEnabled = true
-        know_icon.setImageDrawable(when (viewModel.currentWord.value?.knowingLevel?.plus(1)) {
-            1 -> ContextCompat.getDrawable(context!!, R.drawable.ic_brain_red_48dp)
-            2 -> ContextCompat.getDrawable(context!!, R.drawable.ic_brain_yellow_48dp)
-            3 -> ContextCompat.getDrawable(context!!, R.drawable.ic_brain_green_48dp)
-            else -> null
-        })
-        dont_know_icon.setImageDrawable(ContextCompat.getDrawable(context!!, R.drawable.ic_brain_empty_48dp))
+        know_icon.setImageDrawable(
+            when (viewModel.currentWord.value?.knowingLevel?.plus(1)) {
+                1 -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_brain_red_48dp)
+                2 -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_brain_yellow_48dp)
+                3 -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_brain_green_48dp)
+                else -> null
+            }
+        )
+        dont_know_icon.setImageDrawable(
+            ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.ic_brain_empty_48dp
+            )
+        )
         know_label.text = getString(R.string.i_was_right)
         dont_know_label.text = getString(R.string.i_was_wrong)
     }
 
-    private fun hideChooseViews(){
+    private fun hideChooseViews() {
         question.visibility = View.INVISIBLE
         choose_views.visibility = View.GONE
         choose_views.isEnabled = false
@@ -555,7 +674,7 @@ class LearningFragment : MainNavigationFragment() {
         no_words_container.visibility = View.VISIBLE
     }
 
-    private fun hideNoWordsView(){
+    private fun hideNoWordsView() {
         no_words_container.visibility = View.GONE
     }
 

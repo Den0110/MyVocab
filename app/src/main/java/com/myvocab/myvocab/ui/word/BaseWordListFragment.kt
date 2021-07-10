@@ -3,8 +3,7 @@ package com.myvocab.myvocab.ui.word
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.MergeAdapter
+import androidx.recyclerview.widget.ConcatAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
@@ -30,7 +29,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
     @Inject
     lateinit var learnAllWordsAdapter: LearnAllWordsAdapter
 
-    lateinit var adapter: MergeAdapter
+    lateinit var adapter: ConcatAdapter
 
     private val learnAllCallback = object : LearnAllCallback() {
         override fun onNeedToLearnAll(state: Boolean) {
@@ -62,19 +61,19 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = MergeAdapter(wordListAdapter)
+        adapter = ConcatAdapter(wordListAdapter)
 
         wordListAdapter.callback = viewModel.wordCallback
         learnAllWordsAdapter.learnAllCallback = learnAllCallback
 
-        viewModel.showWordDialogEvent.observe(viewLifecycleOwner, Observer {
+        viewModel.showWordDialogEvent.observe(viewLifecycleOwner, {
             it.getContentIfNotHandled()?.let { wordData ->
                 val word = wordData.first
                 val isSavedLocally = wordData.second
 
                 val items = getContextMenuItems(word, isSavedLocally)
 
-                AlertDialog.Builder(context!!)
+                AlertDialog.Builder(requireContext())
                         .setTitle(wordData.first.word)
                         .setItems(items) { _, index ->
                             onContextMenuItemClicked(items[index], word)
@@ -86,13 +85,13 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
             }
         })
 
-        viewModel.notifyWordChangedEvent.observe(viewLifecycleOwner, Observer {
+        viewModel.notifyWordChangedEvent.observe(viewLifecycleOwner, {
             it.getContentIfNotHandled()?.let { index ->
                 wordListAdapter.notifyItemChanged(index)
             }
         })
 
-        viewModel.addToMyWordsResultEvent.observe(viewLifecycleOwner, Observer {
+        viewModel.addToMyWordsResultEvent.observe(viewLifecycleOwner, {
             it.getContentIfNotHandled()?.let { wordData ->
                 val word = wordData.first
                 val isAdded = wordData.second
@@ -108,7 +107,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
             }
         })
 
-        viewModel.notifyWordRemovedEvent.observe(viewLifecycleOwner, Observer {
+        viewModel.notifyWordRemovedEvent.observe(viewLifecycleOwner, {
             it.getContentIfNotHandled()?.let { index ->
                 if (index == -1) {
                     Snackbar.make(view, "Error, word wasn't deleted", Snackbar.LENGTH_SHORT).show()

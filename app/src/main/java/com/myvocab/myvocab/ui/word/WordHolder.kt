@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.util.convertSpToPixels
-import com.myvocab.myvocab.util.spToPixels
 import java.util.*
 
 class WordHolder(private val view: View) : RecyclerView.ViewHolder(view) {
@@ -29,7 +28,7 @@ class WordHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
     fun bind(word: Word, callback: WordCallback? = null, savedLocally: Boolean? = false) {
 
-        val wordTitle = SpannableStringBuilder(word.word.toLowerCase(Locale.getDefault()))
+        val wordTitle = SpannableStringBuilder(word.word.lowercase(Locale.getDefault()))
         if(word.transcription.isNotEmpty()){
             val ts = " [${word.transcription}]".replace("ˈ", "'")
             wordTitle.append(ts)
@@ -43,7 +42,7 @@ class WordHolder(private val view: View) : RecyclerView.ViewHolder(view) {
         }
         wordView.text = wordTitle
 
-        var translationTitle = word.translation.toLowerCase(Locale.getDefault())
+        var translationTitle = word.translation.lowercase(Locale.getDefault())
         if (!word.synonyms.isNullOrEmpty())
             translationTitle += word.synonyms.joinToString(", ", prefix = ", ", limit = 2)
         translateView.text = translationTitle

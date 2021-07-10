@@ -6,11 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.MergeAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
@@ -34,7 +32,7 @@ class MyWordsFragment : BaseWordListFragment() {
             by lazy { ViewModelProvider(this, viewModelFactory).get(MyWordsViewModel::class.java) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_words, container, false)
         return binding.root
     }
@@ -53,7 +51,7 @@ class MyWordsFragment : BaseWordListFragment() {
 
         recycler_view.adapter = adapter
 
-        viewModel.words.observe(viewLifecycleOwner, Observer {
+        viewModel.words.observe(viewLifecycleOwner, {
             when (it.status) {
                 Resource.Status.LOADING -> {
                     swipe_refresh_layout.isRefreshing = true

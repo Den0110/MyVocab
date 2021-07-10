@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.WordSet
@@ -30,7 +29,7 @@ class SearchFragment : MainNavigationFragment() {
     @Inject
     lateinit var wordSetListAdapter: WordSetListAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_search, container, false)
         return binding.root
     }
@@ -50,7 +49,7 @@ class SearchFragment : MainNavigationFragment() {
             }
         }
 
-        viewModel.wordSets.observe(viewLifecycleOwner, Observer {
+        viewModel.wordSets.observe(viewLifecycleOwner, {
             when(it.status){
                 Resource.Status.LOADING -> {
                     swipe_refresh_layout.isRefreshing = true

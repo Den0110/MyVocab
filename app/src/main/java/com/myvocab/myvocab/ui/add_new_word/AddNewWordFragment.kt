@@ -8,10 +8,11 @@ import android.database.sqlite.SQLiteConstraintException
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -49,7 +50,7 @@ class AddNewWordFragment : MainNavigationFragment() {
     private lateinit var examplesAdapter: ExamplesAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View? {
+                              savedInstanceState: Bundle?): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_new_word, container, false)
         return binding.root
     }
@@ -66,7 +67,7 @@ class AddNewWordFragment : MainNavigationFragment() {
             viewModel.initWith(AddNewWordFragmentArgs.fromBundle(it).wordToEdit)
         }
 
-        viewModel.suggestedWord.observe(viewLifecycleOwner, Observer {
+        viewModel.suggestedWord.observe(viewLifecycleOwner, {
             when (it.status) {
                 Resource.Status.LOADING -> word_suggestion_container.visibility = View.GONE
                 Resource.Status.SUCCESS -> {
@@ -88,7 +89,7 @@ class AddNewWordFragment : MainNavigationFragment() {
             }
         })
 
-        viewModel.examples.observe(viewLifecycleOwner, Observer {
+        viewModel.examples.observe(viewLifecycleOwner, {
             examplesAdapter.examples = it
             examplesAdapter.notifyDataSetChanged()
         })
@@ -118,7 +119,7 @@ class AddNewWordFragment : MainNavigationFragment() {
                                     findNavController().navigateUp()
 
                                     // log adding new word
-                                    FirebaseAnalytics.getInstance(context!!).logEvent("add_new_word", Bundle().apply {
+                                    FirebaseAnalytics.getInstance(requireContext()).logEvent("add_new_word", Bundle().apply {
                                         putString("text", viewModel.newWord.value)
                                         putInt("length", viewModel.newWord.value?.length ?: 0)
                                     })

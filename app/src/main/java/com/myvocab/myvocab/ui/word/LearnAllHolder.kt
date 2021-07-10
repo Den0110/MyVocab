@@ -5,7 +5,7 @@ import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import com.myvocab.myvocab.R
 
-class LearnAllHolder(private val view: View) : RecyclerView.ViewHolder(view) {
+class LearnAllHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     private val needToLearnCheckBox: CheckBox = view.findViewById(R.id.need_to_learn_checkbox)
 
