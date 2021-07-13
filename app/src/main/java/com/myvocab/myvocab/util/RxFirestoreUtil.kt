@@ -10,7 +10,7 @@ fun Query.getMaybe(): Maybe<QuerySnapshot?> {
             if (task.isSuccessful) {
                 if (task.result?.documents.isNullOrEmpty()) {
                     if (!emitter.isDisposed)
-                        emitter.onError(Exception("Failed to load"))
+                        emitter.onError(RuntimeException("Failed to load", task.exception))
                 } else {
                     emitter.onSuccess(task.result!!)
                 }

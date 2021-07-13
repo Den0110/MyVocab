@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
@@ -39,14 +40,13 @@ import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.model.Word.Example.Companion.getHighlight
 import com.myvocab.myvocab.data.model.Word.Example.Companion.getRawText
 import com.myvocab.myvocab.databinding.FragmentLearningBinding
+import com.myvocab.myvocab.databinding.LearningWordExampleBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.util.*
 import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.fragment_learning.*
-import kotlinx.android.synthetic.main.learning_word_example.view.*
 import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
@@ -94,7 +94,7 @@ class LearningFragment : MainNavigationFragment() {
         hideNextViews()
         hideChooseViews()
 
-        search_words_btn.setOnClickListener { findNavController().navigate(R.id.navigation_search) }
+        binding.searchWordsBtn.setOnClickListener { findNavController().navigate(R.id.navigation_search) }
 
         viewModel.currentWord.observe(viewLifecycleOwner, { word ->
 
@@ -139,7 +139,7 @@ class LearningFragment : MainNavigationFragment() {
                                             viewModel.zeroizeKnowingLevel()
                                                 .observeOn(AndroidSchedulers.mainThread())
                                                 .subscribe {
-                                                    next_container.setOnClickListener {
+                                                    binding.nextContainer.setOnClickListener {
                                                         // when them finished memorizing, show next word
                                                         viewModel.nextWord()
                                                     }
@@ -242,11 +242,11 @@ class LearningFragment : MainNavigationFragment() {
     }
 
     private fun getAskObservable(): Single<Boolean> = Single.create { emitter ->
-        enableSelectItemBg(know_container, dont_know_container)
-        know_container.setOnClickListener {
+        enableSelectItemBg(binding.knowContainer, binding.dontKnowContainer)
+        binding.knowContainer.setOnClickListener {
             emitter.onSuccess(true)
         }
-        dont_know_container.setOnClickListener {
+        binding.dontKnowContainer.setOnClickListener {
             emitter.onSuccess(false)
         }
     }
@@ -294,14 +294,14 @@ class LearningFragment : MainNavigationFragment() {
                 addTransition(ChangeBounds().setDuration(TRANSLATION_SHOW_BOUNDS_ANIM_TIME))
                 addTransition(Fade(Fade.IN).setDuration(TRANSLATION_SHOW_FADE_ANIM_TIME))
                 ordering = TransitionSet.ORDERING_SEQUENTIAL
-                addTarget(translation_container)
-                addTarget(examples_container)
-                addTarget(word_container)
+                addTarget(binding.translationContainer)
+                addTarget(binding.examplesContainer)
+                addTarget(binding.wordContainer)
 
                 addListener(rxTransitionCallback(emitter))
             }
 
-            TransitionManager.beginDelayedTransition(word_scroll, showTranslationAnim)
+            TransitionManager.beginDelayedTransition(binding.wordScroll, showTranslationAnim)
             showTranslation(word.translation.lowercase(Locale.getDefault()))
             showExampleTranslations(word)
         })
@@ -321,15 +321,15 @@ class LearningFragment : MainNavigationFragment() {
     private fun animateShowDoesUserKnowViews(): Completable {
         return animateHideChooseViews(FAST_FADE_ANIM_TIME).andThen(Completable.create {
             showDoesUserKnowViews()
-            disableSelectItemBg(know_container, dont_know_container)
+            disableSelectItemBg(binding.knowContainer, binding.dontKnowContainer)
             it.onComplete()
         }).andThen(Completable.create { emitter ->
 
             ValueAnimator.ofFloat(0f, 1f).apply {
                 addUpdateListener {
                     val value = it.animatedValue as Float
-                    question.alpha = value
-                    choose_views.alpha = value
+                    binding.question.alpha = value
+                    binding.chooseViews.alpha = value
                 }
                 addListener(rxAnimatorCallback(emitter))
                 duration = FAST_FADE_ANIM_TIME
@@ -341,15 +341,15 @@ class LearningFragment : MainNavigationFragment() {
     private fun animateShowWasUserRightViews(): Completable {
         return animateHideChooseViews(SLOW_FADE_ANIM_TIME).andThen(Completable.create {
             showWasUserRight()
-            disableSelectItemBg(know_container, dont_know_container)
+            disableSelectItemBg(binding.knowContainer, binding.dontKnowContainer)
             it.onComplete()
         }).andThen(Completable.create { emitter ->
 
             ValueAnimator.ofFloat(0f, 1f).apply {
                 addUpdateListener {
                     val value = it.animatedValue as Float
-                    question.alpha = value
-                    choose_views.alpha = value
+                    binding.question.alpha = value
+                    binding.chooseViews.alpha = value
                 }
                 addListener(rxAnimatorCallback(emitter))
                 duration = SLOW_FADE_ANIM_TIME
@@ -360,12 +360,12 @@ class LearningFragment : MainNavigationFragment() {
 
     private fun animateHideChooseViews(dur: Long): Completable {
         return Completable.create { emitter ->
-            if (choose_views.visibility != View.GONE) {
+            if (binding.chooseViews.visibility != View.GONE) {
                 ValueAnimator.ofFloat(1f, 0f).apply {
                     addUpdateListener {
                         val value = it.animatedValue as Float
-                        question.alpha = value
-                        choose_views.alpha = value
+                        binding.question.alpha = value
+                        binding.chooseViews.alpha = value
                     }
                     addListener(rxAnimatorCallback(emitter))
                     duration = dur
@@ -381,15 +381,15 @@ class LearningFragment : MainNavigationFragment() {
 
     private fun animateShowNextViews(): Completable {
         return Completable.create { emitter ->
-            if (next_container.visibility != View.VISIBLE) {
+            if (binding.nextContainer.visibility != View.VISIBLE) {
                 showNextViews()
 
                 ValueAnimator.ofFloat(0f, 1f).apply {
                     duration = SLOW_FADE_ANIM_TIME
                     addUpdateListener {
                         val value = it.animatedValue as Float
-                        question.alpha = value
-                        choose_views.alpha = value
+                        binding.question.alpha = value
+                        binding.chooseViews.alpha = value
                     }
                     addListener(rxAnimatorCallback(emitter))
                 }.start()
@@ -401,10 +401,10 @@ class LearningFragment : MainNavigationFragment() {
 
     private fun animateShowNoWordsView(): Completable {
         return Completable.create {
-            if (no_words_container.visibility != View.VISIBLE) {
+            if (binding.noWordsContainer.visibility != View.VISIBLE) {
                 showNoWordsView()
                 ObjectAnimator
-                    .ofFloat(no_words_container, View.ALPHA, 0f, 1f)
+                    .ofFloat(binding.noWordsContainer, View.ALPHA, 0f, 1f)
                     .addListener(rxAnimatorCallback(it))
             } else {
                 it.onComplete()
@@ -420,15 +420,15 @@ class LearningFragment : MainNavigationFragment() {
     }
 
     private fun showWord() {
-        word_scroll.visibility = View.VISIBLE
+        binding.wordScroll.visibility = View.VISIBLE
     }
 
     private fun hideWord() {
-        word_scroll.visibility = View.GONE
+        binding.wordScroll.visibility = View.GONE
     }
 
     private fun setKnowingLevel(word: Word?) {
-        knowing_level.setImageDrawable(
+        binding.knowingLevel.setImageDrawable(
             when (word?.knowingLevel) {
                 0 -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_brain_empty_24dp)
                 1 -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_brain_red_24dp)
@@ -467,38 +467,38 @@ class LearningFragment : MainNavigationFragment() {
                 )
             }
 
-            word_title.text = wordTitle
+            binding.wordTitle.text = wordTitle
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                word_title.breakStrategy = LineBreaker.BREAK_STRATEGY_HIGH_QUALITY
+                binding.wordTitle.breakStrategy = LineBreaker.BREAK_STRATEGY_HIGH_QUALITY
             }
         }
     }
 
     private fun setMeanings(word: Word?) {
         if (!word?.meanings.isNullOrEmpty()) {
-            meanings.text = word!!.meanings.joinToString(", ", postfix = ", …")
-            meanings.visibility = View.VISIBLE
+            binding.meanings.text = word!!.meanings.joinToString(", ", postfix = ", …")
+            binding.meanings.visibility = View.VISIBLE
         } else {
-            meanings.visibility = View.GONE
+            binding.meanings.visibility = View.GONE
         }
     }
 
     private fun setSynonyms(word: Word?) {
         if (!word?.synonyms.isNullOrEmpty()) {
-            synonyms.text = word!!.synonyms.joinToString(", ", postfix = ", …")
-            synonyms.visibility = View.VISIBLE
+            binding.synonyms.text = word!!.synonyms.joinToString(", ", postfix = ", …")
+            binding.synonyms.visibility = View.VISIBLE
         } else {
-            synonyms.visibility = View.GONE
+            binding.synonyms.visibility = View.GONE
         }
     }
 
     private fun setExamples(word: Word?) {
-        examples_container.removeAllViews()
+        binding.examplesContainer.removeAllViews()
         if (!word?.examples.isNullOrEmpty()) {
             word?.examples!!.forEach {
-                val exampleView = layoutInflater.inflate(
-                    R.layout.learning_word_example,
-                    examples_container,
+                val exampleView = LearningWordExampleBinding.inflate(
+                    LayoutInflater.from(requireContext()),
+                    binding.examplesContainer,
                     false
                 )
 
@@ -558,26 +558,26 @@ class LearningFragment : MainNavigationFragment() {
 
                 exampleView.translation.text = translation
 
-                examples_container.addView(exampleView)
+                binding.examplesContainer.addView(exampleView.root)
             }
-            examples_container.visibility = View.VISIBLE
+            binding.examplesContainer.visibility = View.VISIBLE
         } else {
-            examples_container.visibility = View.GONE
+            binding.examplesContainer.visibility = View.GONE
         }
     }
 
     private fun showTranslation(text: String?) {
-        translation.text = text
-        translation_container.visibility = View.VISIBLE
+        binding.translation.text = text
+        binding.translationContainer.visibility = View.VISIBLE
     }
 
     private fun hideTranslation() {
-        translation_container.visibility = View.GONE
+        binding.translationContainer.visibility = View.GONE
     }
 
     private fun showExampleTranslations(word: Word?) {
         word?.let {
-            examples_container.children.forEachIndexed { index, view ->
+            binding.examplesContainer.children.forEachIndexed { index, view ->
 
                 val example = word.examples[index]
                 val translation = SpannableStringBuilder(getRawText(example.translation))
@@ -604,38 +604,38 @@ class LearningFragment : MainNavigationFragment() {
                     )
                 }
 
-                view.translation.text = translation
+                view.findViewById<TextView>(R.id.translation).text = translation
             }
         }
     }
 
     private fun showDoesUserKnowViews() {
-        question.visibility = View.VISIBLE
-        question.text = getString(R.string.do_you_know)
-        choose_views.visibility = View.VISIBLE
-        choose_views.isEnabled = true
-        know_icon.setImageDrawable(
+        binding.question.visibility = View.VISIBLE
+        binding.question.text = getString(R.string.do_you_know)
+        binding.chooseViews.visibility = View.VISIBLE
+        binding.chooseViews.isEnabled = true
+        binding.knowIcon.setImageDrawable(
             ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.ic_done_48dp
             )
         )
-        dont_know_icon.setImageDrawable(
+        binding.dontKnowIcon.setImageDrawable(
             ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.ic_close_48dp
             )
         )
-        know_label.text = getString(R.string.i_know)
-        dont_know_label.text = getString(R.string.i_dont_know)
+        binding.knowLabel.text = getString(R.string.i_know)
+        binding.dontKnowLabel.text = getString(R.string.i_dont_know)
     }
 
     private fun showWasUserRight() {
-        question.visibility = View.VISIBLE
-        question.text = getString(R.string.was_you_right)
-        choose_views.visibility = View.VISIBLE
-        choose_views.isEnabled = true
-        know_icon.setImageDrawable(
+        binding.question.visibility = View.VISIBLE
+        binding.question.text = getString(R.string.was_you_right)
+        binding.chooseViews.visibility = View.VISIBLE
+        binding.chooseViews.isEnabled = true
+        binding.knowIcon.setImageDrawable(
             when (viewModel.currentWord.value?.knowingLevel?.plus(1)) {
                 1 -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_brain_red_48dp)
                 2 -> ContextCompat.getDrawable(requireContext(), R.drawable.ic_brain_yellow_48dp)
@@ -643,39 +643,39 @@ class LearningFragment : MainNavigationFragment() {
                 else -> null
             }
         )
-        dont_know_icon.setImageDrawable(
+        binding.dontKnowIcon.setImageDrawable(
             ContextCompat.getDrawable(
                 requireContext(),
                 R.drawable.ic_brain_empty_48dp
             )
         )
-        know_label.text = getString(R.string.i_was_right)
-        dont_know_label.text = getString(R.string.i_was_wrong)
+        binding.knowLabel.text = getString(R.string.i_was_right)
+        binding.dontKnowLabel.text = getString(R.string.i_was_wrong)
     }
 
     private fun hideChooseViews() {
-        question.visibility = View.INVISIBLE
-        choose_views.visibility = View.GONE
-        choose_views.isEnabled = false
+        binding.question.visibility = View.INVISIBLE
+        binding.chooseViews.visibility = View.GONE
+        binding.chooseViews.isEnabled = false
     }
 
     private fun showNextViews() {
-        question.visibility = View.VISIBLE
-        question.text = getString(R.string.memorise_the_translation)
-        next_container.visibility = View.VISIBLE
+        binding.question.visibility = View.VISIBLE
+        binding.question.text = getString(R.string.memorise_the_translation)
+        binding.nextContainer.visibility = View.VISIBLE
     }
 
     private fun hideNextViews() {
-        question.visibility = View.INVISIBLE
-        next_container.visibility = View.GONE
+        binding.question.visibility = View.INVISIBLE
+        binding.nextContainer.visibility = View.GONE
     }
 
     private fun showNoWordsView() {
-        no_words_container.visibility = View.VISIBLE
+        binding.noWordsContainer.visibility = View.VISIBLE
     }
 
     private fun hideNoWordsView() {
-        no_words_container.visibility = View.GONE
+        binding.noWordsContainer.visibility = View.GONE
     }
 
 }

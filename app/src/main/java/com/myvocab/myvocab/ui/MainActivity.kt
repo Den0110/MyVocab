@@ -11,11 +11,11 @@ import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.myvocab.myvocab.MyVocabApp
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.source.WordRepository
+import com.myvocab.myvocab.databinding.ActivityMainBinding
 import com.myvocab.myvocab.util.PreferencesManager
 import com.myvocab.myvocab.util.setupToolbar
 import dagger.android.support.DaggerAppCompatActivity
 import io.reactivex.disposables.Disposable
-import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 class MainActivity : DaggerAppCompatActivity(), NavigationHost {
@@ -35,21 +35,24 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
     @Inject
     lateinit var preferencesManager: PreferencesManager
 
+    private lateinit var binding: ActivityMainBinding
+
     private var wordCountDisposable: Disposable? = null
 
     private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val navHostFragment = nav_host as NavHostFragment
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host) as NavHostFragment
         val inflater = navHostFragment.navController.navInflater
         val graph = inflater.inflate(R.navigation.navigation_graph)
 
         navController = navHostFragment.navController
 
-        NavigationUI.setupWithNavController(bottom_navigation, navController)
+        NavigationUI.setupWithNavController(binding.bottomNavigation, navController)
 
         if(!preferencesManager.fastTranslationGuideShowed) {
             graph.startDestination = R.id.navigation_settings

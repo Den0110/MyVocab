@@ -8,7 +8,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.ui.MainNavigationFragment
-import kotlinx.android.synthetic.main.fragment_word_set_details.*
 import javax.inject.Inject
 
 abstract class BaseWordListFragment : MainNavigationFragment() {
@@ -52,7 +51,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
                         dialog.dismiss()
                     }
                     .setOnDismissListener {
-                        recycler_view.post { wordListAdapter.notifyDataSetChanged() }
+                        postNotifyRecyclerView()
                     }
                     .create().show()
         }
@@ -122,5 +121,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
     abstract fun getContextMenuItems(word: Word, isSavedLocally: Boolean): Array<String>
 
     abstract fun onContextMenuItemClicked(item: String, word: Word)
+
+    abstract fun postNotifyRecyclerView()
 
 }

@@ -20,15 +20,13 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
+import com.myvocab.myvocab.databinding.AddWordExampleBinding
 import com.myvocab.myvocab.databinding.FragmentAddNewWordBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.util.Resource
 import com.myvocab.myvocab.util.enableSelectItemBg
 import com.myvocab.myvocab.util.findNavController
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.add_word_example.view.*
-import kotlinx.android.synthetic.main.fragment_add_new_word.*
-import kotlinx.android.synthetic.main.toolbar_layout.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -49,9 +47,12 @@ class AddNewWordFragment : MainNavigationFragment() {
 
     private lateinit var examplesAdapter: ExamplesAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_add_new_word, container, false)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_add_new_word, container, false)
         return binding.root
     }
 
@@ -69,23 +70,23 @@ class AddNewWordFragment : MainNavigationFragment() {
 
         viewModel.suggestedWord.observe(viewLifecycleOwner, {
             when (it.status) {
-                Resource.Status.LOADING -> word_suggestion_container.visibility = View.GONE
+                Resource.Status.LOADING -> binding.wordSuggestionContainer.visibility = View.GONE
                 Resource.Status.SUCCESS -> {
                     val w = it.data!!
                     var wordText = "${w.word} [${w.transcription}] - ${w.translation}"
                     if (!w.synonyms.isNullOrEmpty())
                         wordText += w.synonyms.joinToString(", ", prefix = ", ", limit = 2)
-                    word_suggestion.text = wordText
+                    binding.wordSuggestion.text = wordText
 
-                    enableSelectItemBg(word_suggestion_container)
-                    word_suggestion_container.visibility = View.VISIBLE
+                    enableSelectItemBg(binding.wordSuggestionContainer)
+                    binding.wordSuggestionContainer.visibility = View.VISIBLE
 
-                    word_suggestion_container.setOnClickListener {
+                    binding.wordSuggestionContainer.setOnClickListener {
                         viewModel.fillFieldsWithSuggestedWord()
-                        word_suggestion_container.visibility = View.GONE
+                        binding.wordSuggestionContainer.visibility = View.GONE
                     }
                 }
-                Resource.Status.ERROR -> word_suggestion_container.visibility = View.GONE
+                Resource.Status.ERROR -> binding.wordSuggestionContainer.visibility = View.GONE
             }
         })
 
@@ -102,35 +103,46 @@ class AddNewWordFragment : MainNavigationFragment() {
             }
         })
 
-        examples_recycler.adapter = examplesAdapter
-        examples_recycler.isNestedScrollingEnabled = false
-        examples_recycler.layoutManager = LinearLayoutManager(context)
+        binding.examplesRecycler.apply {
+            adapter = examplesAdapter
+            isNestedScrollingEnabled = false
+            layoutManager = LinearLayoutManager(context)
+        }
 
-        container.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+        binding.container.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
 
-        toolbar.inflateMenu(R.menu.add_new_word)
-        toolbar.setOnMenuItemClickListener {
+        binding.includeToolbar.toolbar.inflateMenu(R.menu.add_new_word)
+        binding.includeToolbar.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.add -> {
                     if (allDataCompleted()) {
                         compositeDisposable.clear()
                         compositeDisposable.add(
-                                viewModel.commitWord().subscribe({
-                                    findNavController().navigateUp()
+                            viewModel.commitWord().subscribe({
+                                findNavController().navigateUp()
 
-                                    // log adding new word
-                                    FirebaseAnalytics.getInstance(requireContext()).logEvent("add_new_word", Bundle().apply {
+                                // log adding new word
+                                FirebaseAnalytics.getInstance(requireContext())
+                                    .logEvent("add_new_word", Bundle().apply {
                                         putString("text", viewModel.newWord.value)
                                         putInt("length", viewModel.newWord.value?.length ?: 0)
                                     })
-                                }, { e ->
-                                    if (e is SQLiteConstraintException){
-                                        Snackbar.make(view, "This word have already added to your vocab", Snackbar.LENGTH_SHORT).show()
-                                    } else {
-                                        Timber.e(e)
-                                        Snackbar.make(view, "Error, word wasn't added", Snackbar.LENGTH_SHORT).show()
-                                    }
-                                })
+                            }, { e ->
+                                if (e is SQLiteConstraintException) {
+                                    Snackbar.make(
+                                        view,
+                                        "This word have already added to your vocab",
+                                        Snackbar.LENGTH_SHORT
+                                    ).show()
+                                } else {
+                                    Timber.e(e)
+                                    Snackbar.make(
+                                        view,
+                                        "Error, word wasn't added",
+                                        Snackbar.LENGTH_SHORT
+                                    ).show()
+                                }
+                            })
                         )
                     }
                 }
@@ -138,18 +150,26 @@ class AddNewWordFragment : MainNavigationFragment() {
             true
         }
 
-        add_example.setOnClickListener {
+        binding.addExample.setOnClickListener {
             if (examplesAdapter.itemCount < 5) {
                 examplesAdapter.examples.add(examplesAdapter.itemCount, Word.Example())
                 examplesAdapter.notifyItemInserted(examplesAdapter.itemCount - 1)
             } else {
-                Toast.makeText(context, getString(R.string.max_examples_number, Word.MAX_EXAMPLES_NUMBER), Toast.LENGTH_SHORT).show()
+                Toast.makeText(
+                    context,
+                    getString(R.string.max_examples_number, Word.MAX_EXAMPLES_NUMBER),
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
 
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         if (requestCode == PERMISSION_REQUEST_CODE && grantResults.size == 2) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 chooseFile()
@@ -165,11 +185,15 @@ class AddNewWordFragment : MainNavigationFragment() {
                 val uri = data.data!!
                 compositeDisposable.clear()
                 compositeDisposable.add(
-                        viewModel.addWordsFromFile(uri).subscribe({
-                            findNavController().navigateUp()
-                        }, {
-                            Snackbar.make(container, "Error, words weren't added", Snackbar.LENGTH_SHORT).show()
-                        })
+                    viewModel.addWordsFromFile(uri).subscribe({
+                        findNavController().navigateUp()
+                    }, {
+                        Snackbar.make(
+                            binding.container,
+                            "Error, words weren't added",
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    })
                 )
             }
         }
@@ -184,18 +208,18 @@ class AddNewWordFragment : MainNavigationFragment() {
     private fun allDataCompleted(): Boolean {
         var ifAllDataCompleted = true
         if (viewModel.translation.value.isNullOrBlank()) {
-            translation_til.error = getString(R.string.enter_translation)
-            translation_edt.requestFocus()
+            binding.translationTil.error = getString(R.string.enter_translation)
+            binding.translationEdt.requestFocus()
             ifAllDataCompleted = false
         } else {
-            translation_til.isErrorEnabled = false
+            binding.translationTil.isErrorEnabled = false
         }
         if (viewModel.newWord.value.isNullOrBlank()) {
-            new_word_til.error = getString(R.string.enter_new_word)
-            new_word_edt.requestFocus()
+            binding.newWordTil.error = getString(R.string.enter_new_word)
+            binding.newWordEdt.requestFocus()
             ifAllDataCompleted = false
         } else {
-            new_word_til.isErrorEnabled = false
+            binding.newWordTil.isErrorEnabled = false
         }
         return ifAllDataCompleted
     }
@@ -205,17 +229,17 @@ class AddNewWordFragment : MainNavigationFragment() {
         compositeDisposable.clear()
     }
 
-    class ExamplesAdapter(val callback: ExampleItemCallback) : RecyclerView.Adapter<ExamplesAdapter.ExampleVH>() {
+    class ExamplesAdapter(val callback: ExampleItemCallback) :
+        RecyclerView.Adapter<ExamplesAdapter.ExampleVH>() {
 
         var examples = mutableListOf<Word.Example>()
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
-                ExampleVH(LayoutInflater.from(parent.context)
-                        .inflate(
-                                R.layout.add_word_example, parent, false),
-                        ExampleEditTextListener { example, s -> example.copy(text = s) },
-                        ExampleEditTextListener { example, s -> example.copy(translation = s) }
-                )
+            ExampleVH(
+                AddWordExampleBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+                ExampleEditTextListener { example, s -> example.copy(text = s) },
+                ExampleEditTextListener { example, s -> example.copy(translation = s) }
+            )
 
         override fun onBindViewHolder(holder: ExampleVH, position: Int) {
             holder.bind(examples[position], callback)
@@ -224,33 +248,42 @@ class AddNewWordFragment : MainNavigationFragment() {
         override fun getItemCount() = examples.size
 
         inner class ExampleVH(
-                itemView: View,
-                private val textListener: ExampleEditTextListener,
-                private val translationListener: ExampleEditTextListener
-        ) : RecyclerView.ViewHolder(itemView) {
+            private var binding: AddWordExampleBinding,
+            private val textListener: ExampleEditTextListener,
+            private val translationListener: ExampleEditTextListener
+        ) : RecyclerView.ViewHolder(binding.root) {
 
             init {
-                itemView.example_edt.addTextChangedListener(textListener)
-                itemView.example_translation_edt.addTextChangedListener(translationListener)
+                with(binding) {
+                    exampleEdt.addTextChangedListener(textListener)
+                    exampleTranslationEdt.addTextChangedListener(translationListener)
+                }
             }
 
             fun bind(example: Word.Example, callback: ExampleItemCallback) {
                 textListener.position = bindingAdapterPosition
                 translationListener.position = bindingAdapterPosition
+                with(binding) {
+                    exampleEdt.setText(example.text)
+                    exampleTranslationEdt.setText(example.translation)
 
-                itemView.example_edt.setText(example.text)
-                itemView.example_translation_edt.setText(example.translation)
+                    exampleTil.hint =
+                        root.context.getString(R.string.example, bindingAdapterPosition + 1)
+                    exampleTranslationTil.hint =
+                        root.context.getString(
+                            R.string.example_translation,
+                            bindingAdapterPosition + 1
+                        )
 
-                itemView.example_til.hint = itemView.context.getString(R.string.example, bindingAdapterPosition + 1)
-                itemView.example_translation_til.hint = itemView.context.getString(R.string.example_translation, bindingAdapterPosition + 1)
-
-                itemView.delete_btn.setOnClickListener {
-                    callback.onDelete(bindingAdapterPosition)
+                    deleteBtn.setOnClickListener {
+                        callback.onDelete(bindingAdapterPosition)
+                    }
                 }
             }
         }
 
-        inner class ExampleEditTextListener(val transform: (e: Word.Example, s: String) -> Word.Example) : TextWatcher {
+        inner class ExampleEditTextListener(val transform: (e: Word.Example, s: String) -> Word.Example) :
+            TextWatcher {
             var position = 0
 
             override fun afterTextChanged(s: Editable?) {}

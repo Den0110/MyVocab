@@ -14,7 +14,6 @@ import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.ui.word_set.WordSetListAdapter
 import com.myvocab.myvocab.util.Resource
 import com.myvocab.myvocab.util.findNavController
-import kotlinx.android.synthetic.main.fragment_search.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,9 +38,9 @@ class SearchFragment : MainNavigationFragment() {
 
         viewModel = ViewModelProvider(this, viewModelFactory).get(SearchViewModel::class.java)
 
-        swipe_refresh_layout.setOnRefreshListener { viewModel.loadWordSets() }
+        binding.swipeRefreshLayout.setOnRefreshListener { viewModel.loadWordSets() }
 
-        word_sets_recycler_view.adapter = wordSetListAdapter
+        binding.wordSetsRecyclerView.adapter = wordSetListAdapter
 
         wordSetListAdapter.onClickListenerClickListener = object : WordSetListAdapter.OnWordSetClickListener {
             override fun onClick(wordSet: WordSet) {
@@ -52,21 +51,21 @@ class SearchFragment : MainNavigationFragment() {
         viewModel.wordSets.observe(viewLifecycleOwner, {
             when(it.status){
                 Resource.Status.LOADING -> {
-                    swipe_refresh_layout.isRefreshing = true
-                    message_failed_to_load.visibility = View.GONE
+                    binding.swipeRefreshLayout.isRefreshing = true
+                    binding.messageFailedToLoad.visibility = View.GONE
                 }
                 Resource.Status.SUCCESS -> {
-                    swipe_refresh_layout.isRefreshing = false
-                    message_failed_to_load.visibility = View.GONE
+                    binding.swipeRefreshLayout.isRefreshing = false
+                    binding.messageFailedToLoad.visibility = View.GONE
                     if(wordSetListAdapter.itemCount == 0 && it.data?.size ?: 0 > 0) {
-                        word_sets_recycler_view.alpha = 0f
-                        word_sets_recycler_view.animate().alpha(1f).setDuration(400).start()
+                        binding.wordSetsRecyclerView.alpha = 0f
+                        binding.wordSetsRecyclerView.animate().alpha(1f).setDuration(400).start()
                     }
                     wordSetListAdapter.submitList(it.data)
                 }
                 Resource.Status.ERROR -> {
-                    swipe_refresh_layout.isRefreshing = false
-                    message_failed_to_load.visibility = View.VISIBLE
+                    binding.swipeRefreshLayout.isRefreshing = false
+                    binding.messageFailedToLoad.visibility = View.VISIBLE
                     Timber.e(it.error)
                 }
             }

@@ -15,8 +15,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.databinding.FragmentSettingsBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
-import com.myvocab.myvocab.util.*
-import kotlinx.android.synthetic.main.fragment_settings.*
+import com.myvocab.myvocab.util.PackageUtils
+import com.myvocab.myvocab.util.PreferencesManager
+import com.myvocab.myvocab.util.REQUEST_CODE_BATTERY
+import com.myvocab.myvocab.util.ignoresPowerOptimization
 import java.util.*
 import javax.inject.Inject
 
@@ -46,12 +48,12 @@ class SettingsFragment : MainNavigationFragment() {
             viewmodel = viewModel
         }
 
-        service_switch.setOnCheckedChangeListener(viewModel.translationStateListener)
-        service_switch.setOnClickListener(viewModel.translationClickListener)
-        reminder_switch.setOnCheckedChangeListener(viewModel.reminderListener)
+        binding.serviceSwitch.setOnCheckedChangeListener(viewModel.translationStateListener)
+        binding.serviceSwitch.setOnClickListener(viewModel.translationClickListener)
+        binding.reminderSwitch.setOnCheckedChangeListener(viewModel.reminderListener)
 
         if(!preferencesManager.fastTranslationGuideShowed) {
-            allow_work_in_background_container.setBackgroundResource(R.drawable.word_suggestion_bg)
+            binding.allowWorkInBackgroundContainer.setBackgroundResource(R.drawable.word_suggestion_bg)
             preferencesManager.fastTranslationGuideShowed = true
         }
 
@@ -66,7 +68,7 @@ class SettingsFragment : MainNavigationFragment() {
         })
 
         viewModel.remindingTime.observe(viewLifecycleOwner, {
-            reminding_time_value.text = DateUtils.formatDateTime(context,
+            binding.remindingTimeValue.text = DateUtils.formatDateTime(context,
                     viewModel.remindingTime.value?.timeInMillis!!, DateUtils.FORMAT_SHOW_TIME)
         })
 
@@ -82,19 +84,19 @@ class SettingsFragment : MainNavigationFragment() {
         super.onResume()
         
         if (!ignoresPowerOptimization(context)) {
-            allow_work_in_background_container.visibility = View.VISIBLE
-            allow_work_in_bg_btn.setOnClickListener {
-                allow_work_in_background_container.background = null
+            binding.allowWorkInBackgroundContainer.visibility = View.VISIBLE
+            binding.allowWorkInBgBtn.setOnClickListener {
+                binding.allowWorkInBackgroundContainer.background = null
                 openBatterySettings()
             }
         } else {
-            allow_work_in_background_container.visibility = View.GONE
+            binding.allowWorkInBackgroundContainer.visibility = View.GONE
         }
     }
 
     private fun enableReminderTimeSwitch(){
-        reminding_time.alpha = 1f
-        reminding_time.setOnClickListener {
+        binding.remindingTime.alpha = 1f
+        binding.remindingTime.setOnClickListener {
             TimePickerDialog(
                     context,
                     viewModel.remindingTimeListener,
@@ -106,20 +108,20 @@ class SettingsFragment : MainNavigationFragment() {
     }
 
     private fun disableReminderTimeSwitch(){
-        reminding_time.alpha = 0.5f
-        reminding_time.setOnClickListener(null)
+        binding.remindingTime.alpha = 0.5f
+        binding.remindingTime.setOnClickListener(null)
     }
 
     private fun enableReminderModeSwitch(){
-        reminder_mode_switch.alpha = 1f
-        reminder_mode_switch.isClickable = true
-        reminder_mode_switch.setOnCheckedChangeListener(viewModel.remindOnlyWordsToLearnListener)
+        binding.reminderModeSwitch.alpha = 1f
+        binding.reminderModeSwitch.isClickable = true
+        binding.reminderModeSwitch.setOnCheckedChangeListener(viewModel.remindOnlyWordsToLearnListener)
     }
 
     private fun disableReminderModeSwitch(){
-        reminder_mode_switch.alpha = 0.5f
-        reminder_mode_switch.isClickable = false
-        reminder_mode_switch.setOnCheckedChangeListener(null)
+        binding.reminderModeSwitch.alpha = 0.5f
+        binding.reminderModeSwitch.isClickable = false
+        binding.reminderModeSwitch.setOnCheckedChangeListener(null)
     }
 
     private fun startTranslationService() {

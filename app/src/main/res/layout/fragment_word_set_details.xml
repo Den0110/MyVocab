@@ -10,7 +10,9 @@
         android:orientation="vertical"
         tools:context=".ui.word_set_details.WordSetDetailsFragment">
 
-        <include layout="@layout/toolbar_layout" />
+        <include
+            android:id="@+id/include_toolbar"
+            layout="@layout/toolbar_layout" />
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
@@ -21,9 +23,9 @@
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:clipToPadding="false"
                 android:paddingTop="@dimen/vertical_layout_margin"
                 android:paddingBottom="@dimen/vertical_layout_margin"
-                android:clipToPadding="false"
                 app:layoutManager=".ui.common.NpaLinearLayoutManager"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

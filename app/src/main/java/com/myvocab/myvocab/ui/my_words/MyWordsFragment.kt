@@ -16,9 +16,6 @@ import com.myvocab.myvocab.databinding.FragmentMyWordsBinding
 import com.myvocab.myvocab.ui.word.BaseWordListFragment
 import com.myvocab.myvocab.util.Resource
 import com.myvocab.myvocab.util.findNavController
-import kotlinx.android.synthetic.main.fragment_in_learning_words.recycler_view
-import kotlinx.android.synthetic.main.fragment_in_learning_words.swipe_refresh_layout
-import kotlinx.android.synthetic.main.fragment_my_words.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -40,43 +37,43 @@ class MyWordsFragment : BaseWordListFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        swipe_refresh_layout.setOnRefreshListener { viewModel.loadMyWords() }
+        binding.swipeRefreshLayout.setOnRefreshListener { viewModel.loadMyWords() }
 
         wordListAdapter.isSavedLocally = true
         wordListAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                (recycler_view.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(positionStart, 0)
+                (binding.recyclerView.layoutManager as LinearLayoutManager).scrollToPositionWithOffset(positionStart, 0)
             }
         })
 
-        recycler_view.adapter = adapter
+        binding.recyclerView.adapter = adapter
 
         viewModel.words.observe(viewLifecycleOwner, {
             when (it.status) {
                 Resource.Status.LOADING -> {
-                    swipe_refresh_layout.isRefreshing = true
+                    binding.swipeRefreshLayout.isRefreshing = true
                 }
                 Resource.Status.SUCCESS -> {
-                    swipe_refresh_layout.isRefreshing = false
+                    binding.swipeRefreshLayout.isRefreshing = false
                     if (it.data.isNullOrEmpty()) {
-                        message_empty_vocab.visibility = View.VISIBLE
+                        binding.messageEmptyVocab.visibility = View.VISIBLE
                         adapter.removeAdapter(learnAllWordsAdapter)
                     } else {
-                        message_empty_vocab.visibility = View.GONE
+                        binding.messageEmptyVocab.visibility = View.GONE
                         adapter.addAdapter(0, learnAllWordsAdapter)
                     }
                     wordListAdapter.submitList(it.data)
                     learnAllWordsAdapter.checkIfAllNeedToLearn(it.data)
                 }
                 Resource.Status.ERROR -> {
-                    swipe_refresh_layout.isRefreshing = false
+                    binding.swipeRefreshLayout.isRefreshing = false
                     Toast.makeText(context, it.error?.message, Toast.LENGTH_SHORT).show()
                     Timber.e(it.error)
                 }
             }
         })
 
-        add_new_word_btn.setOnClickListener {
+        binding.addNewWordBtn.setOnClickListener {
             Navigation.findNavController(view).navigate(R.id.to_add_new_word)
         }
 
@@ -116,6 +113,10 @@ class MyWordsFragment : BaseWordListFragment() {
             }
             WORD_MENU_ITEMS[4] -> viewModel.delete(word)
         }
+    }
+
+    override fun postNotifyRecyclerView() {
+        binding.recyclerView.post { wordListAdapter.notifyDataSetChanged() }
     }
 
 }

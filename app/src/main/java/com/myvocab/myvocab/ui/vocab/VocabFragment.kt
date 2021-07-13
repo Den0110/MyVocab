@@ -9,7 +9,6 @@ import com.myvocab.myvocab.R
 import com.myvocab.myvocab.databinding.FragmentVocabBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.util.findNavController
-import kotlinx.android.synthetic.main.fragment_vocab.*
 
 class VocabFragment : MainNavigationFragment() {
 
@@ -24,11 +23,11 @@ class VocabFragment : MainNavigationFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        my_words_btn.setOnClickListener {
+        binding.myWordsBtn.setOnClickListener {
             findNavController().navigate(R.id.to_my_words)
         }
 
-        my_word_sets_btn.setOnClickListener {
+        binding.myWordSetsBtn.setOnClickListener {
             findNavController().navigate(R.id.to_my_word_sets)
         }
 
