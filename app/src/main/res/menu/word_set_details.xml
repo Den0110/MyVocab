@@ -5,7 +5,7 @@
     <item
         android:id="@+id/remove"
         android:icon="@drawable/ic_delete_24dp"
-        android:title="@string/remove_from_my_vocab"
+        android:title="@string/remove_the_wordlist"
         app:showAsAction="ifRoom"
         android:visible="false"/>
 

@@ -68,17 +68,15 @@ class MyWordsFragment : BaseWordListFragment() {
                     }
                     is Resource.Success -> {
                         binding.swipeRefreshLayout.isRefreshing = false
-                        if (it.data.isNullOrEmpty()) {
+
+                        if (it.data.isNullOrEmpty().not()) {
+                            binding.messageEmptyVocab.visibility = View.GONE
+                            commonAdapter.addAdapter(LEARN_ALL_ADAPTER_INDEX, learnAllWordsAdapter)
+                        } else {
                             binding.messageEmptyVocab.visibility = View.VISIBLE
                             commonAdapter.removeAdapter(learnAllWordsAdapter)
-                        } else {
-                            binding.messageEmptyVocab.visibility = View.GONE
-                            commonAdapter.addAdapter(0, learnAllWordsAdapter)
-
-                            if (it.data!!.isNotEmpty()) {
-                                commonAdapter.addAdapter(0, searchAdapter)
-                            }
                         }
+
                         wordListAdapter.submitList(it.data)
                         learnAllWordsAdapter.checkIfAllNeedToLearn(it.data)
                     }

@@ -97,6 +97,11 @@
     <string name="max_examples_number">Максимальное количество примеров %d</string>
     <string name="edit_word">Редактировать</string>
     <string name="developer">Разработчик</string>
-    <string name="search_hint">Найти…</string>
+    <string name="search_hint">Поиск…</string>
+    <string name="alphabetically">По алфавиту</string>
+    <string name="by_knowledge_level">По уровню выученности</string>
+    <string name="by_default">По умолчанию</string>
+    <string name="add_wordlist">Добавить этот список слов</string>
+    <string name="remove_the_wordlist">Удалить список слов</string>
 
 </resources>

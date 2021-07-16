@@ -16,6 +16,18 @@ open class AnimationListenerAdapter : Animation.AnimationListener {
     override fun onAnimationRepeat(animation: Animation) {}
 }
 
+open class AnimatorListenerAdapter(
+    private val onStart: (() -> Unit)? = null,
+    private val onEnd: (() -> Unit)? = null,
+    private val onCancel: (() -> Unit)? = null,
+    private val onRepeat: (() -> Unit)? = null,
+) : Animator.AnimatorListener {
+    override fun onAnimationStart(animation: Animator?) { onStart?.invoke() }
+    override fun onAnimationEnd(animation: Animator?) { onEnd?.invoke() }
+    override fun onAnimationCancel(animation: Animator?) { onCancel?.invoke() }
+    override fun onAnimationRepeat(animation: Animator?) { onRepeat?.invoke() }
+}
+
 fun rxTransitionCallback(emitter: CompletableEmitter) =
         object : Transition.TransitionListener {
             override fun onTransitionEnd(transition: Transition) {

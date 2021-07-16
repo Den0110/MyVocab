@@ -21,6 +21,9 @@
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingTop="@dimen/vertical_layout_margin"
+                android:paddingBottom="@dimen/vertical_layout_margin"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/item_word_set" />
 

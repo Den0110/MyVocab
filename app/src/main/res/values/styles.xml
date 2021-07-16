@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar.Bridge">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -10,12 +10,12 @@
         <item name="android:windowBackground">@color/colorBackground</item>
     </style>
 
-    <style name="AppTheme.AppBarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+    <style name="AppTheme.AppBarStyle" parent="ThemeOverlay.MaterialComponents.Dark.ActionBar">
         <item name="android:background">@android:color/transparent</item>
     </style>
 
     <style name="AppTheme.Toolbar" parent="AppTheme">
-        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Dark</item>
+        <item name="popupTheme">@style/ThemeOverlay.MaterialComponents.Dark</item>
     </style>
 
     <style name="AppTheme.SnackBar" parent="AppTheme">

@@ -14,6 +14,10 @@ import javax.inject.Inject
 
 abstract class BaseWordListFragment : MainNavigationFragment() {
 
+    companion object {
+        const val LEARN_ALL_ADAPTER_INDEX = 1
+    }
+
     val WORD_MENU_ITEMS: Array<String> by lazy {
         arrayOf(
             getString(R.string.mark_as_learned),
@@ -33,9 +37,11 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
     lateinit var learnAllWordsAdapter: LearnAllWordsAdapter
 
     protected val searchAdapter by lazy {
-        SearchAdapter {
+        SearchAdapter ({
             viewModel.onSearchFilterChanged(it)
-        }
+        }, {
+            viewModel.onSortTypeChanged(it)
+        })
     }
 
     lateinit var commonAdapter: ConcatAdapter
@@ -70,7 +76,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        commonAdapter = ConcatAdapter(wordListAdapter)
+        commonAdapter = ConcatAdapter(searchAdapter, wordListAdapter)
 
         wordListAdapter.callback = viewModel.wordCallback
         learnAllWordsAdapter.learnAllCallback = learnAllCallback
@@ -78,6 +84,12 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
         lifecycleScope.launchWhenStarted {
             viewModel.searchFilter.collectLatest {
                 searchAdapter.searchText = it
+            }
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.sortType.collectLatest {
+                searchAdapter.selectedSortType = it
             }
         }
 

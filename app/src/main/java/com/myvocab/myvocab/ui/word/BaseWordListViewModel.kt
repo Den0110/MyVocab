@@ -12,7 +12,10 @@ import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+
+enum class SortType { BY_DEFAULT, ALPHABETICALLY, BY_KNOWLEDGE_LEVEL }
 
 open class BaseWordListViewModel(
     private val wordRepository: WordRepository
@@ -24,8 +27,21 @@ open class BaseWordListViewModel(
     private val _searchFilter = MutableStateFlow("")
     val searchFilter = _searchFilter.asStateFlow()
 
-    val filteredWords = combine(_words, _searchFilter) { words, filter ->
-        words.withNewData(words.data?.filter { it.word.contains(filter) }?.toMutableList())
+    private val _sortType = MutableStateFlow(SortType.BY_DEFAULT)
+    val sortType = _sortType.asStateFlow()
+
+    val filteredWords = combine(_words, _searchFilter.debounce(300), _sortType) { words, filter, sortType ->
+        val finalList = words.data
+            ?.filter { it.word.contains(filter) }
+            ?.toMutableList() ?: mutableListOf()
+
+        when(sortType) {
+            SortType.ALPHABETICALLY -> finalList.sortBy { it.word }
+            SortType.BY_KNOWLEDGE_LEVEL -> finalList.sortBy { it.knowingLevel }
+            else -> {}
+        }
+
+        words.withNewData(finalList)
     }
 
     val showWordDialogEvent: MutableLiveData<Event<Pair<Word, Boolean>>> = MutableLiveData()
@@ -63,6 +79,12 @@ open class BaseWordListViewModel(
     fun onSearchFilterChanged(text: String) {
         viewModelScope.launch {
             _searchFilter.emit(text)
+        }
+    }
+
+    fun onSortTypeChanged(sortType: SortType) {
+        viewModelScope.launch {
+            _sortType.emit(sortType)
         }
     }
 

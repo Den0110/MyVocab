@@ -140,17 +140,10 @@ class WordSetDetailsFragment : BaseWordListFragment() {
                     is Resource.Success -> {
                         binding.swipeRefreshLayout.isRefreshing = false
 
-                        if (it.data?.isNotEmpty() == true) {
-                            commonAdapter.addAdapter(0, searchAdapter)
-                        } else {
-                            commonAdapter.removeAdapter(searchAdapter)
-                        }
-
                         wordListAdapter.isSavedLocally = viewModel.isSavedLocally.value
-                        if (wordListAdapter.isSavedLocally == true) {
+                        if (wordListAdapter.isSavedLocally == true && it.data.isNullOrEmpty().not()) {
                             learnAllWordsAdapter.checkIfAllNeedToLearn(it.data)
-                            val index = if (commonAdapter.adapters.contains(searchAdapter)) 1 else 0
-                            commonAdapter.addAdapter(index, learnAllWordsAdapter)
+                            commonAdapter.addAdapter(LEARN_ALL_ADAPTER_INDEX, learnAllWordsAdapter)
                             binding.recyclerView.smoothScrollToPosition(0)
                         } else {
                             commonAdapter.removeAdapter(learnAllWordsAdapter)

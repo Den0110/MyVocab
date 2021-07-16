@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -97,7 +96,7 @@
                                 android:text="@string/disable_optimization"
                                 android:textColor="@color/secondaryTextColor" />
 
-                            <Button
+                            <com.google.android.material.button.MaterialButton
                                 android:id="@+id/allow_work_in_bg_btn"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -144,12 +143,12 @@
                                 android:id="@+id/reminding_time_value"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="13:00"
-                                android:textColor="@color/secondaryTextColor" />
+                                android:textColor="@color/secondaryTextColor"
+                                tools:text="13:00" />
 
                         </LinearLayout>
 
-                        <Button
+                        <com.google.android.material.button.MaterialButton
                             android:id="@+id/remove_all_words"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
@@ -172,38 +171,24 @@
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical">
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:padding="16dp">
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
+                            android:text="@string/developer"
+                            android:textColor="@color/primaryTextColor"
+                            android:textSize="16sp" />
 
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="vertical"
-                                android:padding="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/developer_details"
+                            android:textColor="@color/secondaryTextColor" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/developer"
-                                    android:textColor="@color/primaryTextColor"
-                                    android:textSize="16sp" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="@string/developer_details"
-                                    android:textColor="@color/secondaryTextColor" />
-
-                            </LinearLayout>
-
-                        </LinearLayout>
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
 
