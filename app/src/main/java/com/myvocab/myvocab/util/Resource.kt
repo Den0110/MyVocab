@@ -1,24 +1,17 @@
 package com.myvocab.myvocab.util
 
-class Resource<out T>(val status: Status, val data: T?, val error: Throwable?) {
+sealed class Resource<out T>(open val data: T?, open val error: Throwable?) {
 
-    enum class Status {
-        SUCCESS, ERROR, LOADING
-    }
+    class Success<T>(override val data: T) : Resource<T>(data, null)
 
-    companion object {
+    class Error<T>(override val error: Throwable, data: T? = null) : Resource<T>(data, error)
 
-        fun <T> success(data: T?): Resource<T> {
-            return Resource(Status.SUCCESS, data, null)
-        }
+    class Loading<T>(data: T? = null) : Resource<T>(data, null)
 
-        fun <T> error(error: Throwable, data: T? = null): Resource<T> {
-            return Resource(Status.ERROR, data, error)
-        }
-
-        fun <T> loading(data: T? = null): Resource<T> {
-            return Resource(Status.LOADING, data, null)
-        }
+    fun <T> withNewData(newData: T): Resource<T> = when(this) {
+        is Loading -> Loading(newData)
+        is Success -> Success(newData)
+        is Error -> Error(error)
     }
 
 }

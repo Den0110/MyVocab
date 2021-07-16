@@ -35,7 +35,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/separator"
-                tools:listitem="@layout/vocab_list_item" />
+                tools:listitem="@layout/item_word" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

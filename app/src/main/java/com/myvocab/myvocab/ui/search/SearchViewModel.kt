@@ -33,16 +33,16 @@ constructor(
                 .toObservable()
                 .publish {
                     it.timeout(500, TimeUnit.MILLISECONDS, Observable.create<MutableList<WordSetUseCaseResult>> {
-                        wordSets.postValue(Resource.loading())
+                        wordSets.postValue(Resource.Loading())
                     })
                             .onErrorResumeNext(Observable.empty())
                             .mergeWith(it)
                 }
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    wordSets.postValue(Resource.success(it))
+                    wordSets.postValue(Resource.Success(it))
                 }, {
-                    wordSets.postValue(Resource.error(it))
+                    wordSets.postValue(Resource.Error(it))
                 })
 
         compositeDisposable.clear()

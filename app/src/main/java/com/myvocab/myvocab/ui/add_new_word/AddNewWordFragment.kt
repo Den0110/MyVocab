@@ -69,10 +69,10 @@ class AddNewWordFragment : MainNavigationFragment() {
         }
 
         viewModel.suggestedWord.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Resource.Status.LOADING -> binding.wordSuggestionContainer.visibility = View.GONE
-                Resource.Status.SUCCESS -> {
-                    val w = it.data!!
+            when (it) {
+                is Resource.Loading -> binding.wordSuggestionContainer.visibility = View.GONE
+                is Resource.Success -> {
+                    val w = it.data
                     var wordText = "${w.word} [${w.transcription}] - ${w.translation}"
                     if (!w.synonyms.isNullOrEmpty())
                         wordText += w.synonyms.joinToString(", ", prefix = ", ", limit = 2)
@@ -86,7 +86,7 @@ class AddNewWordFragment : MainNavigationFragment() {
                         binding.wordSuggestionContainer.visibility = View.GONE
                     }
                 }
-                Resource.Status.ERROR -> binding.wordSuggestionContainer.visibility = View.GONE
+                is Resource.Error -> binding.wordSuggestionContainer.visibility = View.GONE
             }
         })
 

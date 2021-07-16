@@ -4,7 +4,7 @@ import android.os.Parcelable
 import androidx.recyclerview.widget.DiffUtil
 import com.myvocab.myvocab.data.model.Word.Example.Companion.setHighlight
 import com.myvocab.myvocab.util.Mapper
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 
 @Parcelize

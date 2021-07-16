@@ -8,7 +8,6 @@ import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import com.myvocab.myvocab.R
-import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.databinding.FragmentSearchBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.ui.word_set.WordSetListAdapter
@@ -42,28 +41,26 @@ class SearchFragment : MainNavigationFragment() {
 
         binding.wordSetsRecyclerView.adapter = wordSetListAdapter
 
-        wordSetListAdapter.onClickListenerClickListener = object : WordSetListAdapter.OnWordSetClickListener {
-            override fun onClick(wordSet: WordSet) {
-                findNavController().navigate(R.id.to_word_set_details, bundleOf("word_set" to wordSet))
-            }
+        wordSetListAdapter.onClick = { wordSet ->
+            findNavController().navigate(R.id.to_word_set_details, bundleOf("word_set" to wordSet))
         }
 
         viewModel.wordSets.observe(viewLifecycleOwner, {
-            when(it.status){
-                Resource.Status.LOADING -> {
+            when (it) {
+                is Resource.Loading -> {
                     binding.swipeRefreshLayout.isRefreshing = true
                     binding.messageFailedToLoad.visibility = View.GONE
                 }
-                Resource.Status.SUCCESS -> {
+                is Resource.Success -> {
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.messageFailedToLoad.visibility = View.GONE
-                    if(wordSetListAdapter.itemCount == 0 && it.data?.size ?: 0 > 0) {
+                    if(wordSetListAdapter.itemCount == 0 && it.data.isNotEmpty()) {
                         binding.wordSetsRecyclerView.alpha = 0f
                         binding.wordSetsRecyclerView.animate().alpha(1f).setDuration(400).start()
                     }
                     wordSetListAdapter.submitList(it.data)
                 }
-                Resource.Status.ERROR -> {
+                is Resource.Error -> {
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.messageFailedToLoad.visibility = View.VISIBLE
                     Timber.e(it.error)

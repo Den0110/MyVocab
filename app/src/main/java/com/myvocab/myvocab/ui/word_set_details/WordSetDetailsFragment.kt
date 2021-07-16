@@ -7,7 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.myvocab.myvocab.R
@@ -15,9 +19,11 @@ import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.databinding.FragmentWordSetDetailsBinding
 import com.myvocab.myvocab.domain.word_set_details.GetWordSetUseCase
+import com.myvocab.myvocab.system.ResourceManager
 import com.myvocab.myvocab.ui.word.BaseWordListFragment
 import com.myvocab.myvocab.util.Resource
 import com.myvocab.myvocab.util.getViewModel
+import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -27,16 +33,31 @@ class WordSetDetailsFragment : BaseWordListFragment() {
 
     @Inject
     lateinit var wordRepository: WordRepository
+
+    @Inject
+    lateinit var resourceManager: ResourceManager
+
     @Inject
     lateinit var getWordSetUseCase: GetWordSetUseCase
 
     override val viewModel: WordSetDetailsViewModel
-            by lazy { getViewModel { WordSetDetailsViewModel(wordRepository, getWordSetUseCase, requireArguments(), requireContext()) } }
+            by lazy {
+                getViewModel {
+                    WordSetDetailsViewModel(
+                        wordRepository,
+                        resourceManager,
+                        getWordSetUseCase,
+                        requireArguments()
+                    )
+                }
+            }
 
     private lateinit var menu: Menu
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_word_set_details, container, false)
         return binding.root
     }
@@ -47,41 +68,42 @@ class WordSetDetailsFragment : BaseWordListFragment() {
         binding.includeToolbar.toolbar.inflateMenu(R.menu.word_set_details)
         menu = binding.includeToolbar.toolbar.menu
 
+        binding.addList.setOnClickListener {
+            AlertDialog.Builder(requireContext())
+                .setMessage(R.string.dialog_sure_want_learn_this_word_list)
+                .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
+                    viewModel.addWordSet()
+
+                    // log saving word set
+                    FirebaseAnalytics.getInstance(requireContext()).logEvent("save_word_set", Bundle().apply {
+                        putString("title", viewModel.title.value)
+                        putInt("size", viewModel.words.value.data?.size ?: 0)
+                    })
+
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.dialog_action_no) { dialog, _ -> dialog.dismiss() }
+                .create().show()
+        }
+
         binding.includeToolbar.toolbar.setOnMenuItemClickListener {
             when (it.itemId) {
-                R.id.add -> {
-                    AlertDialog.Builder(requireContext())
-                            .setMessage(R.string.dialog_sure_want_learn_this_word_list)
-                            .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
-                                viewModel.addWordSet()
-
-                                // log saving word set
-                                FirebaseAnalytics.getInstance(requireContext()).logEvent("save_word_set", Bundle().apply {
-                                    putString("title", viewModel.title.value)
-                                    putInt("size", viewModel.words.value?.data?.size ?: 0)
-                                })
-
-                                dialog.dismiss()
-                            }
-                            .setNegativeButton(R.string.dialog_action_no) { dialog, _ -> dialog.dismiss() }
-                            .create().show()
-                }
                 R.id.remove -> {
                     AlertDialog.Builder(requireContext())
-                            .setMessage(R.string.dialog_sure_want_remove_this_word_list)
-                            .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
-                                viewModel.removeWordSet()
+                        .setMessage(R.string.dialog_sure_want_remove_this_word_list)
+                        .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
+                            viewModel.removeWordSet()
 
-                                // log removing word set
-                                FirebaseAnalytics.getInstance(requireContext()).logEvent("remove_word_set", Bundle().apply {
-                                    putString("title", viewModel.title.value)
-                                    putInt("size", viewModel.words.value?.data?.size ?: 0)
-                                })
+                            // log removing word set
+                            FirebaseAnalytics.getInstance(requireContext()).logEvent("remove_word_set", Bundle().apply {
+                                putString("title", viewModel.title.value)
+                                putInt("size", viewModel.words.value.data?.size ?: 0)
+                            })
 
-                                dialog.dismiss()
-                            }
-                            .setNegativeButton(R.string.dialog_action_no) { dialog, _ -> dialog.dismiss() }
-                            .create().show()
+                            dialog.dismiss()
+                        }
+                        .setNegativeButton(R.string.dialog_action_no) { dialog, _ -> dialog.dismiss() }
+                        .create().show()
                 }
             }
             true
@@ -89,7 +111,14 @@ class WordSetDetailsFragment : BaseWordListFragment() {
 
         binding.swipeRefreshLayout.setOnRefreshListener { viewModel.loadWordSet() }
 
-        binding.recyclerView.adapter = adapter
+        binding.recyclerView.apply {
+            adapter = commonAdapter
+            itemAnimator = object : DefaultItemAnimator() {
+                override fun canReuseUpdatedViewHolder(viewHolder: RecyclerView.ViewHolder): Boolean {
+                    return true
+                }
+            }
+        }
 
         viewModel.isSavedLocally.observe(viewLifecycleOwner, {
             if (it) {
@@ -102,44 +131,57 @@ class WordSetDetailsFragment : BaseWordListFragment() {
         viewModel.title.observe(viewLifecycleOwner, { binding.includeToolbar.toolbar.title = it })
         viewModel.subtitle.observe(viewLifecycleOwner, { binding.includeToolbar.toolbar.subtitle = it })
 
-        viewModel.words.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Resource.Status.LOADING -> {
-                    binding.swipeRefreshLayout.isRefreshing = true
-                }
-                Resource.Status.SUCCESS -> {
-                    binding.swipeRefreshLayout.isRefreshing = false
-                    wordListAdapter.isSavedLocally = viewModel.isSavedLocally.value
-                    if (wordListAdapter.isSavedLocally == true) {
-                        learnAllWordsAdapter.checkIfAllNeedToLearn(it.data)
-                        adapter.addAdapter(0, learnAllWordsAdapter)
-                        binding.recyclerView.smoothScrollToPosition(0)
-                    } else {
-                        adapter.removeAdapter(learnAllWordsAdapter)
+        lifecycleScope.launchWhenStarted {
+            viewModel.filteredWords.collectLatest {
+                when (it) {
+                    is Resource.Loading -> {
+                        binding.swipeRefreshLayout.isRefreshing = true
                     }
-                    wordListAdapter.submitList(it.data)
-                }
-                Resource.Status.ERROR -> {
-                    binding.swipeRefreshLayout.isRefreshing = false
-                    Toast.makeText(context, it.error?.message, Toast.LENGTH_SHORT).show()
-                    Timber.e(it.error)
+                    is Resource.Success -> {
+                        binding.swipeRefreshLayout.isRefreshing = false
+
+                        if (it.data?.isNotEmpty() == true) {
+                            commonAdapter.addAdapter(0, searchAdapter)
+                        } else {
+                            commonAdapter.removeAdapter(searchAdapter)
+                        }
+
+                        wordListAdapter.isSavedLocally = viewModel.isSavedLocally.value
+                        if (wordListAdapter.isSavedLocally == true) {
+                            learnAllWordsAdapter.checkIfAllNeedToLearn(it.data)
+                            val index = if (commonAdapter.adapters.contains(searchAdapter)) 1 else 0
+                            commonAdapter.addAdapter(index, learnAllWordsAdapter)
+                            binding.recyclerView.smoothScrollToPosition(0)
+                        } else {
+                            commonAdapter.removeAdapter(learnAllWordsAdapter)
+                        }
+
+                        wordListAdapter.submitList(it.data)
+                    }
+                    is Resource.Error -> {
+                        binding.swipeRefreshLayout.isRefreshing = false
+                        Toast.makeText(context, it.error.message, Toast.LENGTH_SHORT).show()
+                        Timber.e(it.error)
+                    }
                 }
             }
-        })
+        }
 
         viewModel.addingWordSet.observe(viewLifecycleOwner, {
             it.getContentIfNotHandled()?.let {
-                when (it.status) {
-                    Resource.Status.LOADING -> {
+                when (it) {
+                    is Resource.Loading -> {
                         Timber.d("Adding \"${it.data?.title}\" word set")
-                        menu.findItem(R.id.add)?.isEnabled = false
+                        binding.addList.isEnabled = false
                     }
-                    Resource.Status.SUCCESS -> {
-                        Snackbar.make(binding.container, "${it.data?.title} (${it.data?.words?.size} words) was added",
-                                Snackbar.LENGTH_SHORT).show()
+                    is Resource.Success -> {
+                        Snackbar.make(
+                            binding.container, "${it.data.title} (${it.data.words.size} words) was added",
+                            Snackbar.LENGTH_SHORT
+                        ).show()
                         viewModel.loadWordSet()
                     }
-                    Resource.Status.ERROR -> {
+                    is Resource.Error -> {
                         Snackbar.make(binding.container, "Error, words weren't added", Snackbar.LENGTH_SHORT).show()
                         Timber.e(it.error)
                     }
@@ -149,17 +191,19 @@ class WordSetDetailsFragment : BaseWordListFragment() {
 
         viewModel.removingWordSet.observe(viewLifecycleOwner, {
             it.getContentIfNotHandled()?.let {
-                when (it.status) {
-                    Resource.Status.LOADING -> {
+                when (it) {
+                    is Resource.Loading -> {
                         Timber.d("Removing \"${it.data?.title}\" word set")
                         menu.findItem(R.id.remove)?.isEnabled = false
                     }
-                    Resource.Status.SUCCESS -> {
-                        Snackbar.make(binding.container, "${it.data?.title} (${it.data?.words?.size} words) was removed",
-                                Snackbar.LENGTH_SHORT).show()
+                    is Resource.Success -> {
+                        Snackbar.make(
+                            binding.container, "${it.data.title} (${it.data.words.size} words) was removed",
+                            Snackbar.LENGTH_SHORT
+                        ).show()
                         viewModel.loadWordSet()
                     }
-                    Resource.Status.ERROR -> {
+                    is Resource.Error -> {
                         Snackbar.make(binding.container, "Error, words weren't removed", Snackbar.LENGTH_SHORT).show()
                         Timber.e(it.error)
                     }
@@ -195,16 +239,16 @@ class WordSetDetailsFragment : BaseWordListFragment() {
     }
 
     private fun showAddBtn() {
-        menu.findItem(R.id.add)?.isVisible = true
+        binding.addList.isVisible = true
         menu.findItem(R.id.remove)?.isVisible = false
-        menu.findItem(R.id.add)?.isEnabled = true
+        binding.addList.isEnabled = true
         menu.findItem(R.id.remove)?.isEnabled = true
     }
 
     private fun showRemoveBtn() {
-        menu.findItem(R.id.add)?.isVisible = false
+        binding.addList.isVisible = false
         menu.findItem(R.id.remove)?.isVisible = true
-        menu.findItem(R.id.add)?.isEnabled = true
+        binding.addList.isEnabled = true
         menu.findItem(R.id.remove)?.isEnabled = true
     }
 

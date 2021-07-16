@@ -97,5 +97,6 @@
     <string name="max_examples_number">Максимальное количество примеров %d</string>
     <string name="edit_word">Редактировать</string>
     <string name="developer">Разработчик</string>
+    <string name="search_hint">Найти…</string>
 
 </resources>

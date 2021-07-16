@@ -21,9 +21,9 @@ constructor(
                 .getWordsByWordSetId(WordSetDbModel.MY_WORDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-                    words.value = Resource.success(it.reversed().toMutableList())
+                    _words.value = Resource.Success(it.reversed().toMutableList())
                 }, {
-                    words.value = Resource.error(it)
+                    _words.value = Resource.Error(it)
                 })
         )
     }

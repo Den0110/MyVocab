@@ -33,7 +33,7 @@
                 android:paddingTop="@dimen/vertical_layout_margin"
                 android:paddingBottom="@dimen/vertical_layout_margin"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                tools:listitem="@layout/word_set_list_item" />
+                tools:listitem="@layout/item_word_set" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

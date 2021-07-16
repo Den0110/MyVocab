@@ -7,7 +7,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.myvocab.myvocab.R
@@ -16,6 +18,7 @@ import com.myvocab.myvocab.databinding.FragmentMyWordsBinding
 import com.myvocab.myvocab.ui.word.BaseWordListFragment
 import com.myvocab.myvocab.util.Resource
 import com.myvocab.myvocab.util.findNavController
+import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -28,8 +31,10 @@ class MyWordsFragment : BaseWordListFragment() {
     override val viewModel: MyWordsViewModel
             by lazy { ViewModelProvider(this, viewModelFactory).get(MyWordsViewModel::class.java) }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_my_words, container, false)
         return binding.root
     }
@@ -46,37 +51,49 @@ class MyWordsFragment : BaseWordListFragment() {
             }
         })
 
-        binding.recyclerView.adapter = adapter
-
-        viewModel.words.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Resource.Status.LOADING -> {
-                    binding.swipeRefreshLayout.isRefreshing = true
-                }
-                Resource.Status.SUCCESS -> {
-                    binding.swipeRefreshLayout.isRefreshing = false
-                    if (it.data.isNullOrEmpty()) {
-                        binding.messageEmptyVocab.visibility = View.VISIBLE
-                        adapter.removeAdapter(learnAllWordsAdapter)
-                    } else {
-                        binding.messageEmptyVocab.visibility = View.GONE
-                        adapter.addAdapter(0, learnAllWordsAdapter)
-                    }
-                    wordListAdapter.submitList(it.data)
-                    learnAllWordsAdapter.checkIfAllNeedToLearn(it.data)
-                }
-                Resource.Status.ERROR -> {
-                    binding.swipeRefreshLayout.isRefreshing = false
-                    Toast.makeText(context, it.error?.message, Toast.LENGTH_SHORT).show()
-                    Timber.e(it.error)
+        binding.recyclerView.apply {
+            adapter = commonAdapter
+            itemAnimator = object : DefaultItemAnimator() {
+                override fun canReuseUpdatedViewHolder(viewHolder: RecyclerView.ViewHolder): Boolean {
+                    return true
                 }
             }
-        })
+        }
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.filteredWords.collectLatest {
+                when (it) {
+                    is Resource.Loading -> {
+                        binding.swipeRefreshLayout.isRefreshing = true
+                    }
+                    is Resource.Success -> {
+                        binding.swipeRefreshLayout.isRefreshing = false
+                        if (it.data.isNullOrEmpty()) {
+                            binding.messageEmptyVocab.visibility = View.VISIBLE
+                            commonAdapter.removeAdapter(learnAllWordsAdapter)
+                        } else {
+                            binding.messageEmptyVocab.visibility = View.GONE
+                            commonAdapter.addAdapter(0, learnAllWordsAdapter)
+
+                            if (it.data!!.isNotEmpty()) {
+                                commonAdapter.addAdapter(0, searchAdapter)
+                            }
+                        }
+                        wordListAdapter.submitList(it.data)
+                        learnAllWordsAdapter.checkIfAllNeedToLearn(it.data)
+                    }
+                    is Resource.Error -> {
+                        binding.swipeRefreshLayout.isRefreshing = false
+                        Toast.makeText(context, it.error.message, Toast.LENGTH_SHORT).show()
+                        Timber.e(it.error)
+                    }
+                }
+            }
+        }
 
         binding.addNewWordBtn.setOnClickListener {
             Navigation.findNavController(view).navigate(R.id.to_add_new_word)
         }
-
     }
 
     override fun onResume() {
@@ -108,7 +125,7 @@ class MyWordsFragment : BaseWordListFragment() {
             WORD_MENU_ITEMS[2] -> viewModel.addToMyWords(word)
             WORD_MENU_ITEMS[3] -> {
                 val action = MyWordsFragmentDirections
-                        .toAddNewWord().setWordToEdit(word)
+                    .toAddNewWord().setWordToEdit(word)
                 findNavController().navigate(action)
             }
             WORD_MENU_ITEMS[4] -> viewModel.delete(word)

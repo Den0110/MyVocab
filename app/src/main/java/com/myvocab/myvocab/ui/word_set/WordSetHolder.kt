@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.myvocab.myvocab.R
+import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.data.model.WordSetUseCaseResult
 
 class WordSetHolder(private val view: View) : RecyclerView.ViewHolder(view) {
@@ -15,7 +16,7 @@ class WordSetHolder(private val view: View) : RecyclerView.ViewHolder(view) {
     private var learningPercentage: TextView = view.findViewById(R.id.learning_percentage)
     private var knowingLevel: ImageView = view.findViewById(R.id.knowing_level)
 
-    fun bind(wordSetResult: WordSetUseCaseResult, callbackClickListener: WordSetListAdapter.OnWordSetClickListener?) {
+    fun bind(wordSetResult: WordSetUseCaseResult, onClick: ((WordSet) -> Unit)?) {
         title.text = wordSetResult.wordSet.title
         wordCount.text = view.context.resources.getQuantityString(
                 R.plurals.word_count,
@@ -40,7 +41,7 @@ class WordSetHolder(private val view: View) : RecyclerView.ViewHolder(view) {
             knowingLevel.visibility = View.GONE
         }
 
-        view.setOnClickListener { callbackClickListener?.onClick(wordSetResult.wordSet) }
+        view.setOnClickListener { onClick?.invoke(wordSetResult.wordSet) }
     }
 
 }

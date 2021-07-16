@@ -10,14 +10,16 @@ import com.myvocab.myvocab.data.source.TranslationRepository
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.util.Resource
 import com.opencsv.CSVParserBuilder
-import io.reactivex.android.schedulers.AndroidSchedulers
 import com.opencsv.CSVReaderBuilder
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import java.io.*
+import java.io.File
+import java.io.FileInputStream
+import java.io.InputStreamReader
 import java.net.URI
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -52,7 +54,7 @@ constructor(
         .debounce(700, TimeUnit.MILLISECONDS)
         .distinctUntilChanged()
         .observeOn(AndroidSchedulers.mainThread())
-        .doOnNext { suggestedWord.value = Resource.loading() }
+        .doOnNext { suggestedWord.value = Resource.Loading() }
         .switchMapSingle {
             translationRepository
                     .translateInDictionary(TranslatableText(it, "en-ru"))
@@ -61,9 +63,9 @@ constructor(
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe {
             if(!it.isEmpty()) {
-                suggestedWord.value = Resource.success(it)
+                suggestedWord.value = Resource.Success(it)
             } else {
-                suggestedWord.value = Resource.error(Exception("Word doesn't have a translation"))
+                suggestedWord.value = Resource.Error(Exception("Word doesn't have a translation"))
             }
         })
     }

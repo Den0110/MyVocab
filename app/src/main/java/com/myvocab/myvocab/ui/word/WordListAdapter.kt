@@ -17,7 +17,7 @@ constructor(wordDiffCallback: WordDiffCallback) : ListAdapter<Word, WordHolder>(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WordHolder {
         return WordHolder(LayoutInflater.from(parent.context)
-                .inflate(R.layout.vocab_list_item, parent, false))
+                .inflate(R.layout.item_word, parent, false))
     }
 
     override fun onBindViewHolder(holder: WordHolder, position: Int) {
@@ -25,7 +25,7 @@ constructor(wordDiffCallback: WordDiffCallback) : ListAdapter<Word, WordHolder>(
     }
 
     override fun getItemViewType(position: Int): Int {
-        return R.layout.vocab_list_item
+        return R.layout.item_word
     }
 
 }

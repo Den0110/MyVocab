@@ -111,6 +111,9 @@
     <string name="max_examples_number">Max number of examples is %d</string>
     <string name="edit_word">Edit</string>
     <string name="developer">Developer</string>
-    <string name="developer_details">Ковалев Денис\ndenkov0110@yandex.ru</string>
+    <string name="developer_details" translatable="false">Ковалев Денис\ndenkov0110@yandex.ru</string>
+    <string name="search_hint">Search…</string>
+    <string name="add_list">Add the list</string>
+    <string name="remove_from_my_vocab">Remove from my vocab</string>
 
 </resources>

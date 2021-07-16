@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.myvocab.myvocab.R
-import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.databinding.FragmentLearnedWordsBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.ui.word_set.WordSetListAdapter
@@ -31,8 +30,10 @@ class LearnedWordSetsFragment : MainNavigationFragment() {
     @Inject
     lateinit var wordSetListAdapter: WordSetListAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_learned_words, container, false)
         return binding.root
     }
@@ -47,10 +48,8 @@ class LearnedWordSetsFragment : MainNavigationFragment() {
 
         binding.recyclerView.adapter = wordSetListAdapter
 
-        wordSetListAdapter.onClickListenerClickListener = object : WordSetListAdapter.OnWordSetClickListener {
-            override fun onClick(wordSet: WordSet) {
-                findNavController().navigate(R.id.to_word_set_details, bundleOf("word_set" to wordSet))
-            }
+        wordSetListAdapter.onClick = { wordSet ->
+            findNavController().navigate(R.id.to_word_set_details, bundleOf("word_set" to wordSet))
         }
 
         wordSetListAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
@@ -60,19 +59,19 @@ class LearnedWordSetsFragment : MainNavigationFragment() {
         })
 
         viewModel.wordSets.observe(viewLifecycleOwner, { words ->
-            when (words.status) {
-                Resource.Status.LOADING -> binding.swipeRefreshLayout.isRefreshing = true
-                Resource.Status.SUCCESS -> {
+            when (words) {
+                is Resource.Loading -> binding.swipeRefreshLayout.isRefreshing = true
+                is Resource.Success -> {
                     wordSetListAdapter.submitList(words.data)
                     binding.swipeRefreshLayout.isRefreshing = false
-                    if(words.data.isNullOrEmpty()){
+                    if (words.data.isNullOrEmpty()) {
                         binding.messageEmptyVocab.visibility = View.VISIBLE
                     } else {
                         binding.messageEmptyVocab.visibility = View.GONE
                     }
                 }
-                Resource.Status.ERROR -> {
-                    Toast.makeText(context, words.error?.toString(), Toast.LENGTH_SHORT).show()
+                is Resource.Error -> {
+                    Toast.makeText(context, words.error.toString(), Toast.LENGTH_SHORT).show()
                     binding.swipeRefreshLayout.isRefreshing = false
                 }
             }

@@ -16,7 +16,7 @@ constructor() : RecyclerView.Adapter<LearnAllHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LearnAllHolder {
         return LearnAllHolder(LayoutInflater.from(parent.context)
-                .inflate(R.layout.vocab_learn_all_list_item, parent, false))
+                .inflate(R.layout.item_vocab_learn_all, parent, false))
     }
 
     override fun onBindViewHolder(holder: LearnAllHolder, position: Int) {
@@ -24,7 +24,7 @@ constructor() : RecyclerView.Adapter<LearnAllHolder>() {
     }
 
     override fun getItemViewType(position: Int): Int {
-        return R.layout.vocab_learn_all_list_item
+        return R.layout.item_vocab_learn_all
     }
 
     override fun getItemCount(): Int {

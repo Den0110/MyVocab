@@ -6,15 +6,16 @@ import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.myvocab.myvocab.BuildConfig
 import com.myvocab.myvocab.common.FastTranslationServiceManager
+import com.myvocab.myvocab.common.ReminderScheduler
 import com.myvocab.myvocab.data.model.WordSetDbModel
+import com.myvocab.myvocab.data.source.TranslationRepository
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.data.source.local.Database
 import com.myvocab.myvocab.data.source.local.WordDao
 import com.myvocab.myvocab.data.source.local.WordSetDao
-import com.myvocab.myvocab.common.ReminderScheduler
-import com.myvocab.myvocab.data.source.TranslationRepository
 import com.myvocab.myvocab.data.source.remote.translation.DictionaryApi
 import com.myvocab.myvocab.data.source.remote.translation.TranslatorApi
+import com.myvocab.myvocab.system.ResourceManager
 import com.myvocab.myvocab.util.PreferencesManager
 import dagger.Module
 import dagger.Provides
@@ -117,5 +118,9 @@ class AppModule {
     @Provides
     @Singleton
     fun provideFastTranslationServiceManager(app: Application, prefManager: PreferencesManager) = FastTranslationServiceManager(app, prefManager)
+
+    @Provides
+    @Singleton
+    fun provideResourceManager(app: Application) = ResourceManager(app)
 
 }

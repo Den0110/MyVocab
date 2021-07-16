@@ -3,22 +3,26 @@ package com.myvocab.myvocab.ui.word
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.ConcatAdapter
 import com.google.android.material.snackbar.Snackbar
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.ui.MainNavigationFragment
+import kotlinx.coroutines.flow.collectLatest
 import javax.inject.Inject
 
 abstract class BaseWordListFragment : MainNavigationFragment() {
 
-    val WORD_MENU_ITEMS: Array<String> by lazy { arrayOf(
+    val WORD_MENU_ITEMS: Array<String> by lazy {
+        arrayOf(
             getString(R.string.mark_as_learned),
             getString(R.string.reset_the_progress),
             getString(R.string.add_to_my_vocab),
             getString(R.string.edit_word),
             getString(R.string.delete_word)
-    ) }
+        )
+    }
 
     abstract val viewModel: BaseWordListViewModel
 
@@ -28,42 +32,54 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
     @Inject
     lateinit var learnAllWordsAdapter: LearnAllWordsAdapter
 
-    lateinit var adapter: ConcatAdapter
+    protected val searchAdapter by lazy {
+        SearchAdapter {
+            viewModel.onSearchFilterChanged(it)
+        }
+    }
+
+    lateinit var commonAdapter: ConcatAdapter
 
     private val learnAllCallback = object : LearnAllCallback() {
         override fun onNeedToLearnAll(state: Boolean) {
             val title =
-                    if (state)
-                        getString(R.string.dialog_select_all_words_to_learn)
-                    else
-                        getString(R.string.dialog_deselect_all_words_to_learn)
+                if (state)
+                    getString(R.string.dialog_select_all_words_to_learn)
+                else
+                    getString(R.string.dialog_deselect_all_words_to_learn)
             AlertDialog.Builder(context!!)
-                    .setMessage(title)
-                    .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
-                        wordListAdapter.currentList.forEach {
-                            it.needToLearn = state
-                            viewModel.update(it)
-                        }
-                        learnAllWordsAdapter.needToLearnAll = state
-                        dialog.dismiss()
+                .setMessage(title)
+                .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
+                    wordListAdapter.currentList.forEach {
+                        it.needToLearn = state
+                        viewModel.update(it)
                     }
-                    .setNegativeButton(R.string.dialog_action_no) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .setOnDismissListener {
-                        postNotifyRecyclerView()
-                    }
-                    .create().show()
+                    learnAllWordsAdapter.needToLearnAll = state
+                    dialog.dismiss()
+                }
+                .setNegativeButton(R.string.dialog_action_no) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .setOnDismissListener {
+                    postNotifyRecyclerView()
+                }
+                .create().show()
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        adapter = ConcatAdapter(wordListAdapter)
+        commonAdapter = ConcatAdapter(wordListAdapter)
 
         wordListAdapter.callback = viewModel.wordCallback
         learnAllWordsAdapter.learnAllCallback = learnAllCallback
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.searchFilter.collectLatest {
+                searchAdapter.searchText = it
+            }
+        }
 
         viewModel.showWordDialogEvent.observe(viewLifecycleOwner, {
             it.getContentIfNotHandled()?.let { wordData ->
@@ -73,14 +89,14 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
                 val items = getContextMenuItems(word, isSavedLocally)
 
                 AlertDialog.Builder(requireContext())
-                        .setTitle(wordData.first.word)
-                        .setItems(items) { _, index ->
-                            onContextMenuItemClicked(items[index], word)
-                        }
-                        .setNegativeButton(R.string.dialog_action_cancel) { dialog, _ ->
-                            dialog.dismiss()
-                        }
-                        .create().show()
+                    .setTitle(wordData.first.word)
+                    .setItems(items) { _, index ->
+                        onContextMenuItemClicked(items[index], word)
+                    }
+                    .setNegativeButton(R.string.dialog_action_cancel) { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .create().show()
             }
         })
 
@@ -95,13 +111,13 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
                 val word = wordData.first
                 val isAdded = wordData.second
                 Snackbar.make(
-                        view,
-                        if (isAdded) {
-                            "\"${word.word}\" is added to your word list"
-                        } else {
-                            "Error, word wasn't added"
-                        },
-                        Snackbar.LENGTH_SHORT
+                    view,
+                    if (isAdded) {
+                        "\"${word.word}\" is added to your word list"
+                    } else {
+                        "Error, word wasn't added"
+                    },
+                    Snackbar.LENGTH_SHORT
                 ).show()
             }
         })

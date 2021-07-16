@@ -18,7 +18,9 @@ import androidx.lifecycle.LifecycleEventObserver
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.ui.MainActivity
 import com.myvocab.myvocab.ui.fast_translation.FastTranslationWidget
-import com.myvocab.myvocab.util.*
+import com.myvocab.myvocab.util.Constants
+import com.myvocab.myvocab.util.FAST_TRANSLATION_CHANNEL_ID
+import com.myvocab.myvocab.util.getNotificationIconId
 import dagger.android.DaggerService
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -77,7 +79,7 @@ class FastTranslationService : DaggerService() {
                 .throttleFirst(300, TimeUnit.MILLISECONDS)
                 .doOnNext { Timber.d("Copied: $it") }
                 // filter empty, non-English or url strings
-                .filter { it.isNotEmpty() && it[0].toInt() in 65..122 && !URLUtil.isValidUrl(it) }
+                .filter { it.isNotEmpty() && it[0].code in 65..122 && !URLUtil.isValidUrl(it) }
                 .subscribe ({
                     translate(it!!)
                 }, {
