@@ -45,7 +45,7 @@
             android:id="@+id/add_list"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/add_wordlist"
+            android:text="@string/learn_wordlist"
             android:layout_marginBottom="@dimen/vertical_layout_margin"
             android:layout_marginHorizontal="@dimen/horizontal_layout_margin"
             app:cornerRadius="8dp"

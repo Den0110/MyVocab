@@ -19,7 +19,7 @@
     <string name="no_words_to_learn">Нет слов для изучения</string>
 
     <!-- Словарь -->
-    <string name="label_vocab">Словарь</string>
+    <string name="label_my_vocab">Мои слова</string>
     <string name="in_learning">В изучении</string>
     <string name="learned">Выучено</string>
     <string name="message_empty_vocab">Ваш словарь пуст.\nДобавьте новые слова вручную или используя Быстрый Перевод.</string>
@@ -99,9 +99,11 @@
     <string name="developer">Разработчик</string>
     <string name="search_hint">Поиск…</string>
     <string name="alphabetically">По алфавиту</string>
-    <string name="by_knowledge_level">По уровню выученности</string>
+    <string name="by_progress">По уровню прогресса</string>
     <string name="by_default">По умолчанию</string>
-    <string name="add_wordlist">Добавить этот список слов</string>
+    <string name="learn_wordlist">Учить этот список слов</string>
     <string name="remove_the_wordlist">Удалить список слов</string>
+    <string name="all">Все</string>
+    <string name="label_wordlists">Списки слов</string>
 
 </resources>

@@ -1,4 +1,4 @@
-package com.myvocab.myvocab.ui.my_word_sets.learned_words
+package com.myvocab.myvocab.ui.word_sets.learned_words
 
 import android.os.Bundle
 import android.view.LayoutInflater

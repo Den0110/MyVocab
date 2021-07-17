@@ -7,14 +7,14 @@
         android:title="@string/label_learning" />
 
     <item
-        android:id="@+id/navigation_vocab"
-        android:icon="@drawable/menu_vocab_item"
-        android:title="@string/label_vocab"/>
+        android:id="@+id/navigation_my_words"
+        android:icon="@drawable/menu_my_words_item"
+        android:title="@string/label_my_words"/>
 
     <item
-        android:id="@+id/navigation_search"
-        android:icon="@drawable/menu_search_item"
-        android:title="@string/label_search"/>
+        android:id="@+id/navigation_wordlists"
+        android:icon="@drawable/menu_wordlists_item"
+        android:title="@string/label_wordlists"/>
 
     <item
         android:id="@+id/navigation_settings"

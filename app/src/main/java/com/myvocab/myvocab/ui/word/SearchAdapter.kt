@@ -126,7 +126,7 @@ class SearchViewHolder(
                     alphabeticallyLabel.setTextColor(inactiveTextColor)
                 }
 
-                if (selectedSortType == SortType.BY_KNOWLEDGE_LEVEL) {
+                if (selectedSortType == SortType.BY_PROGRESS_LEVEL) {
                     byKnowledgeLevelIcon.setColorFilter(colorAccent)
                     byKnowledgeLevelLabel.setTextColor(colorAccent)
                 } else {
@@ -145,7 +145,7 @@ class SearchViewHolder(
                 }
 
                 byKnowledgeLevelBtn.setOnClickListener {
-                    onSortTypeChanged(SortType.BY_KNOWLEDGE_LEVEL)
+                    onSortTypeChanged(SortType.BY_PROGRESS_LEVEL)
                     animateSelectorDisappearing()
                 }
 

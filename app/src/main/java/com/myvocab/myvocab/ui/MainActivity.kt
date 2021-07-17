@@ -23,8 +23,8 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
     companion object {
         private val TOP_LEVEL_DESTINATIONS = setOf(
                 R.id.navigation_learning,
-                R.id.navigation_vocab,
-                R.id.navigation_search,
+                R.id.navigation_my_words,
+                R.id.navigation_wordlists,
                 R.id.navigation_settings
         )
     }
@@ -65,11 +65,11 @@ class MainActivity : DaggerAppCompatActivity(), NavigationHost {
                 graph.startDestination = if (it > 0) {
                     R.id.navigation_learning
                 } else {
-                    R.id.navigation_vocab
+                    R.id.navigation_my_words
                 }
                 navController.graph = graph
             }, {
-                graph.startDestination = R.id.navigation_vocab
+                graph.startDestination = R.id.navigation_my_words
                 navController.graph = graph
             })
             (application as MyVocabApp).started = true

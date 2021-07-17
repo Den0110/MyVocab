@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.RecyclerView
@@ -21,8 +22,8 @@ import com.myvocab.myvocab.databinding.FragmentWordSetDetailsBinding
 import com.myvocab.myvocab.domain.word_set_details.GetWordSetUseCase
 import com.myvocab.myvocab.system.ResourceManager
 import com.myvocab.myvocab.ui.word.BaseWordListFragment
+import com.myvocab.myvocab.util.BaseViewModelFactory
 import com.myvocab.myvocab.util.Resource
-import com.myvocab.myvocab.util.getViewModel
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 import javax.inject.Inject
@@ -40,17 +41,16 @@ class WordSetDetailsFragment : BaseWordListFragment() {
     @Inject
     lateinit var getWordSetUseCase: GetWordSetUseCase
 
-    override val viewModel: WordSetDetailsViewModel
-            by lazy {
-                getViewModel {
-                    WordSetDetailsViewModel(
-                        wordRepository,
-                        resourceManager,
-                        getWordSetUseCase,
-                        requireArguments()
-                    )
-                }
-            }
+    override val viewModel: WordSetDetailsViewModel by viewModels {
+        BaseViewModelFactory {
+            WordSetDetailsViewModel(
+                wordRepository,
+                resourceManager,
+                getWordSetUseCase,
+                requireArguments()
+            )
+        }
+    }
 
     private lateinit var menu: Menu
 

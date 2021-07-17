@@ -27,7 +27,7 @@
     <string name="no_words_to_learn">No words to learn</string>
 
     <!-- Vocab -->
-    <string name="label_vocab">Vocab</string>
+    <string name="label_my_vocab">Vocab</string>
     <string name="label_my_words">My words</string>
     <string name="label_my_word_lists">My word lists</string>
     <string name="in_learning">In Learning</string>
@@ -113,10 +113,12 @@
     <string name="developer">Developer</string>
     <string name="developer_details" translatable="false">Ковалев Денис\ndenkov0110@yandex.ru</string>
     <string name="search_hint">Search…</string>
-    <string name="add_wordlist">Add the wordlist</string>
+    <string name="learn_wordlist">Learn the wordlist</string>
     <string name="remove_the_wordlist">Remove the wordlist</string>
     <string name="alphabetically">Alphabetically</string>
-    <string name="by_knowledge_level">By knowledge level</string>
+    <string name="by_progress">By progress level</string>
     <string name="by_default">Default</string>
+    <string name="all">All</string>
+    <string name="label_wordlists">Wordlists</string>
 
 </resources>

@@ -36,8 +36,8 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
     @Inject
     lateinit var learnAllWordsAdapter: LearnAllWordsAdapter
 
-    protected val searchAdapter by lazy {
-        SearchAdapter ({
+    private val searchAdapter by lazy {
+        SearchAdapter({
             viewModel.onSearchFilterChanged(it)
         }, {
             viewModel.onSortTypeChanged(it)
@@ -56,10 +56,7 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
             AlertDialog.Builder(context!!)
                 .setMessage(title)
                 .setPositiveButton(R.string.dialog_action_yes) { dialog, _ ->
-                    wordListAdapter.currentList.forEach {
-                        it.needToLearn = state
-                        viewModel.update(it)
-                    }
+                    viewModel.applyNeedToLearnState(wordListAdapter.currentList, state)
                     learnAllWordsAdapter.needToLearnAll = state
                     dialog.dismiss()
                 }
@@ -112,14 +109,8 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
             }
         })
 
-        viewModel.notifyWordChangedEvent.observe(viewLifecycleOwner, {
-            it.getContentIfNotHandled()?.let { index ->
-                wordListAdapter.notifyItemChanged(index)
-            }
-        })
-
-        viewModel.addToMyWordsResultEvent.observe(viewLifecycleOwner, {
-            it.getContentIfNotHandled()?.let { wordData ->
+        lifecycleScope.launchWhenStarted {
+            viewModel.addToMyWordsResultEvent.collectLatest { wordData ->
                 val word = wordData.first
                 val isAdded = wordData.second
                 Snackbar.make(
@@ -132,18 +123,13 @@ abstract class BaseWordListFragment : MainNavigationFragment() {
                     Snackbar.LENGTH_SHORT
                 ).show()
             }
-        })
+        }
 
-        viewModel.notifyWordRemovedEvent.observe(viewLifecycleOwner, {
-            it.getContentIfNotHandled()?.let { index ->
-                if (index == -1) {
-                    Snackbar.make(view, "Error, word wasn't deleted", Snackbar.LENGTH_SHORT).show()
-                } else {
-                    wordListAdapter.notifyItemRemoved(index)
-                }
+        lifecycleScope.launchWhenStarted {
+            viewModel.wordDeleteError.collectLatest {
+                Snackbar.make(view, "Error, word wasn't deleted", Snackbar.LENGTH_SHORT).show()
             }
-        })
-
+        }
     }
 
     abstract fun getContextMenuItems(word: Word, isSavedLocally: Boolean): Array<String>

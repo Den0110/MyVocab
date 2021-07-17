@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
@@ -28,8 +29,10 @@ class MyWordsFragment : BaseWordListFragment() {
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
-    override val viewModel: MyWordsViewModel
-            by lazy { ViewModelProvider(this, viewModelFactory).get(MyWordsViewModel::class.java) }
+    override val viewModel: MyWordsViewModel by viewModels(
+        ownerProducer = { requireParentFragment() },
+        factoryProducer = { viewModelFactory }
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -121,11 +124,7 @@ class MyWordsFragment : BaseWordListFragment() {
             WORD_MENU_ITEMS[0] -> viewModel.markAsLearned(word)
             WORD_MENU_ITEMS[1] -> viewModel.resetProgress(word)
             WORD_MENU_ITEMS[2] -> viewModel.addToMyWords(word)
-            WORD_MENU_ITEMS[3] -> {
-                val action = MyWordsFragmentDirections
-                    .toAddNewWord().setWordToEdit(word)
-                findNavController().navigate(action)
-            }
+            WORD_MENU_ITEMS[3] -> findNavController().navigate(MyWordsFragmentDirections.toAddNewWord(word))
             WORD_MENU_ITEMS[4] -> viewModel.delete(word)
         }
     }

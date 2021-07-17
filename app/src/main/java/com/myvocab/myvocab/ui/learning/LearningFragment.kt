@@ -94,7 +94,7 @@ class LearningFragment : MainNavigationFragment() {
         hideNextViews()
         hideChooseViews()
 
-        binding.searchWordsBtn.setOnClickListener { findNavController().navigate(R.id.navigation_search) }
+        binding.searchWordsBtn.setOnClickListener { findNavController().navigate(R.id.navigation_wordlists) }
 
         viewModel.currentWord.observe(viewLifecycleOwner, { word ->
 

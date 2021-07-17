@@ -1,19 +1,19 @@
-package com.myvocab.myvocab.ui.my_word_sets.learned_words
+package com.myvocab.myvocab.ui.word_sets.in_learning_words
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.myvocab.myvocab.data.model.WordSetUseCaseResult
-import com.myvocab.myvocab.domain.my_word_sets.learned_words.GetLearnedWordSetsUseCase
+import com.myvocab.myvocab.domain.my_word_sets.in_learning_words.GetInLearningWordSetsUseCase
 import com.myvocab.myvocab.util.Resource
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import javax.inject.Inject
 
-class LearnedWordSetsViewModel
+class InLearningWordSetsViewModel
 @Inject
 constructor(
-        private val learnedWordSetsUseCase: GetLearnedWordSetsUseCase
+        private val inLearningWordSetsUseCase: GetInLearningWordSetsUseCase
 ) : ViewModel() {
 
     var wordSets: MutableLiveData<Resource<List<WordSetUseCaseResult>>> = MutableLiveData()
@@ -22,18 +22,15 @@ constructor(
     private var compositeDisposable = CompositeDisposable()
 
     init {
-        loadLearnedWords()
+        loadInLearningWords()
     }
 
-    fun loadLearnedWords(){
+    fun loadInLearningWords(){
         getWordsDisposable?.dispose()
-        getWordsDisposable = learnedWordSetsUseCase
+        getWordsDisposable = inLearningWordSetsUseCase
                 .getWordSets()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
-//                    // there is no sense to show 100% learned status for all word sets
-//                    // so, null learningPercentage for all ones
-//                    it.forEach { ws -> ws.learningPercentage = null }
                     wordSets.postValue(Resource.Success(it))
                 },{
                     wordSets.postValue(Resource.Error(it))

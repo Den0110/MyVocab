@@ -7,15 +7,12 @@ import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.source.WordRepository
 import com.myvocab.myvocab.util.Event
 import com.myvocab.myvocab.util.Resource
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
+import com.myvocab.myvocab.util.withUpdatedList
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.rx2.await
 
-enum class SortType { BY_DEFAULT, ALPHABETICALLY, BY_KNOWLEDGE_LEVEL }
+enum class SortType { BY_DEFAULT, ALPHABETICALLY, BY_PROGRESS_LEVEL }
 
 open class BaseWordListViewModel(
     private val wordRepository: WordRepository
@@ -35,10 +32,11 @@ open class BaseWordListViewModel(
             ?.filter { it.word.contains(filter) }
             ?.toMutableList() ?: mutableListOf()
 
-        when(sortType) {
+        when (sortType) {
             SortType.ALPHABETICALLY -> finalList.sortBy { it.word }
-            SortType.BY_KNOWLEDGE_LEVEL -> finalList.sortBy { it.knowingLevel }
-            else -> {}
+            SortType.BY_PROGRESS_LEVEL -> finalList.sortBy { it.knowingLevel }
+            else -> {
+            }
         }
 
         words.withNewData(finalList)
@@ -46,11 +44,11 @@ open class BaseWordListViewModel(
 
     val showWordDialogEvent: MutableLiveData<Event<Pair<Word, Boolean>>> = MutableLiveData()
 
-    val notifyWordChangedEvent: MutableLiveData<Event<Int>> = MutableLiveData()
-    val addToMyWordsResultEvent: MutableLiveData<Event<Pair<Word, Boolean>>> = MutableLiveData()
-    val notifyWordRemovedEvent: MutableLiveData<Event<Int>> = MutableLiveData()
+    private val _addToMyWordsResultEvent = MutableSharedFlow<Pair<Word, Boolean>>()
+    val addToMyWordsResultEvent = _addToMyWordsResultEvent.asSharedFlow()
 
-    private val wordOperationsDisposable = CompositeDisposable()
+    private val _wordDeleteError = MutableSharedFlow<Unit>()
+    val wordDeleteError = _wordDeleteError.asSharedFlow()
 
     val wordCallback = object : WordCallback() {
 
@@ -59,21 +57,9 @@ open class BaseWordListViewModel(
         }
 
         override fun onNeedToLearnChanged(word: Word, state: Boolean) {
-            _words.value = _words.value.withNewData(_words.value.data?.toMutableList()?.apply {
-                val w = first { w -> w.id == word.id }.apply { needToLearn = state }
-                update(w)
-            })
+            updateWord(word) { needToLearn = state }
         }
 
-    }
-
-    fun update(word: Word) {
-        wordOperationsDisposable.add(
-            wordRepository
-                .updateWord(word)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe()
-        )
     }
 
     fun onSearchFilterChanged(text: String) {
@@ -89,70 +75,69 @@ open class BaseWordListViewModel(
     }
 
     fun markAsLearned(word: Word) {
-        _words.value.data?.let {
-            val i = it.indexOfFirst { w -> w.id == word.id }
-            it[i].knowingLevel = 3
-            wordOperationsDisposable.add(wordRepository
-                .updateWord(it[i])
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    notifyWordChangedEvent.value = Event(i)
-                }
-            )
-        }
+        updateWord(word) { knowingLevel = 3 }
     }
 
     fun resetProgress(word: Word) {
-        _words.value.data?.let {
-            val i = it.indexOfFirst { w -> w.id == word.id }
-            it[i].knowingLevel = 0
-            wordOperationsDisposable.add(wordRepository
-                .updateWord(it[i])
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe {
-                    notifyWordChangedEvent.value = Event(i)
-                }
-            )
-        }
+        updateWord(word) { knowingLevel = 0 }
     }
 
     fun addToMyWords(word: Word) {
-        val w = word.copy(id = null)
-        wordOperationsDisposable.add(
-            wordRepository
-                .addMyWord(w)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    addToMyWordsResultEvent.value = Event(Pair(w, true))
-                }, {
-                    addToMyWordsResultEvent.value = Event(Pair(w, false))
-                })
-        )
+        viewModelScope.launch {
+            val w = word.copy(id = null)
+            val result = try {
+                wordRepository.addMyWord(w).await()
+                true
+            } catch (e: Exception) {
+                false
+            }
+            _addToMyWordsResultEvent.emit(Pair(w, result))
+        }
     }
 
     fun delete(word: Word) {
-        wordOperationsDisposable.add(
-            wordRepository
-                .deleteWord(word)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    _words.value.data?.let {
-                        val i = it.indexOfFirst { w -> w.id == word.id }
-                        it.remove(word)
-
-                        if (it.size == 0) {
-                            _words.value = Resource.Success(mutableListOf())
-                        }
-                        notifyWordRemovedEvent.value = Event(i)
-                    }
-                }, {
-                    notifyWordRemovedEvent.value = Event(-1)
-                })
-        )
+        viewModelScope.launch {
+            try {
+                wordRepository.deleteWord(word).await()
+                _words.emit(_words.value.withUpdatedList { remove(word) })
+            } catch (e: Exception) {
+                _wordDeleteError.emit(Unit)
+            }
+        }
     }
 
-    override fun onCleared() {
-        wordOperationsDisposable.clear()
+    fun applyNeedToLearnState(words: List<Word>, state: Boolean) {
+        words.forEach {
+            it.needToLearn = state
+        }
+        viewModelScope.launch {
+            try {
+                wordRepository.updateWords(words).await()
+            } catch (e: Exception) {
+            }
+        }
+    }
+
+    private fun updateWord(word: Word, block: Word.() -> Unit) {
+        val wordId = word.id
+        val list = _words.value.data ?: mutableListOf()
+        val index = list.indexOfFirst { w -> w.id == wordId }
+        if (index > -1) {
+            val newWord = list[index].copy().apply { block(this) }
+            applyUpdate(newWord) {
+                _words.value = _words.value.withUpdatedList { set(index, newWord) }
+            }
+        }
+    }
+
+    private fun applyUpdate(word: Word, onSuccess: (() -> Unit)? = null) {
+        viewModelScope.launch {
+            try {
+                wordRepository.updateWord(word).await()
+                onSuccess?.invoke()
+            } catch (e: Exception) {
+            }
+        }
     }
 
 }

@@ -1,10 +1,10 @@
 package com.myvocab.myvocab.data.source
 
 import com.google.firebase.firestore.FirebaseFirestore
-import com.myvocab.myvocab.data.source.local.WordDao
 import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.data.model.WordSetDbModel
+import com.myvocab.myvocab.data.source.local.WordDao
 import com.myvocab.myvocab.data.source.local.WordSetDao
 import com.myvocab.myvocab.util.ListMapperImpl
 import com.myvocab.myvocab.util.RepositoryData
@@ -17,8 +17,8 @@ import io.reactivex.schedulers.Schedulers
 
 class WordRepository
 constructor(
-        private val wordDao: WordDao,
-        private val wordSetDao: WordSetDao
+    private val wordDao: WordDao,
+    private val wordSetDao: WordSetDao
 ) {
 
     //  To concat network and local db
@@ -32,94 +32,94 @@ constructor(
 
     fun getWordSets(): Single<List<RepositoryData<WordSet>>> {
         return wordSetDao
-                .getWordSets()
-                .map { modelsToWordSets(it) }
-                .subscribeOn(Schedulers.io())
+            .getWordSets()
+            .map { modelsToWordSets(it) }
+            .subscribeOn(Schedulers.io())
     }
 
     fun getInLearningWordSets(): Single<List<RepositoryData<WordSet>>> {
         return wordSetDao
-                .getInLearningWordSets()
-                .map { modelsToWordSets(it) }
-                .subscribeOn(Schedulers.io())
+            .getInLearningWordSets()
+            .map { modelsToWordSets(it) }
+            .subscribeOn(Schedulers.io())
     }
 
     fun getLearnedWordSets(): Single<List<RepositoryData<WordSet>>> {
         return wordSetDao
-                .getLearnedWordSets()
-                .map { modelsToWordSets(it) }
-                .subscribeOn(Schedulers.io())
+            .getLearnedWordSets()
+            .map { modelsToWordSets(it) }
+            .subscribeOn(Schedulers.io())
     }
 
     fun isWordSetSavedLocally(globalId: String): Single<Boolean> {
         return wordSetDao
-                .getWordSetsCount(globalId)
-                .map { it > 0 }
-                .subscribeOn(Schedulers.io())
+            .getWordSetsCount(globalId)
+            .map { it > 0 }
+            .subscribeOn(Schedulers.io())
     }
 
     fun getWordsCountInWordSet(globalId: String): Single<Int> {
         return wordDao
-                .getWordsCountInWordSet(globalId)
-                .subscribeOn(Schedulers.io())
+            .getWordsCountInWordSet(globalId)
+            .subscribeOn(Schedulers.io())
     }
 
     private fun modelsToWordSets(models: List<WordSetDbModel>) =
-            models.map { RepositoryData(WordSet(it.globalId, it.id, it.title), Source.LOCAL) }
+        models.map { RepositoryData(WordSet(it.globalId, it.id, it.title), Source.LOCAL) }
 
     fun getWordSet(globalId: String): Single<RepositoryData<WordSet>> =
-            getWordSetFromDb(globalId)
-                    .onErrorResumeNext { getWordSetFromServer(globalId) }
-                    .subscribeOn(Schedulers.io())
+        getWordSetFromDb(globalId)
+            .onErrorResumeNext { getWordSetFromServer(globalId) }
+            .subscribeOn(Schedulers.io())
 
     private fun getWordSetFromDb(globalId: String): Single<RepositoryData<WordSet>> =
-            getWordSetEntityFromDb(globalId)
-                    .zipWith(getWordsByWordSetId(globalId), BiFunction { model: WordSetDbModel, words: List<Word> ->
-                        RepositoryData(WordSet(model.globalId, model.id, model.title, words), Source.LOCAL)
-                    })
-                    .subscribeOn(Schedulers.io())
+        getWordSetEntityFromDb(globalId)
+            .zipWith(getWordsByWordSetId(globalId), BiFunction { model: WordSetDbModel, words: List<Word> ->
+                RepositoryData(WordSet(model.globalId, model.id, model.title, words), Source.LOCAL)
+            })
+            .subscribeOn(Schedulers.io())
 
     private fun getWordSetFromServer(globalId: String): Single<RepositoryData<WordSet>> =
-            RxFirestore
-                    .getDocument(FirebaseFirestore.getInstance().collection("word_sets").document(globalId))
-                    .map {
-                        val obj = it.toObject(WordSet::class.java)!!
-                        val wordSet = WordSet(it.id, null, obj.title, obj.words)
-                        RepositoryData(wordSet, Source.REMOTE)
-                    }
-                    .toSingle()
+        RxFirestore
+            .getDocument(FirebaseFirestore.getInstance().collection("word_sets").document(globalId))
+            .map {
+                val obj = it.toObject(WordSet::class.java)!!
+                val wordSet = WordSet(it.id, null, obj.title, obj.words)
+                RepositoryData(wordSet, Source.REMOTE)
+            }
+            .toSingle()
 
     fun getWordSetLearningPercentage(globalId: String) =
-            wordDao
-                    .getLearningPercentageByWordSetId(globalId)
-                    .subscribeOn(Schedulers.io())
+        wordDao
+            .getLearningPercentageByWordSetId(globalId)
+            .subscribeOn(Schedulers.io())
 
     fun getWordSetEntityFromDb(globalId: String) =
-            wordSetDao.getWordSetById(globalId)
+        wordSetDao.getWordSetById(globalId)
 
     fun addWordSet(wordSet: WordSet): Completable {
         val model = WordSetDbModel(globalId = wordSet.globalId, title = wordSet.title)
         return wordSetDao
-                .addWordSet(model)
-                .andThen(Completable.defer {
-                    for (w: Word in wordSet.words)
-                        w.wordSetId = wordSet.globalId
-                    addWords(wordSet.words)
-                })
-                .subscribeOn(Schedulers.io())
+            .addWordSet(model)
+            .andThen(Completable.defer {
+                for (w: Word in wordSet.words)
+                    w.wordSetId = wordSet.globalId
+                addWords(wordSet.words)
+            })
+            .subscribeOn(Schedulers.io())
     }
 
     fun deleteWordSet(globalId: String): Completable {
         return wordSetDao
-                .deleteWordSet(globalId)
-                .andThen(Completable.defer { wordDao.deleteWordsByWordSetId(globalId) })
-                .subscribeOn(Schedulers.io())
+            .deleteWordSet(globalId)
+            .andThen(Completable.defer { wordDao.deleteWordsByWordSetId(globalId) })
+            .subscribeOn(Schedulers.io())
     }
 
     fun deleteAllWordSets(): Completable =
-            wordSetDao
-                    .deleteAll()
-                    .subscribeOn(Schedulers.io())
+        wordSetDao
+            .deleteAll()
+            .subscribeOn(Schedulers.io())
 
 
     /**
@@ -134,12 +134,12 @@ constructor(
 
     fun getWordByContent(content: String): Single<Word> {
         return wordDao.getWordByContent(content).subscribeOn(Schedulers.io())
-                .map { Word.fromDBWord().map(it) }
+            .map { Word.fromDBWord().map(it) }
     }
 
     fun getWordsByWordSetId(wordSetId: String): Single<List<Word>> {
         return wordDao.getWordsByWordSetId(wordSetId).subscribeOn(Schedulers.io())
-                .map { ListMapperImpl(Word.fromDBWord()).map(it) }
+            .map { ListMapperImpl(Word.fromDBWord()).map(it) }
     }
 
     fun getInLearningWordsByKnowingLevel(knowingLevel: Int): Single<List<Word>> {
@@ -166,6 +166,10 @@ constructor(
         return updateWordInDb(word).subscribeOn(Schedulers.io())
     }
 
+    fun updateWords(words: List<Word>): Completable {
+        return updateWordsInDb(words).subscribeOn(Schedulers.io())
+    }
+
     fun deleteWord(word: Word): Completable {
         return deleteWordFromDb(word).subscribeOn(Schedulers.io())
     }
@@ -175,28 +179,31 @@ constructor(
     }
 
     private fun getInLearningWordsCountFromDb(): Single<Int> =
-            wordDao.getInLearningWordsCount()
+        wordDao.getInLearningWordsCount()
 
     private fun getWordsInLearningByKnowingLevelFromDb(knowingLevel: Int): Single<List<Word>> =
-            wordDao.getWordsInLearningByKnowingLevel(knowingLevel)
-                    .map { ListMapperImpl(Word.fromDBWord()).map(it) }
+        wordDao.getWordsInLearningByKnowingLevel(knowingLevel)
+            .map { ListMapperImpl(Word.fromDBWord()).map(it) }
 
     private fun getWordByIdFromDb(id: Int): Single<Word> =
-            wordDao.getWordById(id).map { Word.fromDBWord().map(it) }
+        wordDao.getWordById(id).map { Word.fromDBWord().map(it) }
 
     private fun addNewWordToDb(word: Word) =
-            wordDao.addNewWord(Word.toDBWord().map(word))
+        wordDao.addNewWord(Word.toDBWord().map(word))
 
     private fun addWordsToDb(words: List<Word>) =
-            wordDao.addWords(ListMapperImpl(Word.toDBWord()).map(words))
+        wordDao.addWords(ListMapperImpl(Word.toDBWord()).map(words))
 
     private fun updateWordInDb(word: Word) =
-            wordDao.updateWord(Word.toDBWord().map(word))
+        wordDao.updateWord(Word.toDBWord().map(word))
+
+    private fun updateWordsInDb(words: List<Word>) =
+        wordDao.updateWords(ListMapperImpl(Word.toDBWord()).map(words))
 
     private fun deleteWordFromDb(word: Word) =
-            wordDao.deleteWord(Word.toDBWord().map(word))
+        wordDao.deleteWord(Word.toDBWord().map(word))
 
     private fun deleteAllWordsFromDb() =
-            wordDao.deleteAllWords()
+        wordDao.deleteAllWords()
 
 }

@@ -45,6 +45,9 @@ interface WordDao {
     @Update
     fun updateWord(word: DBWord): Completable
 
+    @Update
+    fun updateWords(words: List<DBWord>): Completable
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addWords(words: List<DBWord>): Completable
 

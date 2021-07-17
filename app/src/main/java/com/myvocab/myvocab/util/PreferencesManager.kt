@@ -100,7 +100,7 @@ class PreferencesManager(val context: Context) {
                         .apply()
             }
         }
-        get() = preferences.getBoolean("remind_only_words_to_learn", false)
+        get() = preferences.getBoolean("remind_only_words_to_learn", true)
 
     var remindingTime: Long
         set(value) {

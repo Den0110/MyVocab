@@ -1,4 +1,4 @@
-package com.myvocab.myvocab.ui.search
+package com.myvocab.myvocab.ui.word_sets.all
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -12,7 +12,7 @@ import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class SearchViewModel
+class AllWordSetsViewModel
 @Inject
 constructor(
         private val getSearchWordSetsUseCase: GetSearchWordSetsUseCase,

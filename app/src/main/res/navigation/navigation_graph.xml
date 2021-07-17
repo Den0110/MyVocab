@@ -13,26 +13,26 @@
         tools:layout="@layout/fragment_learning"/>
 
     <fragment
-        android:id="@+id/navigation_vocab"
-        android:name="com.myvocab.myvocab.ui.vocab.VocabFragment"
-        android:label="@string/label_vocab"
-        tools:layout="@layout/fragment_vocab">
+        android:id="@+id/navigation_my_words"
+        android:name="com.myvocab.myvocab.ui.my_words.MyWordsFragment"
+        android:label="@string/label_my_words"
+        tools:layout="@layout/fragment_my_words">
 
         <action
-            android:id="@+id/to_my_words"
-            app:destination="@id/navigation_my_words_fragment" />
-
-        <action
-            android:id="@+id/to_my_word_sets"
-            app:destination="@id/navigation_my_word_sets_fragment" />
+            android:id="@+id/to_add_new_word"
+            app:destination="@id/navigation_add_new_word"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
 
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_search"
-        android:name="com.myvocab.myvocab.ui.search.SearchFragment"
-        android:label="@string/label_search"
-        tools:layout="@layout/fragment_search">
+        android:id="@+id/navigation_wordlists"
+        android:name="com.myvocab.myvocab.ui.word_sets.WordSetsFragment"
+        android:label="@string/label_wordlists"
+        tools:layout="@layout/fragment_all_wordsets">
 
         <action
             android:id="@+id/to_word_set_details"
@@ -58,38 +58,6 @@
         <argument
             android:name="word_set"
             app:argType="com.myvocab.myvocab.data.model.WordSet" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_my_word_sets_fragment"
-        android:name="com.myvocab.myvocab.ui.my_word_sets.MyWordSetsFragment"
-        android:label="@string/label_my_word_lists"
-        tools:layout="@layout/fragment_my_word_sets">
-
-        <action
-            android:id="@+id/to_word_set_details"
-            app:destination="@id/navigation_word_set_details"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
-
-    </fragment>
-
-    <fragment
-        android:id="@+id/navigation_my_words_fragment"
-        android:name="com.myvocab.myvocab.ui.my_words.MyWordsFragment"
-        android:label="@string/label_my_words"
-        tools:layout="@layout/fragment_my_words">
-
-        <action
-            android:id="@+id/to_add_new_word"
-            app:destination="@id/navigation_add_new_word"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
 
     </fragment>
 

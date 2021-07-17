@@ -1,4 +1,4 @@
-package com.myvocab.myvocab.ui.my_word_sets.in_learning_words
+package com.myvocab.myvocab.ui.word_sets.in_learning_words
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +14,7 @@ import com.myvocab.myvocab.R
 import com.myvocab.myvocab.databinding.FragmentInLearningWordsBinding
 import com.myvocab.myvocab.ui.MainNavigationFragment
 import com.myvocab.myvocab.ui.word_set.WordSetListAdapter
+import com.myvocab.myvocab.ui.word_sets.WordSetsFragmentDirections
 import com.myvocab.myvocab.util.Resource
 import com.myvocab.myvocab.util.findNavController
 import javax.inject.Inject
@@ -49,7 +49,7 @@ class InLearningWordSetsFragment : MainNavigationFragment() {
         binding.recyclerView.adapter = wordSetListAdapter
 
         wordSetListAdapter.onClick = { wordSet ->
-            findNavController().navigate(R.id.to_word_set_details, bundleOf("word_set" to wordSet))
+            findNavController().navigate(WordSetsFragmentDirections.toWordSetDetails(wordSet))
         }
 
         wordSetListAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
