@@ -25,10 +25,11 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="@string/admob_app_id"/>
+            android:value="@string/admob_app_id" />
 
         <activity
             android:name=".ui.IntroActivity"
+            android:exported="true"
             android:screenOrientation="userPortrait"
             android:theme="@style/AppTheme.TranslucentStatusTheme">
             <intent-filter>
@@ -46,14 +47,18 @@
             android:enabled="true"
             android:process=":translationService" />
 
-        <receiver android:name=".common.broadcast_receivers.BootUpReceiver">
+        <receiver
+            android:name=".common.broadcast_receivers.BootUpReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".common.broadcast_receivers.TimeChangedReceiver">
+        <receiver
+            android:name=".common.broadcast_receivers.TimeChangedReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_TICK" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />

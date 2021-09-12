@@ -70,7 +70,6 @@
         <argument
             android:name="wordToEdit"
             app:argType="com.myvocab.myvocab.data.model.Word"
-            android:defaultValue="@null"
             app:nullable="true" />
 
     </fragment>
