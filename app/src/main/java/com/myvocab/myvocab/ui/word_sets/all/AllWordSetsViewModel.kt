@@ -1,57 +1,35 @@
 package com.myvocab.myvocab.ui.word_sets.all
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.myvocab.myvocab.data.model.WordSetUseCaseResult
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.myvocab.myvocab.data.model.GetWordSetOptionsUseCaseResult
 import com.myvocab.myvocab.domain.search.GetSearchWordSetsUseCase
 import com.myvocab.myvocab.util.Resource
-import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class AllWordSetsViewModel
 @Inject
 constructor(
-        private val getSearchWordSetsUseCase: GetSearchWordSetsUseCase,
-        context: Application
-) : AndroidViewModel(context) {
+    private val getSearchWordSetsUseCase: GetSearchWordSetsUseCase
+) : ViewModel() {
 
-    val wordSets: MutableLiveData<Resource<List<WordSetUseCaseResult>>> = MutableLiveData()
-
-    private val compositeDisposable = CompositeDisposable()
+    val getWordSetsOptions: MutableLiveData<Resource<List<GetWordSetOptionsUseCaseResult>>> = MutableLiveData()
 
     init {
         loadWordSets()
     }
 
     fun loadWordSets() {
-        val wordSetsDisposable = getSearchWordSetsUseCase
-                .getWordSets()
-                .toObservable()
-                .publish {
-                    it.timeout(500, TimeUnit.MILLISECONDS, Observable.create<MutableList<WordSetUseCaseResult>> {
-                        wordSets.postValue(Resource.Loading())
-                    })
-                            .onErrorResumeNext(Observable.empty())
-                            .mergeWith(it)
-                }
-                .subscribeOn(Schedulers.io())
-                .subscribe({
-                    wordSets.postValue(Resource.Success(it))
-                }, {
-                    wordSets.postValue(Resource.Error(it))
-                })
-
-        compositeDisposable.clear()
-        compositeDisposable.add(wordSetsDisposable)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        compositeDisposable.clear()
+        viewModelScope.launch {
+            try {
+                getWordSetsOptions.postValue(Resource.Loading())
+                getWordSetsOptions.postValue(Resource.Success(getSearchWordSetsUseCase.getWordSets()))
+            } catch (e: Exception) {
+                getWordSetsOptions.postValue(Resource.Error(e))
+            }
+        }
     }
 
 }

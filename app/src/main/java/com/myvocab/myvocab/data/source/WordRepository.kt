@@ -1,6 +1,7 @@
 package com.myvocab.myvocab.data.source
 
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import com.myvocab.myvocab.data.model.Word
 import com.myvocab.myvocab.data.model.WordSet
 import com.myvocab.myvocab.data.model.WordSetDbModel
@@ -14,6 +15,7 @@ import io.reactivex.Completable
 import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.tasks.await
 
 class WordRepository
 constructor(
@@ -35,6 +37,19 @@ constructor(
             .getWordSets()
             .map { modelsToWordSets(it) }
             .subscribeOn(Schedulers.io())
+    }
+
+    suspend fun getWordSetsFromServer(): List<WordSet> {
+        val collection = FirebaseFirestore.getInstance()
+            .collection("word_sets")
+            .orderBy("timestamp", Query.Direction.DESCENDING)
+            .get()
+            .await()
+
+        return collection.documents.map { doc ->
+            val obj = doc.toObject(WordSet::class.java)!!
+            WordSet(doc.id, null, obj.title, obj.words.reversed())
+        }
     }
 
     fun getInLearningWordSets(): Single<List<RepositoryData<WordSet>>> {

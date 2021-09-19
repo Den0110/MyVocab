@@ -58,7 +58,7 @@ class LearnedWordSetsFragment : MainNavigationFragment() {
             }
         })
 
-        viewModel.wordSets.observe(viewLifecycleOwner, { words ->
+        viewModel.getWordSetsOptions.observe(viewLifecycleOwner, { words ->
             when (words) {
                 is Resource.Loading -> binding.swipeRefreshLayout.isRefreshing = true
                 is Resource.Success -> {

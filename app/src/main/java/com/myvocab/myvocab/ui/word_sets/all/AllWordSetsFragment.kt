@@ -44,7 +44,7 @@ class AllWordSetsFragment : MainNavigationFragment() {
             findNavController().navigate(R.id.to_word_set_details, bundleOf("word_set" to wordSet))
         }
 
-        viewModel.wordSets.observe(viewLifecycleOwner, {
+        viewModel.getWordSetsOptions.observe(viewLifecycleOwner, {
             when (it) {
                 is Resource.Loading -> {
                     binding.swipeRefreshLayout.isRefreshing = true
@@ -53,7 +53,7 @@ class AllWordSetsFragment : MainNavigationFragment() {
                 is Resource.Success -> {
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.messageFailedToLoad.visibility = View.GONE
-                    if(wordSetListAdapter.itemCount == 0 && it.data.isNotEmpty()) {
+                    if (wordSetListAdapter.itemCount == 0 && it.data.isNotEmpty()) {
                         binding.wordSetsRecyclerView.alpha = 0f
                         binding.wordSetsRecyclerView.animate().alpha(1f).setDuration(400).start()
                     }

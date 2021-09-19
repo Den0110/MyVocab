@@ -4,16 +4,16 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.myvocab.myvocab.R
+import com.myvocab.myvocab.data.model.GetWordSetOptionsUseCaseResult
 import com.myvocab.myvocab.data.model.LoadWordSetUseCaseResultDiffCallback
 import com.myvocab.myvocab.data.model.WordSet
-import com.myvocab.myvocab.data.model.WordSetUseCaseResult
 import javax.inject.Inject
 
 class WordSetListAdapter
 @Inject
 constructor(
         wordSetResultCallback: LoadWordSetUseCaseResultDiffCallback
-) : ListAdapter<WordSetUseCaseResult, WordSetHolder>(wordSetResultCallback) {
+) : ListAdapter<GetWordSetOptionsUseCaseResult, WordSetHolder>(wordSetResultCallback) {
 
     var onClick: ((WordSet) -> Unit)? = null
 

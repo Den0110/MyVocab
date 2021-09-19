@@ -54,28 +54,26 @@ constructor(
 
     fun loadWordSet() {
         _wordSet.value = Resource.Loading(initialWordSet)
-        compositeDisposable.add(
-            getWordSetUseCase
-                .getWordSet(initialWordSet.globalId)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    isSavedLocally.value = it.savedLocally
-                    subtitle.value =
-                        if (it.savedLocally) {
-                            resources.getString(R.string.learning_percentage, it.learningPercentage)
-                        } else {
-                            resources
-                                .getQuantityString(
-                                    R.plurals.word_count,
-                                    it.wordSet.words.size,
-                                    it.wordSet.words.size
-                                )
-                        }
-                    _wordSet.value = Resource.Success(it.wordSet)
-                }, {
-                    _wordSet.value = Resource.Error(it)
-                })
-        )
+        viewModelScope.launch {
+            try {
+                val result = getWordSetUseCase.getWordSet(initialWordSet.globalId)
+                isSavedLocally.postValue(result.savedLocally)
+                subtitle.postValue(
+                    if (result.savedLocally) {
+                        resources.getString(R.string.learning_percentage, result.learningPercentage)
+                    } else {
+                        resources.getQuantityString(
+                            R.plurals.word_count,
+                            result.wordSet.words.size,
+                            result.wordSet.words.size
+                        )
+                    }
+                )
+                _wordSet.emit(Resource.Success(result.wordSet))
+            } catch (e: Exception) {
+                _wordSet.emit(Resource.Error(e))
+            }
+        }
     }
 
     fun addWordSet() {
