@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation_graph"
+    app:startDestination="@id/learning_flow">
+
+    <include app:graph="@navigation/learning_flow"/>
+    <include app:graph="@navigation/mywords_flow"/>
+    <include app:graph="@navigation/wordlists_flow"/>
+    <include app:graph="@navigation/settings_flow"/>
+
+    <action
+        android:id="@+id/toLeaningFlow"
+        app:destination="@+id/learning_flow"/>
+
+    <action
+        android:id="@+id/toMyWordsFlow"
+        app:destination="@+id/mywords_flow"/>
+
+    <action
+        android:id="@+id/toWordListsFlow"
+        app:destination="@id/wordlists_flow"/>
+
+    <action
+        android:id="@+id/toSettingsFlow"
+        app:destination="@+id/settings_flow"/>
+
+</navigation>

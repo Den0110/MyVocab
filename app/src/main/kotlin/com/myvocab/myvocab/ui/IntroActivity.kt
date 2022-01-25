@@ -5,11 +5,11 @@ import android.os.Bundle
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.github.paolorotolo.appintro.AppIntro
+import com.myvocab.core.util.PreferencesManager
 import com.myvocab.myvocab.R
 import com.myvocab.myvocab.ui.intro.IntroEnableFastTranslationFragment
 import com.myvocab.myvocab.ui.intro.IntroWordListsFragment
 import com.myvocab.myvocab.ui.intro.SplashFragment
-import com.myvocab.myvocab.util.PreferencesManager
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 

@@ -2,7 +2,7 @@ package com.myvocab.myvocab
 
 object Versions {
     const val gradle = "7.0.2"
-    const val kotlin = "1.5.30"
+    const val kotlin = "1.5.31"
     const val gs = "4.3.10"
     const val safeArgs = "2.3.5"
     const val crashlytics = "2.7.1"
@@ -20,7 +20,7 @@ object Versions {
     const val okHttpLogging = "4.7.2"
     const val rxJava  = "2.2.21"
     const val rxAndroid = "2.1.1"
-    const val rxRetrofitAdapter = "2.9.0"
+    const val rxRetrofitAdapter = "2.4.0"
     const val reactiveStreams = "1.1.1"
     const val openCsv = "5.5.2"
     const val timber = "5.0.1"

@@ -3,17 +3,19 @@ package com.myvocab.myvocab
 import android.content.Context
 import androidx.multidex.MultiDex
 import com.google.android.gms.ads.MobileAds
-import com.myvocab.myvocab.common.FastTranslationServiceManager
-import com.myvocab.myvocab.common.ReminderScheduler
-import com.myvocab.myvocab.data.source.WordRepository
-import com.myvocab.myvocab.data.source.local.Database
+import com.myvocab.core.util.createFastTranslationNotificationChannel
+import com.myvocab.core.util.createReminderNotificationChannel
+import com.myvocab.core.util.createTranslationNotificationChannel
+import com.myvocab.data.source.local.Database
+import com.myvocab.domain.repositories.WordRepository
+import com.myvocab.fasttranslation.FastTranslationServiceManagerImpl
+import com.myvocab.fasttranslation.ReminderSchedulerImpl
 import com.myvocab.myvocab.di.DaggerAppComponent
-import com.myvocab.myvocab.util.createFastTranslationNotificationChannel
-import com.myvocab.myvocab.util.createReminderNotificationChannel
-import com.myvocab.myvocab.util.createTranslationNotificationChannel
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
 import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import javax.inject.Inject
@@ -22,8 +24,8 @@ class MyVocabApp : DaggerApplication() {
 
     @Inject lateinit var wordsDb: Database
     @Inject lateinit var wordRepository: WordRepository
-    @Inject lateinit var reminderScheduler: ReminderScheduler
-    @Inject lateinit var translationServiceManager: FastTranslationServiceManager
+    @Inject lateinit var reminderScheduler: ReminderSchedulerImpl
+    @Inject lateinit var translationServiceManager: FastTranslationServiceManagerImpl
 
     var started: Boolean = false
 
@@ -43,7 +45,7 @@ class MyVocabApp : DaggerApplication() {
         reminderScheduler.scheduleIfEnabled()
 
         // just to create and pre-populate database
-        wordsDb.wordSetsDao().getWordSets().subscribe({},{})
+        GlobalScope.launch { wordsDb.wordSetsDao().getWordSets() }
 
         RxJavaPlugins.setErrorHandler {
             Timber.e(it)

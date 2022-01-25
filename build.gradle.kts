@@ -10,7 +10,6 @@ buildscript {
         classpath(com.myvocab.myvocab.BuildPlugins.gs)
         classpath(com.myvocab.myvocab.BuildPlugins.safeArgs)
         classpath(com.myvocab.myvocab.BuildPlugins.crashlytics)
-        classpath(com.myvocab.myvocab.BuildPlugins.ktlint)
     }
 }
 
@@ -20,8 +19,6 @@ allprojects {
         mavenCentral()
         maven(url = "https://jitpack.io")
     }
-
-    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 }
 
 tasks.register("clean", Delete::class) {

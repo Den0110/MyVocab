@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="learning_flow" type="id" />
+    <item name="mywords_flow" type="id" />
+    <item name="wordlists_flow" type="id" />
+    <item name="settings_flow" type="id" />
+</resources>

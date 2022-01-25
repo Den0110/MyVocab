@@ -3,11 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.myvocab.myvocab">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".MyVocabApp"
@@ -43,12 +45,12 @@
             android:screenOrientation="userPortrait" />
 
         <service
-            android:name=".common.fasttranslation.FastTranslationService"
+            android:name="com.myvocab.fasttranslation.fasttranslation.FastTranslationService"
             android:enabled="true"
             android:process=":translationService" />
 
         <receiver
-            android:name=".common.broadcast_receivers.BootUpReceiver"
+            android:name="com.myvocab.fasttranslation.broadcast_receivers.BootUpReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -57,7 +59,7 @@
         </receiver>
 
         <receiver
-            android:name=".common.broadcast_receivers.TimeChangedReceiver"
+            android:name="com.myvocab.fasttranslation.broadcast_receivers.TimeChangedReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_TICK" />
@@ -66,8 +68,8 @@
             </intent-filter>
         </receiver>
 
-        <receiver android:name=".common.fasttranslation.FastTranslationServiceStarter" />
-        <receiver android:name=".common.broadcast_receivers.ReminderReceiver" />
+        <receiver android:name="com.myvocab.fasttranslation.fasttranslation.FastTranslationServiceStarter" />
+        <receiver android:name="com.myvocab.fasttranslation.broadcast_receivers.ReminderReceiver" />
 
     </application>
 

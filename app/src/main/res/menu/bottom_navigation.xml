@@ -2,22 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_learning"
+        android:id="@id/learning_flow"
         android:icon="@drawable/menu_learning_item"
         android:title="@string/label_learning" />
 
     <item
-        android:id="@+id/navigation_my_words"
+        android:id="@id/mywords_flow"
         android:icon="@drawable/menu_my_words_item"
         android:title="@string/label_my_words"/>
 
     <item
-        android:id="@+id/navigation_wordlists"
+        android:id="@id/wordlists_flow"
         android:icon="@drawable/menu_wordlists_item"
         android:title="@string/label_wordlists"/>
 
     <item
-        android:id="@+id/navigation_settings"
+        android:id="@id/settings_flow"
         android:icon="@drawable/menu_settings_item"
         android:title="@string/label_settings"/>
 

@@ -1,1 +1,12 @@
-include(":app")
+include(
+    ":app",
+    ":core",
+    ":domain",
+    ":data",
+    ":navigation",
+    ":commonui",
+    ":feature-fast-translation",
+    ":feature-wordset",
+    ":feature-settings",
+    ":feature-learning"
+)

@@ -1,7 +1,7 @@
 package com.myvocab.myvocab.di
 
 import androidx.lifecycle.ViewModelProvider
-import com.myvocab.myvocab.viewmodels.ViewModelProviderFactory
+import com.myvocab.core.viewmodels.ViewModelProviderFactory
 import dagger.Binds
 import dagger.Module
 

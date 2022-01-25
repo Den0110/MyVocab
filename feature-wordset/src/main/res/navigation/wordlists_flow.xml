@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/wordlists_flow"
+    app:startDestination="@id/navigation_wordlists">
+
+    <fragment
+        android:id="@+id/navigation_wordlists"
+        android:name="com.myvocab.wordlists.wordsets.WordSetsFragment"
+        android:label="@string/label_wordlists"
+        tools:layout="@layout/fragment_all_wordsets">
+
+        <action
+            android:id="@+id/to_word_set_details"
+            app:destination="@id/navigation_word_set_details"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_word_set_details"
+        android:name="com.myvocab.wordlists.wordset_details.WordSetDetailsFragment"
+        tools:layout="@layout/fragment_word_set_details">
+
+        <argument
+            android:name="word_set"
+            app:argType="com.myvocab.domain.entities.WordSet" />
+
+    </fragment>
+
+</navigation>

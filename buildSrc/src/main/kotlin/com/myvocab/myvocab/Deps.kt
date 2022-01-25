@@ -1,5 +1,7 @@
 package com.myvocab.myvocab
 
+import org.gradle.api.artifacts.dsl.DependencyHandler
+
 object Deps {
 
     const val reflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
@@ -19,6 +21,7 @@ object Deps {
     const val leakCanary = "com.squareup.leakcanary:plumber-android:${Versions.leakCanary}"
 
     object Coroutines {
+        const val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
         const val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
         const val rx2 = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2:${Versions.coroutines}"
         const val playServices = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:${Versions.coroutines}"
@@ -32,6 +35,7 @@ object Deps {
         const val cardView = "androidx.cardview:cardview:${Versions.AndroidX.cardView}"
         const val recyclerView = "androidx.recyclerview:recyclerview:${Versions.AndroidX.recyclerView}"
         const val room = "androidx.room:room-rxjava2:${Versions.room}"
+        const val roomCoroutines = "androidx.room:room-ktx:${Versions.room}"
         const val roomCompiler = "androidx.room:room-compiler:${Versions.room}"
         const val fragment = "androidx.fragment:fragment-ktx:${Versions.AndroidX.fragment}"
         const val lifecycleExt = "androidx.lifecycle:lifecycle-extensions:${Versions.AndroidX.lifecycleExt}"
@@ -51,8 +55,8 @@ object Deps {
     }
     
     object Navigation {
-        const val fragment = "android.arch.navigation:navigation-fragment:${Versions.navigation}"
-        const val ui = "android.arch.navigation:navigation-ui:${Versions.navigation}"
+        const val fragment = "android.arch.navigation:navigation-fragment-ktx:${Versions.navigation}"
+        const val ui = "android.arch.navigation:navigation-ui-ktx:${Versions.navigation}"
     }
     
     object Dagger {
@@ -83,4 +87,52 @@ object Deps {
         const val robolectric = "org.robolectric:robolectric:${Versions.Tests.robolectric}"
         const val mockito = "org.mockito:mockito-core:${Versions.Tests.mockito}"
     }
+}
+
+fun DependencyHandler.room() {
+    implementation(Deps.AndroidX.room)
+    implementation(Deps.AndroidX.roomCoroutines)
+    kapt(Deps.AndroidX.roomCompiler)
+}
+
+fun DependencyHandler.dagger() {
+    implementation(Deps.Dagger.main)
+    implementation(Deps.Dagger.android)
+    implementation(Deps.Dagger.androidSupport)
+    kapt(Deps.Dagger.compiler)
+    kapt(Deps.Dagger.androidProcessor)
+}
+
+fun DependencyHandler.glide() {
+    implementation(Deps.Glide.main)
+    kapt(Deps.Glide.compiler)
+}
+
+fun DependencyHandler.tests() {
+    testImplementation(Deps.Tests.junit)
+    testImplementation(Deps.Tests.kotlinJunit)
+    testImplementation(Deps.Tests.androidCore)
+    testImplementation(Deps.Tests.robolectric)
+    testImplementation(Deps.Tests.mockito)
+    androidTestImplementation(Deps.Tests.androidExt)
+    androidTestImplementation(Deps.Tests.androidTestRunner)
+}
+
+private fun DependencyHandler.implementation(depName: String) {
+    add("implementation", depName)
+}
+private fun DependencyHandler.testImplementation(depName: String) {
+    add("testImplementation", depName)
+}
+private fun DependencyHandler.androidTestImplementation(depName: String) {
+    add("androidTestImplementation", depName)
+}
+private fun DependencyHandler.kapt(depName: String) {
+    add("kapt", depName)
+}
+private fun DependencyHandler.compileOnly(depName: String) {
+    add("compileOnly", depName)
+}
+private fun DependencyHandler.api(depName: String) {
+    add("api", depName)
 }

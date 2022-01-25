@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@id/learning_flow"
+    app:startDestination="@+id/navigation_learning">
+
+    <fragment
+        android:id="@+id/navigation_learning"
+        android:name="com.myvocab.learning.LearningFragment"
+        android:label="@string/label_learning"
+        tools:layout="@layout/fragment_learning"/>
+
+</navigation>
